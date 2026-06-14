@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>404 - الصفحة غير موجودة | MarnissaMall</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" href="images/logo.png" type="image/png">
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&family=Cairo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    /* ========== الألوان ========== */
+    :root {
+      --blue-primary: #0057b3;
+      --blue-dark: #003d80;
+      --blue-light: #3a8fd4;
+      --black: #0a0a0a;
+      --black-light: #0d1117;
+      --text-light: #ffffff;
+      --text-muted: #c9d1d9;
+      --text-dim: #8b949e;
+      --gold: #0057b3;
+      --gold-light: #3a8fd4;
+      --border: rgba(0,87,179,0.3);
+      --border2: rgba(0,87,179,0.5);
+      --bg: #0a0a0a;
+      --bg2: #0d1117;
+      --text: #ffffff;
+      --text2: #c9d1d9;
+      --text3: #8b949e;
+    }
+
+    body {
+      background: var(--bg);
+      font-family: 'Tajawal', sans-serif;
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 2rem;
+      position: relative;
+      overflow: hidden;
+      transition: background-color 0.5s ease, color 0.5s ease;
+    }
+
+    /* خلفية زخرفية بسيطة */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' opacity='0.03'%3E%3Cpath fill='%230057b3' d='M50,0 L100,50 L50,100 L0,50 Z'/%3E%3Cpath fill='%233a8fd4' d='M50,25 L75,50 L50,75 L25,50 Z'/%3E%3C/svg%3E");
+      background-repeat: repeat;
+      background-size: 45px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      max-width: 600px;
+    }
+
+    .logo-wrap {
+      margin-bottom: 2.5rem;
+    }
+    .logo-wrap img {
+      height: 70px;
+      width: auto;
+      border-radius: 12px;
+      opacity: 0.9;
+      transition: transform 0.3s;
+    }
+    .logo-wrap img:hover {
+      transform: scale(1.05);
+    }
+
+    .error-number {
+      font-family: 'Cairo', 'Tajawal', sans-serif;
+      font-size: clamp(5rem, 20vw, 9rem);
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--blue-primary) 0%, var(--blue-light) 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      line-height: 1;
+      margin-bottom: 0.5rem;
+      animation: float 4s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-12px); }
+    }
+
+    .blue-line {
+      width: 80px;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--blue-primary), transparent);
+      margin: 1rem auto;
+      border-radius: 4px;
+    }
+
+    .error-title {
+      font-family: 'Tajawal', sans-serif;
+      font-size: clamp(1.4rem, 4vw, 2rem);
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 0.8rem;
+    }
+
+    .error-subtitle {
+      font-size: clamp(0.85rem, 2vw, 1rem);
+      color: var(--text3);
+      line-height: 1.8;
+      margin-bottom: 2.5rem;
+      max-width: 400px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .btns-row {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 3rem;
+    }
+
+    .btn-home {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0.85rem 2rem;
+      background: transparent;
+      border: 1.5px solid var(--blue-primary);
+      border-radius: 50px;
+      color: var(--text);
+      font-family: 'Tajawal', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-decoration: none;
+      letter-spacing: 1px;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.4s;
+    }
+
+    .btn-home::before {
+      content: '';
+      position: absolute;
+      top: 0; left: -100%;
+      width: 100%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(0,87,179,0.2), transparent);
+      transition: left 0.5s;
+    }
+
+    .btn-home:hover::before { left: 100%; }
+    .btn-home:hover {
+      border-color: var(--blue-light);
+      color: var(--blue-light);
+      transform: translateY(-2px);
+    }
+
+    .btn-whatsapp {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0.85rem 2rem;
+      background: #25D366;
+      border: none;
+      border-radius: 50px;
+      color: white;
+      font-family: 'Tajawal', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-decoration: none;
+      transition: all 0.3s;
+    }
+
+    .btn-whatsapp:hover {
+      background: #20b859;
+      transform: translateY(-2px);
+    }
+
+    .quick-links {
+      border-top: 1px solid var(--border);
+      padding-top: 2rem;
+    }
+
+    .quick-links p {
+      font-size: 0.75rem;
+      color: var(--text3);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+    }
+
+    .links-row {
+      display: flex;
+      gap: 1.5rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .links-row a {
+      font-size: 0.8rem;
+      color: var(--text2);
+      text-decoration: none;
+      transition: color 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .links-row a:hover { 
+      color: var(--blue-primary); 
+    }
+
+    @media (max-width: 480px) {
+      .btns-row { flex-direction: column; align-items: center; }
+      .btn-home, .btn-whatsapp { width: 100%; justify-content: center; }
+      .links-row { gap: 1rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+
+    <div class="logo-wrap">
+      <a href="index.html">
+        <img src="images/logo-blue-theme.png" alt="MarnissaMall" onerror="this.src='https://placehold.co/70x70/0057b3/ffffff?text=M'">
+      </a>
+    </div>
+
+    <div class="error-number">404</div>
+
+    <div class="blue-line"></div>
+
+    <h1 class="error-title">هاد الصفحة ما كاينةش 🛍️</h1>
+
+    <p class="error-subtitle">
+      يبدو أن الصفحة اللي بغيتي تشوفيها ما كاينةش أو تحركات لمكان آخر.
+      ما تقلقش — MarnissaMall هنا باش نعاونك!
+    </p>
+
+    <div class="btns-row">
+      <a href="index.html" class="btn-home">
+        <i class="fas fa-home"></i>
+        الرجوع للرئيسية
+      </a>
+      <a href="https://wa.me/212612345678" target="_blank" class="btn-whatsapp">
+        <i class="fab fa-whatsapp"></i>
+        تواصل مع خدمة العملاء
+      </a>
+    </div>
+
+    <div class="quick-links">
+      <p>✦ أو زور إحدى هاد الصفحات ✦</p>
+      <div class="links-row">
+        <a href="products.html"><i class="fas fa-store"></i> المنتجات</a>
+        <a href="sellers.html"><i class="fas fa-users"></i> الباعة</a>
+        <a href="about.html"><i class="fas fa-info-circle"></i> من نحن</a>
+        <a href="contact.html"><i class="fas fa-envelope"></i> اتصل بنا</a>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- إضافة الفooter (اختياري) -->
+  <script src="footer.js"></script>
+
+  <script>
+    // تحديث رابط الواتساب من config.js إذا كان موجود
+    if (typeof MARNISSA_CONFIG !== 'undefined' && MARNISSA_CONFIG.SOCIAL && MARNISSA_CONFIG.SOCIAL.whatsapp) {
+      const whatsappBtn = document.querySelector('.btn-whatsapp');
+      if (whatsappBtn) {
+        whatsappBtn.href = MARNISSA_CONFIG.SOCIAL.whatsapp;
+      }
+    }
+  </script>
+
+</body>
+</html>

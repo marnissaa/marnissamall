@@ -1,377 +1,592 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>MarnissaMall – أول سوق إلكتروني في مرنيسة قرية</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  <meta charset="UTF-8">
+  <!-- ========== START SEO & META TAGS ========== -->
+  <meta name="description" content="MarnissaMall - أول سوق إلكتروني في مرنيسة قرية، تاونات. تسوق منتجات محلية: زيت الزيتون، عسل جبلي، حرف يدوية ومنتجات تقليدية">
+  <meta name="keywords" content="مرنيسة, تاونات, منتجات محلية, زيت الزيتون, عسل, حرف يدوية, سوق إلكتروني, المغرب">
+  <meta property="og:title" content="MarnissaMall | أول سوق إلكتروني في مرنيسة قرية">
+  <meta property="og:description" content="تسوق منتجات مرنيسة الأصلية - زيت الزيتون، عسل جبلي، حرف يدوية ومنتجات تقليدية بجودة عالية">
+  <meta property="og:image" content="images/logo.png">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://marnissamall.ma/index.html">
+  <link rel="icon" href="images/logo.png" type="image/png">
+  <!-- ========== END SEO & META TAGS ========== -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>MarnissaMall – أول سوق إلكتروني في مرنيسة قرية</title>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&family=Cairo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script src="config.js"></script>
+  
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    /* ========== الألوان الأساسية المتناسقة ========== */
+    :root {
+      --blue-primary: #0057b3;
+      --blue-dark: #003d80;
+      --blue-light: #3a8fd4;
+      --black: #0a0a0a;
+      --black-light: #0d1117;
+      --gray: #161b22;
+      --text-light: #ffffff;
+      --text-muted: #c9d1d9;
+      --text-dim: #8b949e;
+      --gold: #C4A06A;
+      --success: #25D366;
+    }
+    
+    /* ========== الوضع الداكن (أسود + أزرق) ========== */
+    body {
+      --bg: #0a0a0a;
+      --bg2: #0d1117;
+      --text: #ffffff;
+      --text-muted: #c9d1d9;
+      --text-dim: #8b949e;
+      --border: rgba(0,87,179,0.35);
+      --border2: rgba(0,87,179,0.5);
+      --card: rgba(13,17,23,0.85);
+      --card-hover: rgba(0,87,179,0.2);
+    }
+    
+    /* ========== الوضع الفاتح (أزرق فاتح) ========== */
+    body.blue-theme {
+      --bg: #e8f0fe;
+      --bg2: #ffffff;
+      --text: #0a0a0a;
+      --text-muted: #1a3a5c;
+      --text-dim: #4a6a8c;
+      --border: rgba(0,87,179,0.2);
+      --border2: rgba(0,87,179,0.3);
+      --card: rgba(255,255,255,0.9);
+      --card-hover: rgba(0,87,179,0.1);
+    }
+    
+    body {
+      background: var(--bg);
+      font-family: 'Tajawal', 'Cairo', sans-serif;
+      color: var(--text);
+      scroll-behavior: smooth;
+      overflow-x: hidden;
+      transition: background-color 0.5s ease, color 0.5s ease;
+    }
+    
+    .gold-text { color: var(--blue-primary); }
+    
+    /* --- LES BOUTONS --- */
+    .gold-btn {
+      background: transparent;
+      border: 1.5px solid var(--blue-primary);
+      color: var(--text);
+      letter-spacing: 2px;
+      font-weight: 500;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.4s;
+      cursor: pointer;
+      display: inline-block;
+    }
+    .gold-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(0,87,179,0.2), transparent);
+      transition: left 0.5s;
+    }
+    .gold-btn:hover::before { left: 100%; }
+    .gold-btn:hover {
+      transform: translateY(-2px);
+      border-color: var(--blue-light);
+      color: var(--blue-light);
+    }
+    
+    .outline-gold {
+      border: 1.5px solid var(--border2);
+      background: rgba(0,87,179,0.05);
+      color: var(--text);
+      font-weight: 500;
+      transition: all 0.4s;
+    }
+    .outline-gold:hover {
+      background: rgba(0,87,179,0.12);
+      transform: translateY(-2px);
+      border-color: var(--blue-primary);
+    }
+    
+    /* --- HERO & VIDEO --- */
+    .video-container {
+      height: 100%;
+      min-height: 480px;
+      background: var(--gray);
+      overflow: hidden;
+      border-radius: 24px;
+      border: 1px solid var(--border2);
+      position: relative;
+    }
+    .video-container::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: radial-gradient(circle at center, transparent 30%, rgba(0,0,0,0.3) 100%);
+      pointer-events: none;
+    }
+    
+    @keyframes float {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+      100% { transform: translateY(0px); }
+    }
+    .float-effect { animation: float 4s ease-in-out infinite; }
+    
+    /* --- LES CARTES --- */
+    .step-card {
+      background: var(--card);
+      backdrop-filter: blur(8px);
+      transition: all 0.4s;
+      padding: clamp(1.5rem, 5vw, 2rem);
+      border-radius: 20px;
+      border: 1px solid var(--border);
+    }
+    .step-card:hover {
+      border-color: var(--blue-primary);
+      transform: translateY(-6px);
+    }
+    
+    .review-form-card {
+      background: var(--card);
+      backdrop-filter: blur(8px);
+      border-radius: 20px;
+      padding: clamp(1.5rem, 5vw, 2rem);
+      border: 1px solid var(--border);
+    }
+    .review-input {
+      background: rgba(0,0,0,0.05);
+      border: 1px solid var(--border2);
+      border-radius: 12px;
+      padding: 0.75rem 1rem;
+      color: var(--text);
+      width: 100%;
+      transition: all 0.3s;
+      font-family: inherit;
+    }
+    .review-input:focus { outline: none; border-color: var(--blue-primary); }
+    .review-input::placeholder { color: var(--text-dim); }
+    
+    .whatsapp-float {
+      position: fixed;
+      bottom: 30px;
+      left: 30px;
+      z-index: 100;
+      background: #25D366;
+      color: white;
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s;
+      font-size: 1.5rem;
+      text-decoration: none;
+    }
+    .whatsapp-float:hover { transform: scale(1.08); }
+    
+    .section-title {
+      position: relative;
+      display: inline-block;
+      font-size: clamp(1.5rem, 5vw, 2rem);
+    }
+    .section-title::after {
+      content: '';
+      position: absolute;
+      bottom: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 50px;
+      height: 2px;
+      background: var(--blue-primary);
+    }
+    
+    .darija-text { font-family: 'Tajawal', 'Cairo', sans-serif; }
 
-        body {
-            font-family: 'Tajawal', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f8f9fa;
-            color: #1e2a3e;
-            line-height: 1.5;
-        }
+    /* Products Grid */
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: clamp(1rem, 3vw, 2rem);
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .product-card {
+      background: var(--gray);
+      border-radius: 16px;
+      overflow: hidden;
+      transition: all 0.4s ease;
+      cursor: pointer;
+      position: relative;
+      border: 1px solid var(--border);
+    }
+    .product-card:hover {
+      transform: translateY(-8px);
+      border-color: var(--blue-primary);
+      box-shadow: 0 20px 40px rgba(0,87,179,0.2);
+    }
+    .product-image-wrapper {
+      position: relative;
+      overflow: hidden;
+      aspect-ratio: 3/4;
+      background: var(--black-light);
+    }
+    .product-image-wrapper img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.6s ease;
+    }
+    .product-card:hover .product-image-wrapper img { transform: scale(1.08); }
+    .product-badge {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: linear-gradient(135deg, var(--blue-primary), var(--blue-dark));
+      color: white;
+      padding: 0.3rem 0.8rem;
+      border-radius: 20px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      box-shadow: 0 4px 12px rgba(0,87,179,0.3);
+    }
+    .product-info-card { padding: clamp(1rem, 3vw, 1.2rem); }
+    .product-category-tag { color: var(--blue-primary); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.5rem; font-weight: 500; }
+    .product-title-card { font-size: 1.1rem; font-weight: 700; color: var(--text); margin-bottom: 0.5rem; line-height: 1.4; }
+    .product-price-card { color: var(--blue-primary); font-size: 1rem; font-weight: 700; }
+    .product-desc-card { font-size: 0.8rem; color: var(--text-dim); margin-top: 0.5rem; line-height: 1.5; display: -webkit-box; -webkit-box-orient: vertical; overflow: hidden; }
+    
+    .featured-loader { display: flex; justify-content: center; align-items: center; min-height: 300px; }
+    .loader-spinner {
+      width: 40px; height: 40px;
+      border: 3px solid rgba(0,87,179,0.3);
+      border-radius: 50%;
+      border-top-color: var(--blue-primary);
+      animation: spin 0.8s ease-in-out infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* تنسيق عام */
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
+    .review-message {
+      padding: 0.5rem 1rem;
+      border-radius: 10px;
+      font-size: 0.85rem;
+      margin-top: 0.75rem;
+      display: none;
+    }
+    .review-message.success { background: rgba(37,211,102,0.1); color: #25D366; border: 1px solid rgba(37,211,102,0.3); }
+    .review-message.error { background: rgba(255,71,87,0.1); color: #FF4757; border: 1px solid rgba(255,71,87,0.3); }
+    .review-message.info { background: rgba(0,87,179,0.1); color: var(--blue-primary); border: 1px solid rgba(0,87,179,0.3); }
+    
+    /* ========== PADDING RESPONSIVE ========== */
+    section {
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+      padding-top: clamp(40px, 8vh, 100px);
+      padding-bottom: clamp(40px, 8vh, 100px);
+    }
+    
+    @media (min-width: 768px) {
+      section {
+        padding-left: 3rem;
+        padding-right: 3rem;
+      }
+      .whatsapp-float { width: 45px; height: 45px; font-size: 1.3rem; bottom: 20px; left: 20px; }
+      .review-form-card { padding: 1.5rem; }
+      .products-grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1.25rem; }
+    }
+    
+    @media (min-width: 1024px) {
+      section {
+        padding-left: 5rem;
+        padding-right: 5rem;
+      }
+      .section-title { font-size: 1.8rem; }
+      .step-card { padding: 1.5rem; }
+      .products-grid { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1.5rem; }
+    }
 
-        /* الهيدر */
-        header {
-            background: linear-gradient(135deg, #0f3b2c, #1e5a3a);
-            color: white;
-            padding: 15px 0;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-
-        .header-flex {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-
-        .logo h1 {
-            font-size: 1.8rem;
-            letter-spacing: -0.5px;
-        }
-        .logo p {
-            font-size: 0.8rem;
-            color: #d1e7dd;
-        }
-
-        .search-bar {
-            flex: 1;
-            max-width: 400px;
-            display: flex;
-        }
-        .search-bar input {
-            width: 100%;
-            padding: 10px;
-            border: none;
-            border-radius: 30px 0 0 30px;
-            font-size: 1rem;
-        }
-        .search-bar button {
-            background-color: #ff9800;
-            border: none;
-            padding: 0 20px;
-            border-radius: 0 30px 30px 0;
-            cursor: pointer;
-            font-weight: bold;
-            color: #1e2a3e;
-        }
-        .cart-icon {
-            background-color: #ff9800;
-            padding: 8px 15px;
-            border-radius: 30px;
-            cursor: pointer;
-            font-weight: bold;
-            display: flex;
-            gap: 8px;
-        }
-
-        /* الـ hero section */
-        .hero {
-            background: url('https://via.placeholder.com/1200x300?text=مرنيسة+قرية+ترحب+بكم') center/cover;
-            background-color: #2c5f2d;
-            color: white;
-            text-align: center;
-            padding: 60px 20px;
-            margin-bottom: 30px;
-        }
-        .hero h2 {
-            font-size: 2.2rem;
-            margin-bottom: 10px;
-            text-shadow: 1px 1px 3px black;
-        }
-
-        /* قسم المنتجات */
-        .section-title {
-            font-size: 1.8rem;
-            margin: 30px 0 20px;
-            border-right: 6px solid #ff9800;
-            padding-right: 15px;
-        }
-
-        .products-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 25px;
-            margin-bottom: 40px;
-        }
-
-        .product-card {
-            background: white;
-            border-radius: 16px;
-            overflow: hidden;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-            transition: transform 0.2s, box-shadow 0.2s;
-            cursor: pointer;
-        }
-        .product-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.12);
-        }
-        .product-img {
-            width: 100%;
-            height: 180px;
-            background-color: #e9ecef;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 3rem;
-        }
-        .product-info {
-            padding: 15px;
-        }
-        .product-title {
-            font-weight: bold;
-            font-size: 1.1rem;
-            margin-bottom: 8px;
-        }
-        .product-price {
-            color: #1e5a3a;
-            font-weight: bold;
-            font-size: 1.2rem;
-            margin: 10px 0;
-        }
-        .btn-buy {
-            background-color: #ff9800;
-            border: none;
-            padding: 8px 0;
-            width: 100%;
-            border-radius: 30px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        .btn-buy:hover {
-            background-color: #e68900;
-        }
-
-        /* عروض خاصة */
-        .offer-badge {
-            background-color: #e63946;
-            color: white;
-            display: inline-block;
-            padding: 5px 12px;
-            border-radius: 30px;
-            font-size: 0.8rem;
-            margin-bottom: 8px;
-        }
-
-        /* قسم الباعة */
-        .seller-section {
-            background-color: #e9f5e9;
-            padding: 40px 0;
-            margin: 40px 0;
-            border-radius: 24px;
-        }
-        .seller-box {
-            background: white;
-            padding: 25px;
-            border-radius: 24px;
-            text-align: center;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-        }
-
-        footer {
-            background-color: #0f3b2c;
-            color: #ddd;
-            text-align: center;
-            padding: 30px 0;
-            margin-top: 40px;
-        }
-
-        @media (max-width: 768px) {
-            .header-flex {
-                flex-direction: column;
-                text-align: center;
-            }
-            .hero h2 {
-                font-size: 1.6rem;
-            }
-        }
-    </style>
+    @media (max-width: 480px) {
+      section {
+        padding-left: 1rem;
+        padding-right: 1rem;
+      }
+      .section-title { font-size: 1.4rem; }
+      .products-grid { grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
+    }
+  </style>
 </head>
 <body>
 
-<header>
-    <div class="container header-flex">
-        <div class="logo">
-            <h1>🛍️ MarnissaMall</h1>
-            <p>أول سوق إلكتروني في مرنيسة قرية - تاونات</p>
+  <!-- الهيدر كيتم إضافته تلقائياً عبر header.js -->
+  
+  <a href="https://wa.me/212612345678" target="_blank" class="whatsapp-float" aria-label="واتساب" id="whatsappFloat">
+    <i class="fab fa-whatsapp"></i>
+  </a>
+  
+  <main>
+    <!-- Hero Section -->
+    <section id="hero" class="w-full">
+      <div class="flex flex-wrap md:flex-nowrap gap-12 md:gap-16 items-center max-w-7xl mx-auto">
+        <div class="w-full md:w-1/2 order-first md:order-last" data-aos="fade-up">
+          <div class="video-container float-effect relative">
+            <video autoplay loop muted playsinline class="w-full h-full object-cover min-h-[380px] md:min-h-[480px]" poster="https://placehold.co/800x600/0a0a0a/0057b3?text=MarnissaMall">
+              <source src="https://cdn.pixabay.com/video/2022/10/12/134689-760949831_tiny.mp4" type="video/mp4">
+              <img src="https://placehold.co/800x600/0a0a0a/0057b3?text=Marnissa+Mall" alt="MarnissaMall">
+            </video>
+          </div>
         </div>
-        <div class="search-bar">
-            <input type="text" id="searchInput" placeholder="ابحث عن منتج... زيت زيتون، عسل، حرف يدوية">
-            <button id="searchBtn">🔍 بحث</button>
+        <div class="w-full md:w-1/2 space-y-5 md:space-y-7" data-aos="fade-up">
+          <span class="text-xs tracking-[0.5em] uppercase gold-text font-light">✦ MarnissaMall ✦</span>
+          <h1 class="text-5xl md:text-7xl lg:text-8xl font-bold leading-tight darija-text" style="color:var(--text);">مرحباً بيك فـ<br>مرنيسة مول</h1>
+          <p class="text-base md:text-lg leading-relaxed max-w-md darija-text" style="color:var(--text-muted);">أول سوق إلكتروني في مرنيسة قرية. تسوق منتجات محلية: زيت الزيتون، عسل جبلي، حرف يدوية ومنتجات تقليدية بجودة عالية.</p>
+          <div class="flex flex-wrap gap-4 pt-3">
+            <button onclick="scrollToShop()" class="gold-btn px-8 py-3 rounded-full text-sm uppercase tracking-wider darija-text">تسوق الآن</button>
+            <button onclick="scrollToCustom()" class="outline-gold px-8 py-3 rounded-full text-sm uppercase tracking-wider darija-text">كن بائعاً</button>
+          </div>
         </div>
-        <div class="cart-icon" id="cartBtn">
-            🛒 السلة (<span id="cartCount">0</span>)
+      </div>
+    </section>
+
+    <!-- كيفاش تخدم معانا -->
+    <section id="custom-order" class="w-full">
+      <div class="max-w-6xl mx-auto text-center">
+        <h2 class="text-3xl md:text-5xl font-bold mb-4 darija-text" style="color:var(--text);">كيفاش تخدم معانا؟</h2>
+        <p class="text-base mb-10 darija-text" style="color:var(--text-dim);">3 خطوات بسيطة باش تبدا</p>
+        <div class="w-12 h-px mx-auto mb-14" style="background:var(--blue-primary);"></div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
+          <div class="step-card" data-aos="fade-up">
+            <div class="w-14 h-14 rounded-full border flex items-center justify-center mx-auto mb-4" style="border-color:var(--blue-primary);">
+              <span class="text-lg font-light" style="color:var(--blue-primary);">01</span>
+            </div>
+            <h3 class="text-lg font-semibold mb-2 darija-text" style="color:var(--text);">تصفح المنتجات</h3>
+            <p class="text-sm darija-text" style="color:var(--text-dim);">اكتشف منتجات مرنيسة الأصلية</p>
+          </div>
+          <div class="step-card" data-aos="fade-up" data-aos-delay="100">
+            <div class="w-14 h-14 rounded-full border flex items-center justify-center mx-auto mb-4" style="border-color:var(--blue-primary);">
+              <span class="text-lg font-light" style="color:var(--blue-primary);">02</span>
+            </div>
+            <h3 class="text-lg font-semibold mb-2 darija-text" style="color:var(--text);">أضف للسلة</h3>
+            <p class="text-sm darija-text" style="color:var(--text-dim);">اختر المنتجات وأضفها لسلة التسوق</p>
+          </div>
+          <div class="step-card" data-aos="fade-up" data-aos-delay="200">
+            <div class="w-14 h-14 rounded-full border flex items-center justify-center mx-auto mb-4" style="border-color:var(--blue-primary);">
+              <span class="text-lg font-light" style="color:var(--blue-primary);">03</span>
+            </div>
+            <h3 class="text-lg font-semibold mb-2 darija-text" style="color:var(--text);">نوصلو ليك</h3>
+            <p class="text-sm darija-text" style="color:var(--text-dim);">نوصلو المنتجات لباب دارك</p>
+          </div>
         </div>
-    </div>
-</header>
-
-<div class="hero">
-    <div class="container">
-        <h2>🌟 مَرْنِيسَة مَول 🌟</h2>
-        <p>من منتجات قرية مرنيسة إلى بيتك – دعم للحرفي والمنتج المحلي</p>
-    </div>
-</div>
-
-<div class="container">
-    <!-- قسم المنتجات المحلية -->
-    <h3 class="section-title">✨ منتجات مرنيسة الأصلية</h3>
-    <div class="products-grid" id="productsContainer">
-        <!-- المنتجات ستظهر هنا عبر JS -->
-    </div>
-
-    <!-- عروض خاصة -->
-    <h3 class="section-title">🔥 عروض خاصة (سوق مرنيسة)</h3>
-    <div class="products-grid" id="offersContainer"></div>
-
-    <!-- قسم خاص بالباعة المحليين -->
-    <div class="seller-section">
-        <div class="container seller-box">
-            <h2>🌿 أنت صاحب حانوت في مرنيسة؟</h2>
-            <p>انضم إلى MarnissaMall كبائع محلي. اعرض منتجاتك (عسل، زيت، حرف يدوية، ملابس تقليدية) ووصل لكل المغرب.</p>
-            <button id="becomeSellerBtn" style="background:#1e5a3a; color:white; padding:12px 30px; border:none; border-radius:40px; margin-top:15px; font-weight:bold;">📢 سجل حانوتك الآن</button>
+        <div class="mt-14">
+          <a href="products.html" class="gold-btn inline-flex items-center gap-2 px-10 py-3 rounded-full text-sm uppercase tracking-wider darija-text">ابدأ التسوق</a>
         </div>
-    </div>
-</div>
+      </div>
+    </section>
 
-<footer>
-    <div class="container">
-        <p>© 2026 MarnissaMall – أول منصة إلكترونية في مرنيسة قرية، إقليم تاونات</p>
-        <p>للتواصل: marnissamall@example.com | هاتف: 05 XX XX XX XX</p>
-    </div>
-</footer>
+    <!-- منتجاتنا -->
+    <section id="ready-to-wear" class="w-full">
+      <div class="max-w-7xl mx-auto">
+        <div class="text-center mb-12">
+          <span class="text-xs tracking-[0.3em] gold-text darija-text">✦ منتجات مرنيسة ✦</span>
+          <h2 class="section-title font-bold inline-block darija-text mt-2" style="color:var(--text);">منتجاتنا</h2>
+          <p class="text-sm mt-4 darija-text" style="color:var(--text-dim);">اكتشف منتجات مرنيسة الأصلية</p>
+        </div>
+        <div class="products-grid" id="productsGrid">
+          <div class="featured-loader" style="grid-column: 1 / -1;">
+            <div class="loader-spinner"></div>
+          </div>
+        </div>
+        <div class="text-center mt-12" data-aos="fade-up">
+          <a href="products.html" class="gold-btn inline-flex items-center gap-2 px-10 py-3.5 rounded-full text-sm uppercase tracking-wider darija-text">
+            <i class="fas fa-store"></i> شوف جميع المنتجات
+          </a>
+        </div>
+      </div>
+    </section>
 
-<script>
-    // قائمة المنتجات (مستوحاة من منتجات قروية)
-    const products = [
-        { id: 1, name: "زيت الزيتون البكر (1 لتر)", price: 55, category: "local", image: "🫒", isOffer: false, originalPrice: null },
-        { id: 2, name: "عسل جبلي طبيعي (500 غ)", price: 85, category: "local", image: "🍯", isOffer: true, originalPrice: 110 },
-        { id: 3, name: "الحناء مرنيسة (250 غ)", price: 20, category: "local", image: "🌿", isOffer: false },
-        { id: 4, name: "كسكس تقليدي (منتوج محلي)", price: 35, category: "local", image: "🍚", isOffer: false },
-        { id: 5, name: "طاجين فخار مرسوم يدوي", price: 120, category: "handmade", image: "🏺", isOffer: true, originalPrice: 160 },
-        { id: 6, name: "زعتر بري مجفف", price: 18, category: "local", image: "🌱", isOffer: false },
-        { id: 7, name: "ملحمة تقليدية (مزركشة)", price: 250, category: "handmade", image: "🧣", isOffer: false },
-        { id: 8, name: "أملاڤ (خبز تقليدي)", price: 12, category: "local", image: "🥖", isOffer: false }
+    <!-- شاركنا رأيك -->
+    <section class="w-full">
+      <div class="max-w-4xl mx-auto text-center">
+        <h2 class="text-2xl md:text-3xl font-light mb-3 darija-text" style="color:var(--text);">✨ شاركنا رأيك ✨</h2>
+        <p class="text-sm mb-8 darija-text" style="color:var(--text-dim);">كون أول واحد يشارك تجربتو مع MarnissaMall</p>
+        
+        <div class="review-form-card">
+          <div class="flex justify-center gap-2 mb-6" id="ratingStars">
+            <i class="far fa-star rating-star" data-rating="1" style="cursor:pointer;font-size:1.5rem;transition:all 0.2s;color:var(--blue-primary);"></i>
+            <i class="far fa-star rating-star" data-rating="2" style="cursor:pointer;font-size:1.5rem;transition:all 0.2s;color:var(--blue-primary);"></i>
+            <i class="far fa-star rating-star" data-rating="3" style="cursor:pointer;font-size:1.5rem;transition:all 0.2s;color:var(--blue-primary);"></i>
+            <i class="far fa-star rating-star" data-rating="4" style="cursor:pointer;font-size:1.5rem;transition:all 0.2s;color:var(--blue-primary);"></i>
+            <i class="far fa-star rating-star" data-rating="5" style="cursor:pointer;font-size:1.5rem;transition:all 0.2s;color:var(--blue-primary);"></i>
+          </div>
+          <input type="text" id="reviewerName" placeholder="سميتك" class="review-input darija-text mb-3 text-right">
+          <textarea id="reviewText" rows="3" placeholder="شاركنا رأيك فهاد التجربة..." class="review-input darija-text mb-4 text-right"></textarea>
+          <button id="submitReview" class="gold-btn px-8 py-2 rounded-full text-sm uppercase tracking-wider darija-text">شارك رأيك</button>
+          <div id="reviewMessage" class="review-message mt-3"></div>
+        </div>
+        
+        <div id="reviewsList" class="mt-10 grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="col-span-2 text-center py-8 darija-text" style="color:var(--text-dim);">
+            <i class="far fa-comment-dots text-3xl mb-3 block opacity-40"></i>جاري تحميل الآراء...
+          </div>
+        </div>
+      </div>
+    </section>
+    
+    <!-- الفوتر كيتم إضافته تلقائياً عبر footer.js -->
+  </main>
+
+  <!-- ========== SCRIPTS ========== -->
+  <script src="header.js"></script>
+  <script src="footer.js"></script>
+
+  <script>
+    AOS.init({ duration: 800, once: true, offset: 80, easing: 'ease-out-quad' });
+
+    // استخدام الإعدادات من config.js
+    if (typeof MARNISSA_CONFIG !== 'undefined') {
+      const whatsappFloat = document.getElementById('whatsappFloat');
+      if (whatsappFloat && MARNISSA_CONFIG.SOCIAL && MARNISSA_CONFIG.SOCIAL.whatsapp) {
+        whatsappFloat.href = MARNISSA_CONFIG.SOCIAL.whatsapp;
+      }
+      console.log('✅ MarnissaMall config loaded:', MARNISSA_CONFIG.SITE_NAME);
+    }
+
+    // ========== المنتجات المحلية ==========
+    const localProducts = [
+      { id: 1, name: "زيت الزيتون البكر (1 لتر)", price: "55 درهم", category: "منتجات غذائية", description: "زيت زيتون بكر ممتاز من زيتون مرنيسة", image: "https://placehold.co/400x500/1a1a2e/0057b3?text=زيت+الزيتون" },
+      { id: 2, name: "عسل جبلي طبيعي (500 غ)", price: "85 درهم", category: "منتجات غذائية", description: "عسل جبلي طبيعي 100% من جبال مرنيسة", image: "https://placehold.co/400x500/1a1a2e/0057b3?text=عسل+جبلي" },
+      { id: 3, name: "الحناء مرنيسة (250 غ)", price: "20 درهم", category: "منتجات تجميلية", description: "حناء طبيعية من أراضي مرنيسة", image: "https://placehold.co/400x500/1a1a2e/0057b3?text=حناء" },
+      { id: 4, name: "طاجين فخار مرسوم يدوي", price: "120 درهم", category: "حرف يدوية", description: "طاجين فخار تقليدي مرسوم يدوياً", image: "https://placehold.co/400x500/1a1a2e/0057b3?text=طاجين+فخار" },
+      { id: 5, name: "كسكس تقليدي", price: "35 درهم", category: "منتجات غذائية", description: "كسكس من القمح المحلي", image: "https://placehold.co/400x500/1a1a2e/0057b3?text=كسكس" },
+      { id: 6, name: "زعتر بري مجفف", price: "18 درهم", category: "منتجات غذائية", description: "زعتر بري من جبال مرنيسة", image: "https://placehold.co/400x500/1a1a2e/0057b3?text=زعتر" }
     ];
 
-    // عروض خاصة (منتجات فيها تخفيض)
-    let cart = JSON.parse(localStorage.getItem('marnissaCart')) || [];
-
-    function updateCartUI() {
-        document.getElementById('cartCount').innerText = cart.length;
-        localStorage.setItem('marnissaCart', JSON.stringify(cart));
+    function loadFeaturedProducts() {
+      const grid = document.getElementById('productsGrid');
+      if (!grid) return;
+      const featured = localProducts.slice(0, 4);
+      renderProducts(featured);
     }
 
-    function addToCart(productId) {
-        const product = products.find(p => p.id === productId);
-        if(product) {
-            cart.push(product);
-            updateCartUI();
-            alert(`✅ تمت إضافة "${product.name}" إلى سلتك!`);
-        }
+    function renderProducts(products) {
+      const grid = document.getElementById('productsGrid');
+      if (!grid) return;
+      grid.innerHTML = products.map(p => `
+        <div class="product-card" data-aos="fade-up" onclick="window.location.href='product.html?id=${p.id}'">
+          <div class="product-image-wrapper">
+            <img src="${p.image}" alt="${escapeHtml(p.name)}" loading="lazy" onerror="this.src='https://placehold.co/400x500/1a1a2e/0057b3?text=${encodeURIComponent(p.name)}'">
+            <div class="product-badge"><i class="fas fa-star"></i> من مرنيسة</div>
+          </div>
+          <div class="product-info-card">
+            <div class="product-category-tag">${escapeHtml(p.category)}</div>
+            <div class="product-title-card">${escapeHtml(p.name)}</div>
+            <div class="product-price-card">${escapeHtml(p.price)}</div>
+            <div class="product-desc-card">${escapeHtml(p.description.substring(0, 80))}${p.description.length > 80 ? '...' : ''}</div>
+          </div>
+        </div>
+      `).join('');
     }
 
-    function renderProducts() {
-        const container = document.getElementById('productsContainer');
-        const offersContainer = document.getElementById('offersContainer');
-        
-        // المنتجات العادية (غير عروض خاصة) محدثين حسب البحث
-        let filteredProducts = products.filter(p => !p.isOffer);
-        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-        if(searchTerm) {
-            filteredProducts = filteredProducts.filter(p => p.name.includes(searchTerm));
-        }
+    // ========== نظام الآراء ==========
+    let currentRating = 0;
 
-        container.innerHTML = '';
-        filteredProducts.forEach(prod => {
-            const card = document.createElement('div');
-            card.className = 'product-card';
-            card.innerHTML = `
-                <div class="product-img">${prod.image}</div>
-                <div class="product-info">
-                    <div class="product-title">${prod.name}</div>
-                    <div class="product-price">${prod.price} درهم</div>
-                    <button class="btn-buy" data-id="${prod.id}">🛒 أضف للسلة</button>
-                </div>
-            `;
-            container.appendChild(card);
-        });
-
-        // العروض الخاصة
-        const offers = products.filter(p => p.isOffer === true);
-        offersContainer.innerHTML = '';
-        offers.forEach(offer => {
-            const card = document.createElement('div');
-            card.className = 'product-card';
-            card.innerHTML = `
-                <div class="product-img">${offer.image}</div>
-                <div class="product-info">
-                    <div class="offer-badge">🔥 عرض خاص</div>
-                    <div class="product-title">${offer.name}</div>
-                    <div class="product-price" style="color:#e63946;">${offer.price} درهم <span style="text-decoration:line-through; color:gray; font-size:0.9rem;">${offer.originalPrice} درهم</span></div>
-                    <button class="btn-buy" data-id="${offer.id}">🛒 أضف للسلة</button>
-                </div>
-            `;
-            offersContainer.appendChild(card);
-        });
-
-        // إضافة مستمعي الأزرار بعد إعادة الرسم
-        document.querySelectorAll('.btn-buy').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const id = parseInt(btn.getAttribute('data-id'));
-                addToCart(id);
-            });
-        });
+    function loadReviews() {
+      const container = document.getElementById('reviewsList');
+      if (!container) return;
+      const storageKey = (typeof MARNISSA_CONFIG !== 'undefined' && MARNISSA_CONFIG.REVIEWS) ? MARNISSA_CONFIG.REVIEWS.storage_key : 'marnissa_reviews';
+      const localReviews = JSON.parse(localStorage.getItem(storageKey) || '[]');
+      const approved = localReviews.filter(r => r.is_approved !== false);
+      if (approved.length > 0) {
+        renderReviews(approved);
+      } else {
+        container.innerHTML = '<div class="col-span-2 text-center py-8 darija-text" style="color:var(--text-dim);"><i class="far fa-comment-dots text-3xl mb-3 block opacity-40"></i>لا توجد آراء بعد. كن أول واحد يشارك رأيه!</div>';
+      }
     }
 
-    // البحث
-    document.getElementById('searchBtn').addEventListener('click', () => {
-        renderProducts();
-    });
-    document.getElementById('searchInput').addEventListener('keyup', (e) => {
-        if(e.key === 'Enter') renderProducts();
-    });
+    function renderReviews(reviews) {
+      const container = document.getElementById('reviewsList');
+      if (!container) return;
+      container.innerHTML = reviews.map((rev, i) => {
+        const d = rev.date || new Date().toLocaleDateString('ar-MA', { year: 'numeric', month: 'long', day: 'numeric' });
+        return `
+          <div class="review-form-card" data-aos="fade-up" data-aos-delay="${i * 100}">
+            <div class="flex justify-center mb-2">${Array(rev.rating).fill('<i class="fas fa-star text-sm" style="color:var(--blue-primary);"></i>').join('')}${Array(5 - rev.rating).fill('<i class="far fa-star text-sm" style="color:var(--blue-primary);"></i>').join('')}</div>
+            <p class="text-center text-xs mb-2 font-semibold" style="color:var(--blue-primary);">${escapeHtml(rev.name)}</p>
+            <p class="text-sm text-center darija-text" style="color:var(--text-muted);">"${escapeHtml(rev.text)}"</p>
+            <p class="text-center text-xs mt-3" style="color:var(--text-dim);">${d}</p>
+          </div>
+        `;
+      }).join('');
+    }
 
-    // زر السلة (عرض محتوى السلة)
-    document.getElementById('cartBtn').addEventListener('click', () => {
-        if(cart.length === 0) {
-            alert("السلة فارغة حالياً. أضف بعض المنتجات من مرنيسة 🛍️");
-        } else {
-            let msg = "🛒 منتجاتك:\n";
-            cart.forEach((item, idx) => { msg += `${idx+1}. ${item.name} - ${item.price} درهم\n`; });
-            msg += `\nالمجموع: ${cart.reduce((sum, p) => sum + p.price, 0)} درهم\nشكراً لدعم المنتج المحلي ❤️`;
-            alert(msg);
-        }
-    });
+    function submitReview() {
+      const name = document.getElementById('reviewerName')?.value.trim();
+      const text = document.getElementById('reviewText')?.value.trim();
+      if (!name || !text || currentRating === 0) {
+        showReviewMessage('⚠️ المرجو إدخال اسمك، رأيك وتقييمك', 'error');
+        return;
+      }
+      const btn = document.getElementById('submitReview');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin ml-2"></i> جاري الإرسال...';
+      const storageKey = (typeof MARNISSA_CONFIG !== 'undefined' && MARNISSA_CONFIG.REVIEWS) ? MARNISSA_CONFIG.REVIEWS.storage_key : 'marnissa_reviews';
+      const reviewData = { name, text, rating: currentRating, is_approved: true, date: new Date().toLocaleDateString('ar-MA', { year: 'numeric', month: 'long', day: 'numeric' }) };
+      const local = JSON.parse(localStorage.getItem(storageKey) || '[]');
+      local.unshift(reviewData);
+      localStorage.setItem(storageKey, JSON.stringify(local));
+      document.getElementById('reviewerName').value = '';
+      document.getElementById('reviewText').value = '';
+      currentRating = 0;
+      document.querySelectorAll('.rating-star').forEach(s => { s.classList.remove('fas'); s.classList.add('far'); });
+      showReviewMessage('✨ شكراً بزاف! رأيك تزاد بنجاح', 'success');
+      loadReviews();
+      btn.disabled = false;
+      btn.innerHTML = 'شارك رأيك';
+    }
 
-    // زر الانضمام كبائع محلي
-    document.getElementById('becomeSellerBtn').addEventListener('click', () => {
-        alert("📢 مرحبا بك في MarnissaMall كبائع.\nللإستفسار: تواصل معنا عبر واتساب 06XXXXXXXX أو زر أقرب نقطة لوجيستيك في تاونات.\nسنضيف حانوتك قريباً!");
-    });
+    function showReviewMessage(text, type) {
+      const msg = document.getElementById('reviewMessage');
+      if (!msg) return;
+      msg.textContent = text;
+      msg.className = `review-message ${type}`;
+      msg.style.display = 'block';
+      clearTimeout(window._rmt);
+      window._rmt = setTimeout(() => { msg.style.display = 'none'; }, 5000);
+    }
 
-    renderProducts();
-    updateCartUI();
-</script>
+    function escapeHtml(s) { if (!s) return ''; return s.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[m]); }
+    function scrollToShop() { document.getElementById('ready-to-wear')?.scrollIntoView({ behavior: 'smooth' }); }
+    function scrollToCustom() { document.getElementById('custom-order')?.scrollIntoView({ behavior: 'smooth' }); }
+    window.scrollToShop = scrollToShop;
+    window.scrollToCustom = scrollToCustom;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadFeaturedProducts();
+      loadReviews();
+      const stars = document.querySelectorAll('.rating-star');
+      stars.forEach(star => {
+        star.addEventListener('mouseenter', function() { const r = parseInt(this.dataset.rating); stars.forEach((s, i) => { s.classList.toggle('fas', i < r); s.classList.toggle('far', i >= r); }); });
+        star.addEventListener('mouseleave', function() { stars.forEach((s, i) => { s.classList.toggle('fas', i < currentRating); s.classList.toggle('far', i >= currentRating); }); });
+        star.addEventListener('click', function() { currentRating = parseInt(this.dataset.rating); stars.forEach((s, i) => { s.classList.toggle('fas', i < currentRating); s.classList.toggle('far', i >= currentRating); }); });
+      });
+      document.getElementById('submitReview')?.addEventListener('click', submitReview);
+      document.querySelectorAll('video').forEach(v => v.play().catch(() => {}));
+    });
+  </script>
 </body>
 </html>
