@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>إدارة المخزون | MarnissaMall</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" href="images/logo.png" type="image/png">
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&family=Cairo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --blue-primary: #0057b3;
+      --blue-dark: #003d80;
+      --blue-light: #3a8fd4;
+      --black: #0a0a0a;
+      --black-light: #0d1117;
+      --gray: #161b22;
+      --text-light: #ffffff;
+      --text-muted: #c9d1d9;
+      --text-dim: #8b949e;
+      --success: #25D366;
+      --danger: #ff4757;
+      --warning: #ffa502;
+    }
+
+    body {
+      --bg: #0a0a0a;
+      --bg2: #0d1117;
+      --text: #ffffff;
+      --text-muted: #c9d1d9;
+      --text-dim: #8b949e;
+      --border: rgba(0,87,179,0.35);
+      --border2: rgba(0,87,179,0.5);
+      --card: rgba(13,17,23,0.85);
+      --card-hover: rgba(0,87,179,0.2);
+    }
+
+    body.blue-theme {
+      --bg: #e8f0fe;
+      --bg2: #ffffff;
+      --text: #0a0a0a;
+      --text-muted: #1a3a5c;
+      --text-dim: #4a6a8c;
+      --border: rgba(0,87,179,0.2);
+      --border2: rgba(0,87,179,0.3);
+      --card: rgba(255,255,255,0.9);
+      --card-hover: rgba(0,87,179,0.1);
+    }
+
+    body {
+      background: var(--bg);
+      font-family: 'Tajawal', 'Cairo', sans-serif;
+      color: var(--text);
+      min-height: 100vh;
+      transition: background-color 0.5s ease, color 0.5s ease;
+    }
+
+    .darija-text { font-family: 'Tajawal', 'Cairo', sans-serif; }
+
+    .page-header {
+      padding: clamp(40px, 6vh, 70px) 1.5rem 1.5rem;
+      max-width: 1300px;
+      margin: 0 auto;
+    }
+
+    .section-title {
+      position: relative;
+      display: inline-block;
+      font-size: clamp(1.5rem, 5vw, 2rem);
+    }
+    .section-title::after {
+      content: '';
+      position: absolute;
+      bottom: -12px;
+      right: 0;
+      width: 50px;
+      height: 2px;
+      background: var(--blue-primary);
+    }
+
+    .container-wrap {
+      max-width: 1300px;
+      margin: 0 auto;
+      padding: 0 1.5rem clamp(60px, 8vh, 100px);
+    }
+
+    /* ===== KPI Cards ===== */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1rem;
+      margin: 2rem 0;
+    }
+    .kpi-card {
+      background: var(--card);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      transition: all 0.3s;
+    }
+    .kpi-card:hover { border-color: var(--blue-primary); transform: translateY(-3px); }
+    .kpi-icon {
+      width: 48px; height: 48px;
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem;
+      flex-shrink: 0;
+    }
+    .kpi-icon.blue { background: rgba(0,87,179,0.15); color: var(--blue-primary); }
+    .kpi-icon.success { background: rgba(37,211,102,0.15); color: var(--success); }
+    .kpi-icon.warning { background: rgba(255,165,2,0.15); color: var(--warning); }
+    .kpi-icon.danger { background: rgba(255,71,87,0.15); color: var(--danger); }
+    .kpi-value { font-size: 1.5rem; font-weight: 800; line-height: 1.2; }
+    .kpi-label { font-size: 0.75rem; color: var(--text-dim); margin-top: 2px; }
+
+    /* ===== Toolbar ===== */
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
+    }
+    .search-input {
+      background: var(--card);
+      border: 1px solid var(--border2);
+      border-radius: 12px;
+      padding: 0.65rem 1rem;
+      color: var(--text);
+      font-family: inherit;
+      min-width: 220px;
+      flex: 1;
+    }
+    .search-input:focus { outline: none; border-color: var(--blue-primary); }
+    .search-input::placeholder { color: var(--text-dim); }
+
+    .filter-select {
+      background: var(--card);
+      border: 1px solid var(--border2);
+      border-radius: 12px;
+      padding: 0.65rem 1rem;
+      color: var(--text);
+      font-family: inherit;
+      cursor: pointer;
+    }
+    .filter-select:focus { outline: none; border-color: var(--blue-primary); }
+
+    .gold-btn {
+      background: transparent;
+      border: 1.5px solid var(--blue-primary);
+      color: var(--text);
+      letter-spacing: 1px;
+      font-weight: 500;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.4s;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.65rem 1.5rem;
+      border-radius: 50px;
+      font-size: 0.85rem;
+      white-space: nowrap;
+    }
+    .gold-btn::before {
+      content: '';
+      position: absolute;
+      top: 0; left: -100%; width: 100%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(0,87,179,0.2), transparent);
+      transition: left 0.5s;
+    }
+    .gold-btn:hover::before { left: 100%; }
+    .gold-btn:hover { transform: translateY(-2px); border-color: var(--blue-light); color: var(--blue-light); }
+
+    /* ===== Table ===== */
+    .table-wrap {
+      background: var(--card);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      overflow: hidden;
+    }
+    .stock-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+    .stock-table th {
+      text-align: right;
+      padding: 1rem;
+      background: rgba(0,87,179,0.08);
+      color: var(--blue-primary);
+      font-weight: 700;
+      font-size: 0.7rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+    .stock-table td {
+      padding: 0.9rem 1rem;
+      border-top: 1px solid var(--border);
+      vertical-align: middle;
+    }
+    .stock-table tr:hover td { background: var(--card-hover); }
+
+    .product-cell { display: flex; align-items: center; gap: 0.75rem; }
+    .product-cell img {
+      width: 46px; height: 46px;
+      border-radius: 10px;
+      object-fit: cover;
+      flex-shrink: 0;
+      background: var(--black-light);
+    }
+    .product-cell .pname { font-weight: 600; color: var(--text); }
+    .product-cell .pcat { font-size: 0.7rem; color: var(--text-dim); }
+
+    .stock-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.7rem;
+      font-weight: 700;
+    }
+    .stock-badge.ok { background: rgba(37,211,102,0.12); color: var(--success); }
+    .stock-badge.low { background: rgba(255,165,2,0.12); color: var(--warning); }
+    .stock-badge.out { background: rgba(255,71,87,0.12); color: var(--danger); }
+
+    .stock-qty-input {
+      width: 70px;
+      background: rgba(0,0,0,0.05);
+      border: 1px solid var(--border2);
+      border-radius: 8px;
+      padding: 0.4rem;
+      color: var(--text);
+      text-align: center;
+      font-family: inherit;
+      font-weight: 700;
+    }
+    .stock-qty-input:focus { outline: none; border-color: var(--blue-primary); }
+
+    .icon-btn {
+      width: 34px; height: 34px;
+      border-radius: 8px;
+      border: 1px solid var(--border2);
+      background: rgba(0,87,179,0.05);
+      color: var(--text-muted);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.25s;
+      font-size: 0.85rem;
+    }
+    .icon-btn:hover { border-color: var(--blue-primary); color: var(--blue-primary); background: rgba(0,87,179,0.12); }
+    .icon-btn.danger:hover { border-color: var(--danger); color: var(--danger); background: rgba(255,71,87,0.12); }
+
+    .actions-cell { display: flex; gap: 0.4rem; justify-content: flex-end; }
+
+    /* ===== Modal ===== */
+    .modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      padding: 1rem;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal-box {
+      background: var(--bg2);
+      border: 1px solid var(--border2);
+      border-radius: 20px;
+      padding: 1.75rem;
+      max-width: 420px;
+      width: 100%;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+    }
+    .modal-box h3 { font-size: 1.1rem; margin-bottom: 0.3rem; }
+    .modal-box p { font-size: 0.8rem; color: var(--text-dim); margin-bottom: 1.25rem; }
+
+    .modal-input {
+      background: rgba(0,0,0,0.05);
+      border: 1px solid var(--border2);
+      border-radius: 12px;
+      padding: 0.65rem 1rem;
+      color: var(--text);
+      width: 100%;
+      font-family: inherit;
+      margin-bottom: 0.75rem;
+    }
+    .modal-input:focus { outline: none; border-color: var(--blue-primary); }
+
+    .modal-radio-row {
+      display: flex;
+      gap: 0.6rem;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+    }
+    .modal-radio-row label {
+      flex: 1;
+      text-align: center;
+      padding: 0.5rem;
+      border: 1px solid var(--border2);
+      border-radius: 10px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .modal-radio-row input { display: none; }
+    .modal-radio-row input:checked + span,
+    .modal-radio-row label:has(input:checked) {
+      color: var(--blue-primary);
+    }
+    .modal-radio-row input:checked ~ * {}
+    .modal-radio-row label.active {
+      border-color: var(--blue-primary);
+      background: rgba(0,87,179,0.1);
+      color: var(--blue-primary);
+    }
+
+    .modal-actions { display: flex; gap: 0.75rem; margin-top: 1rem; }
+    .modal-actions .gold-btn { flex: 1; justify-content: center; }
+    .btn-cancel {
+      flex: 1;
+      justify-content: center;
+      background: rgba(255,71,87,0.08);
+      border: 1.5px solid rgba(255,71,87,0.3);
+      color: var(--danger);
+      border-radius: 50px;
+      padding: 0.65rem 1.5rem;
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: inherit;
+      display: inline-flex;
+      align-items: center;
+      transition: all 0.3s;
+    }
+    .btn-cancel:hover { background: rgba(255,71,87,0.15); }
+
+    /* ===== Toast ===== */
+    .toast-msg {
+      position: fixed;
+      bottom: 30px; left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: var(--bg2);
+      border: 1px solid var(--blue-primary);
+      border-radius: 12px;
+      padding: 0.8rem 1.5rem;
+      font-size: 0.85rem;
+      display: flex; align-items: center; gap: 0.6rem;
+      z-index: 3000;
+      opacity: 0;
+      transition: all 0.35s;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+    }
+    .toast-msg.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+    .toast-msg.success { border-color: var(--success); color: var(--success); }
+    .toast-msg.error { border-color: var(--danger); color: var(--danger); }
+
+    .empty-state, .loading-state {
+      text-align: center;
+      padding: 4rem 1rem;
+      color: var(--text-dim);
+    }
+    .loader-spinner {
+      width: 36px; height: 36px;
+      border: 3px solid rgba(0,87,179,0.3);
+      border-radius: 50%;
+      border-top-color: var(--blue-primary);
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 1rem;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* mobile: hide some columns, allow horizontal scroll */
+    @media (max-width: 768px) {
+      .table-wrap { overflow-x: auto; }
+      .stock-table { min-width: 720px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- الهيدر -->
+
+  <div class="page-header">
+    <span class="text-xs tracking-[0.3em] darija-text" style="color:var(--blue-primary);">✦ لوحة تحكم البائع ✦</span>
+    <h1 class="section-title font-bold darija-text mt-2" style="color:var(--text);">إدارة المخزون</h1>
+    <p class="text-sm mt-4 darija-text" style="color:var(--text-dim);">تتبع كمية كل منتج، حدّث المخزون، وتابع التنبيهات</p>
+  </div>
+
+  <div class="container-wrap">
+
+    <!-- KPI Cards -->
+    <div class="kpi-grid">
+      <div class="kpi-card" data-aos="fade-up">
+        <div class="kpi-icon blue"><i class="fas fa-boxes-stacked"></i></div>
+        <div>
+          <div class="kpi-value" id="kpiTotalProducts">—</div>
+          <div class="kpi-label darija-text">إجمالي المنتجات</div>
+        </div>
+      </div>
+      <div class="kpi-card" data-aos="fade-up" data-aos-delay="50">
+        <div class="kpi-icon success"><i class="fas fa-cubes"></i></div>
+        <div>
+          <div class="kpi-value" id="kpiTotalStock">—</div>
+          <div class="kpi-label darija-text">إجمالي الكميات</div>
+        </div>
+      </div>
+      <div class="kpi-card" data-aos="fade-up" data-aos-delay="100">
+        <div class="kpi-icon warning"><i class="fas fa-triangle-exclamation"></i></div>
+        <div>
+          <div class="kpi-value" id="kpiLowStock">—</div>
+          <div class="kpi-label darija-text">مخزون منخفض</div>
+        </div>
+      </div>
+      <div class="kpi-card" data-aos="fade-up" data-aos-delay="150">
+        <div class="kpi-icon danger"><i class="fas fa-ban"></i></div>
+        <div>
+          <div class="kpi-value" id="kpiOutOfStock">—</div>
+          <div class="kpi-label darija-text">نفذ من المخزون</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="toolbar">
+      <input type="text" id="searchInput" class="search-input darija-text" placeholder="🔍 بحث عن منتج...">
+      <select id="filterSelect" class="filter-select darija-text">
+        <option value="all">كل المنتجات</option>
+        <option value="low">مخزون منخفض</option>
+        <option value="out">نفذ من المخزون</option>
+        <option value="available">متوفر</option>
+      </select>
+      <button class="gold-btn darija-text" onclick="window.location.href='dashboard.html#products'">
+        <i class="fas fa-plus"></i> منتج جديد
+      </button>
+    </div>
+
+    <!-- Table -->
+    <div class="table-wrap">
+      <div id="loadingState" class="loading-state">
+        <div class="loader-spinner"></div>
+        <p class="darija-text">جاري تحميل المخزون...</p>
+      </div>
+      <div id="tableContainer" style="display:none; overflow-x:auto;">
+        <table class="stock-table">
+          <thead>
+            <tr>
+              <th>المنتج</th>
+              <th>السعر</th>
+              <th>الكمية الحالية</th>
+              <th>الحالة</th>
+              <th>الحد الأدنى</th>
+              <th>إجراءات</th>
+            </tr>
+          </thead>
+          <tbody id="stockTableBody"></tbody>
+        </table>
+      </div>
+      <div id="emptyState" class="empty-state darija-text" style="display:none;">
+        <i class="fas fa-box-open text-3xl mb-3 block opacity-40"></i>
+        لا توجد منتجات حتى الآن
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Modal: تعديل المخزون (حركة مخزون) -->
+  <div class="modal-overlay" id="stockModal">
+    <div class="modal-box">
+      <h3 class="darija-text" id="modalTitle" style="color:var(--text);">تحديث المخزون</h3>
+      <p class="darija-text" id="modalProductName">—</p>
+
+      <div class="modal-radio-row" id="reasonRow">
+        <label class="active" data-reason="restock"><i class="fas fa-arrow-up"></i><br>توريد</label>
+        <label data-reason="adjustment"><i class="fas fa-sliders"></i><br>تصحيح</label>
+        <label data-reason="return"><i class="fas fa-rotate-left"></i><br>إرجاع</label>
+      </div>
+
+      <label class="darija-text text-xs mb-1 block" style="color:var(--text-dim);">الكمية (استعمل سالب للتقليل، مثال: -3)</label>
+      <input type="number" id="modalChangeInput" class="modal-input" placeholder="مثال: 10 أو -3">
+
+      <div class="modal-actions">
+        <button class="btn-cancel darija-text" onclick="closeStockModal()">إلغاء</button>
+        <button class="gold-btn darija-text" onclick="confirmStockChange()">
+          <i class="fas fa-check"></i> تأكيد
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast-msg" id="toastMsg"></div>
+
+  <!-- ========== SCRIPTS ========== -->
+  <script src="header.js"></script>
+  <script src="footer.js"></script>
+
+  <script>
+    AOS.init({ duration: 700, once: true, offset: 60 });
+
+    let allProducts = [];
+    let currentProductId = null;
+    let selectedReason = 'restock';
+
+    // ========== التحقق من تسجيل الدخول ==========
+    // ملاحظة: تأكد أن المستخدم بائع أو مسؤول قبل عرض الصفحة (يمكن ربطها بـ sb.auth.getUser())
+
+  
+    // ========== جلب المنتجات والمخزون ==========
+    async function loadStock() {
+      const sellerId = await getCurrentSellerId();
+      if (!sellerId) {
+        document.getElementById('loadingState').style.display = 'none';
+        document.getElementById('emptyState').style.display = 'block';
+        return;
+      }
+
+      const { data, error } = await sb
+        .from('products')
+        .select('id, name, price, stock, low_stock_threshold, is_available, images, categories(name)')
+        .eq('seller_id', sellerId)
+        .order('created_at', { ascending: false });
+
+      document.getElementById('loadingState').style.display = 'none';
+
+      if (error) {
+        showToast('❌ خطأ في تحميل المنتجات: ' + error.message, 'error');
+        document.getElementById('emptyState').style.display = 'block';
+        return;
+      }
+
+      allProducts = data || [];
+
+      if (allProducts.length === 0) {
+        document.getElementById('emptyState').style.display = 'block';
+        return;
+      }
+
+      document.getElementById('tableContainer').style.display = 'block';
+      renderTable(allProducts);
+      updateKPIs(allProducts);
+    }
+
+    // ========== حساب وعرض الإحصائيات ==========
+    function updateKPIs(products) {
+      const total = products.length;
+      const totalStock = products.reduce((sum, p) => sum + (p.stock || 0), 0);
+      const low = products.filter(p => p.stock > 0 && p.stock <= (p.low_stock_threshold || 5)).length;
+      const out = products.filter(p => p.stock <= 0).length;
+
+      document.getElementById('kpiTotalProducts').textContent = total;
+      document.getElementById('kpiTotalStock').textContent = totalStock;
+      document.getElementById('kpiLowStock').textContent = low;
+      document.getElementById('kpiOutOfStock').textContent = out;
+    }
+
+    // ========== رسم جدول المخزون ==========
+    function renderTable(products) {
+      const tbody = document.getElementById('stockTableBody');
+
+      if (products.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="text-center py-8 darija-text" style="color:var(--text-dim);">لا توجد نتائج مطابقة</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = products.map(p => {
+        const status = getStockStatus(p);
+        const img = (p.images && p.images.length > 0) ? p.images[0] : 'https://placehold.co/46x46/1a1a2e/0057b3?text=M';
+        const catName = p.categories ? p.categories.name : '—';
+
+        return `
+          <tr>
+            <td>
+              <div class="product-cell">
+                <img src="${img}" alt="${escapeHtml(p.name)}" onerror="this.src='https://placehold.co/46x46/1a1a2e/0057b3?text=M'">
+                <div>
+                  <div class="pname darija-text">${escapeHtml(p.name)}</div>
+                  <div class="pcat darija-text">${escapeHtml(catName)}</div>
+                </div>
+              </div>
+            </td>
+            <td class="darija-text">${escapeHtml(String(p.price))} درهم</td>
+            <td>
+              <input type="number" class="stock-qty-input" value="${p.stock}" data-id="${p.id}" onchange="quickUpdateStock(this)">
+            </td>
+            <td>
+              <span class="stock-badge ${status.cls} darija-text">
+                <i class="fas ${status.icon}"></i> ${status.label}
+              </span>
+            </td>
+            <td class="darija-text">${p.low_stock_threshold || 5}</td>
+            <td>
+              <div class="actions-cell">
+                <button class="icon-btn" title="إضافة/سحب كمية" onclick="openStockModal('${p.id}', '${escapeHtml(p.name)}')">
+                  <i class="fas fa-pen"></i>
+                </button>
+                <button class="icon-btn" title="عرض المنتج" onclick="window.location.href='product.html?id=${p.id}'">
+                  <i class="fas fa-eye"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // ========== تحديد حالة المخزون ==========
+    function getStockStatus(p) {
+      const threshold = p.low_stock_threshold || 5;
+      if (p.stock <= 0) return { cls: 'out', icon: 'fa-ban', label: 'نفذ' };
+      if (p.stock <= threshold) return { cls: 'low', icon: 'fa-triangle-exclamation', label: 'منخفض' };
+      return { cls: 'ok', icon: 'fa-check', label: 'متوفر' };
+    }
+
+    // ========== تحديث سريع للكمية (تصحيح مباشر) ==========
+    async function quickUpdateStock(input) {
+      const productId = input.dataset.id;
+      const newValue = parseInt(input.value);
+      const product = allProducts.find(p => p.id === productId);
+      if (!product) return;
+
+      if (isNaN(newValue) || newValue < 0) {
+        showToast('⚠️ الكمية غير صحيحة', 'error');
+        input.value = product.stock;
+        return;
+      }
+
+      const diff = newValue - product.stock;
+      if (diff === 0) return;
+
+      const { error } = await sb.from('stock_movements').insert({
+        product_id: productId,
+        change: diff,
+        reason: 'adjustment'
+      });
+
+      if (error) {
+        showToast('❌ فشل التحديث: ' + error.message, 'error');
+        input.value = product.stock;
+        return;
+      }
+
+      product.stock = newValue;
+      renderTable(filterProducts());
+      updateKPIs(allProducts);
+      showToast('✅ تم تحديث المخزون بنجاح', 'success');
+    }
+
+    // ========== فتح نافذة تحديث المخزون ==========
+    function openStockModal(productId, productName) {
+      currentProductId = productId;
+      document.getElementById('modalProductName').textContent = productName;
+      document.getElementById('modalChangeInput').value = '';
+      selectedReason = 'restock';
+      document.querySelectorAll('#reasonRow label').forEach(l => l.classList.remove('active'));
+      document.querySelector('#reasonRow label[data-reason="restock"]').classList.add('active');
+      document.getElementById('stockModal').classList.add('open');
+    }
+
+    function closeStockModal() {
+      document.getElementById('stockModal').classList.remove('open');
+      currentProductId = null;
+    }
+
+    // ========== تأكيد تغيير المخزون من النافذة ==========
+    async function confirmStockChange() {
+      const changeVal = parseInt(document.getElementById('modalChangeInput').value);
+      if (isNaN(changeVal) || changeVal === 0) {
+        showToast('⚠️ ادخل قيمة صحيحة', 'error');
+        return;
+      }
+
+      const product = allProducts.find(p => p.id === currentProductId);
+      if (!product) return;
+
+      // التحقق من عدم النزول تحت 0
+      if (product.stock + changeVal < 0) {
+        showToast('⚠️ لا يمكن أن يكون المخزون أقل من 0', 'error');
+        return;
+      }
+
+      const { error } = await sb.from('stock_movements').insert({
+        product_id: currentProductId,
+        change: changeVal,
+        reason: selectedReason
+      });
+
+      if (error) {
+        showToast('❌ فشل التحديث: ' + error.message, 'error');
+        return;
+      }
+
+      product.stock += changeVal;
+      renderTable(filterProducts());
+      updateKPIs(allProducts);
+      closeStockModal();
+      showToast('✅ تم تحديث المخزون بنجاح', 'success');
+    }
+
+    // ========== فلترة وبحث ==========
+    function filterProducts() {
+      const search = document.getElementById('searchInput').value.trim().toLowerCase();
+      const filter = document.getElementById('filterSelect').value;
+
+      return allProducts.filter(p => {
+        const matchesSearch = !search || p.name.toLowerCase().includes(search);
+        let matchesFilter = true;
+        const threshold = p.low_stock_threshold || 5;
+
+        if (filter === 'low') matchesFilter = p.stock > 0 && p.stock <= threshold;
+        else if (filter === 'out') matchesFilter = p.stock <= 0;
+        else if (filter === 'available') matchesFilter = p.is_available && p.stock > 0;
+
+        return matchesSearch && matchesFilter;
+      });
+    }
+
+    // ========== Toast ==========
+    function showToast(text, type) {
+      const toast = document.getElementById('toastMsg');
+      toast.textContent = text;
+      toast.className = `toast-msg ${type} show`;
+      clearTimeout(window._toastTimer);
+      window._toastTimer = setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    function escapeHtml(s) {
+      if (!s) return '';
+      return String(s).replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+    }
+
+    // ========== ربط الأحداث ==========
+    document.addEventListener('DOMContentLoaded', () => {
+      loadStock();
+
+      document.getElementById('searchInput').addEventListener('input', () => renderTable(filterProducts()));
+      document.getElementById('filterSelect').addEventListener('change', () => renderTable(filterProducts()));
+
+      document.querySelectorAll('#reasonRow label').forEach(label => {
+        label.addEventListener('click', () => {
+          document.querySelectorAll('#reasonRow label').forEach(l => l.classList.remove('active'));
+          label.classList.add('active');
+          selectedReason = label.dataset.reason;
+        });
+      });
+
+      document.getElementById('stockModal').addEventListener('click', (e) => {
+        if (e.target.id === 'stockModal') closeStockModal();
+      });
+    });
+  </script>
+</body>
+</html>

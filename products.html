@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>جميع المنتجات - MarnissaMall</title>
+  <meta name="description" content="تسوق جميع منتجات مرنيسة الأصلية - زيت الزيتون، عسل جبلي، حرف يدوية ومنتجات تقليدية">
+  <link rel="icon" href="images/logo.png" type="image/png">
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script src="config.js"></script>
+  
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    :root {
+      --blue-primary: #0057b3;
+      --blue-dark: #003d80;
+      --blue-light: #3a8fd4;
+      --black: #0a0a0a;
+      --black-light: #0d1117;
+      --gray: #161b22;
+      --text-light: #ffffff;
+      --text-muted: #c9d1d9;
+      --text-dim: #8b949e;
+    }
+    
+    body {
+      background: var(--black);
+      font-family: 'Tajawal', sans-serif;
+      color: var(--text-light);
+      transition: all 0.3s ease;
+    }
+    
+    body.blue-theme {
+      --black: #f0f2f5;
+      --black-light: #ffffff;
+      --gray: #e8e8e8;
+      --text-light: #1a1a2e;
+      --text-muted: #3a3a5e;
+      --text-dim: #6b6b8b;
+    }
+    
+    /* المنتجات */
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.5rem;
+    }
+    
+    .product-card {
+      background: var(--gray);
+      border-radius: 16px;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      border: 1px solid rgba(0,87,179,0.2);
+    }
+    
+    .product-card:hover {
+      transform: translateY(-5px);
+      border-color: var(--blue-primary);
+      box-shadow: 0 10px 25px rgba(0,87,179,0.2);
+    }
+    
+    .product-image {
+      width: 100%;
+      aspect-ratio: 1;
+      object-fit: cover;
+    }
+    
+    .product-badge {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: var(--blue-primary);
+      color: white;
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-size: 0.7rem;
+      font-weight: bold;
+    }
+    
+    .stock-badge {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      background: rgba(0,0,0,0.7);
+      color: white;
+      padding: 3px 8px;
+      border-radius: 20px;
+      font-size: 0.65rem;
+    }
+    
+    .stock-low {
+      background: #ff4757;
+    }
+    
+    .stock-out {
+      background: #2a2a2a;
+    }
+    
+    .filter-sidebar {
+      background: var(--gray);
+      border-radius: 16px;
+      padding: 1.25rem;
+      position: sticky;
+      top: 80px;
+    }
+    
+    .filter-btn {
+      background: transparent;
+      border: 1px solid var(--blue-primary);
+      color: var(--text-light);
+      padding: 0.5rem 1rem;
+      border-radius: 30px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .filter-btn.active,
+    .filter-btn:hover {
+      background: var(--blue-primary);
+      color: white;
+    }
+    
+    .pagination-btn {
+      background: var(--gray);
+      border: 1px solid var(--blue-primary);
+      color: var(--text-light);
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .pagination-btn:hover,
+    .pagination-btn.active {
+      background: var(--blue-primary);
+      color: white;
+    }
+    
+    .loader-spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid rgba(0,87,179,0.3);
+      border-radius: 50%;
+      border-top-color: var(--blue-primary);
+      animation: spin 0.8s ease-in-out infinite;
+      margin: 2rem auto;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    @media (max-width: 768px) {
+      .products-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.75rem;
+      }
+      .filter-sidebar {
+        position: static;
+        margin-bottom: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- الهيدر -->
+  <div id="header-placeholder"></div>
+
+  <main class="container mx-auto px-4 py-8">
+    
+    <!-- العنوان -->
+    <div class="text-center mb-8" data-aos="fade-up">
+      <h1 class="text-3xl md:text-4xl font-bold" style="color: var(--text-light);">جميع المنتجات</h1>
+      <p class="text-sm mt-2" style="color: var(--text-dim);">اكتشف منتجات مرنيسة الأصلية من زيت الزيتون والعسل والحرف اليدوية</p>
+      <div class="w-16 h-0.5 bg-[#0057b3] mx-auto mt-4"></div>
+    </div>
+
+    <div class="flex flex-col lg:flex-row gap-8">
+      
+      <!-- Sidebar الفلترة -->
+      <div class="lg:w-64" data-aos="fade-left">
+        <div class="filter-sidebar">
+          <h3 class="font-bold mb-4" style="color: var(--blue-primary);">🔍 فلترة المنتجات</h3>
+          
+          <!-- بحث -->
+          <div class="mb-4">
+            <input type="text" id="searchInput" placeholder="🔎 بحث عن منتج..." 
+                   class="w-full px-3 py-2 rounded-lg border border-gray-700 bg-transparent text-white focus:border-[#0057b3] outline-none">
+          </div>
+          
+          <!-- الفئات -->
+          <div class="mb-4">
+            <h4 class="text-sm font-semibold mb-2" style="color: var(--text-muted);">📂 الفئات</h4>
+            <div id="categoriesList" class="space-y-2">
+              <div class="loader-spinner w-6 h-6"></div>
+            </div>
+          </div>
+          
+          <!-- نطاق السعر -->
+          <div class="mb-4">
+            <h4 class="text-sm font-semibold mb-2" style="color: var(--text-muted);">💰 السعر</h4>
+            <div class="flex gap-2">
+              <input type="number" id="minPrice" placeholder="الحد الأدنى" class="w-1/2 px-2 py-1 rounded-lg border border-gray-700 bg-transparent text-white text-sm">
+              <input type="number" id="maxPrice" placeholder="الحد الأقصى" class="w-1/2 px-2 py-1 rounded-lg border border-gray-700 bg-transparent text-white text-sm">
+            </div>
+            <button id="applyPriceBtn" class="w-full mt-2 filter-btn text-sm py-1">تطبيق</button>
+          </div>
+          
+          <!-- حالة المنتج -->
+          <div>
+            <h4 class="text-sm font-semibold mb-2" style="color: var(--text-muted);">📦 الحالة</h4>
+            <div class="flex gap-2 flex-wrap">
+              <button data-stock="all" class="stock-filter filter-btn active text-sm py-1 px-3">الكل</button>
+              <button data-stock="available" class="stock-filter filter-btn text-sm py-1 px-3">متوفر</button>
+              <button data-stock="low" class="stock-filter filter-btn text-sm py-1 px-3">مخزون محدود</button>
+              <button data-stock="out" class="stock-filter filter-btn text-sm py-1 px-3">غير متوفر</button>
+            </div>
+          </div>
+          
+          <button id="resetFilters" class="w-full mt-4 py-2 rounded-lg text-sm bg-gray-700 hover:bg-gray-600 transition">
+            🗑️ إعادة تعيين الفلترة
+          </button>
+        </div>
+      </div>
+      
+      <!-- المنتجات -->
+      <div class="flex-1">
+        
+        <!-- عدد النتائج والترتيب -->
+        <div class="flex justify-between items-center mb-4 flex-wrap gap-2">
+          <div id="resultsCount" class="text-sm" style="color: var(--text-dim);"></div>
+          <select id="sortSelect" class="px-3 py-1 rounded-lg border border-gray-700 bg-transparent text-sm">
+            <option value="newest">الأحدث</option>
+            <option value="price_asc">السعر: من الأقل إلى الأعلى</option>
+            <option value="price_desc">السعر: من الأعلى إلى الأقل</option>
+            <option value="popular">الأكثر مبيعاً</option>
+            <option value="rating">الأعلى تقييماً</option>
+          </select>
+        </div>
+        
+        <!-- شبكة المنتجات -->
+        <div id="productsGrid" class="products-grid">
+          <div class="loader-spinner"></div>
+        </div>
+        
+        <!-- الترقيم -->
+        <div id="pagination" class="flex justify-center gap-2 mt-8 flex-wrap"></div>
+        
+      </div>
+    </div>
+  </main>
+
+  <script src="header.js"></script>
+  <script src="footer.js"></script>
+  
+  <script>
+    AOS.init({ duration: 800, once: true });
+    
+    // ========== Supabase Client ==========
+    const supabaseUrl = (typeof MARNISSA_CONFIG !== 'undefined' && MARNISSA_CONFIG.SUPABASE_URL) 
+      ? MARNISSA_CONFIG.SUPABASE_URL 
+      : 'https://your-project.supabase.co';
+    const supabaseKey = (typeof MARNISSA_CONFIG !== 'undefined' && MARNISSA_CONFIG.SUPABASE_ANON_KEY) 
+      ? MARNISSA_CONFIG.SUPABASE_ANON_KEY 
+      : 'your-anon-key';
+    
+    const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+    
+    // ========== المتغيرات ==========
+    let allProducts = [];
+    let categories = [];
+    let currentFilters = {
+      search: '',
+      category: '',
+      minPrice: '',
+      maxPrice: '',
+      stock: 'all',
+      sort: 'newest'
+    };
+    let currentPage = 1;
+    const itemsPerPage = 12;
+    
+    // ========== تحميل المنتجات ==========
+    async function loadProducts() {
+      showLoader();
+      
+      try {
+        let query = supabaseClient
+          .from('products')
+          .select(`
+            *,
+            categories (name, slug),
+            sellers (store_name)
+          `);
+        
+        // الفلترة
+        if (currentFilters.category) {
+          query = query.eq('category_id', currentFilters.category);
+        }
+        
+        if (currentFilters.search) {
+          query = query.ilike('name', `%${currentFilters.search}%`);
+        }
+        
+        if (currentFilters.minPrice) {
+          query = query.gte('price', parseFloat(currentFilters.minPrice));
+        }
+        
+        if (currentFilters.maxPrice) {
+          query = query.lte('price', parseFloat(currentFilters.maxPrice));
+        }
+        
+        // حالة المخزون
+        if (currentFilters.stock === 'available') {
+          query = query.gt('stock', 0);
+        } else if (currentFilters.stock === 'low') {
+          query = query.lte('stock', 5).gt('stock', 0);
+        } else if (currentFilters.stock === 'out') {
+          query = query.eq('stock', 0);
+        }
+        
+        // الترتيب
+        switch (currentFilters.sort) {
+          case 'price_asc':
+            query = query.order('price', { ascending: true });
+            break;
+          case 'price_desc':
+            query = query.order('price', { ascending: false });
+            break;
+          case 'popular':
+            query = query.order('orders_count', { ascending: false });
+            break;
+          case 'rating':
+            query = query.order('rating_avg', { ascending: false });
+            break;
+          default:
+            query = query.order('created_at', { ascending: false });
+        }
+        
+        const { data, error } = await query;
+        
+        if (error) throw error;
+        
+        allProducts = data || [];
+        renderProducts();
+        
+      } catch (err) {
+        console.error('❌ Error loading products:', err);
+        document.getElementById('productsGrid').innerHTML = `
+          <div class="col-span-full text-center py-12">
+            <i class="fas fa-exclamation-triangle text-4xl mb-3" style="color: var(--blue-primary);"></i>
+            <p>حدث خطأ في تحميل المنتجات</p>
+            <button onclick="loadProducts()" class="mt-3 filter-btn">إعادة المحاولة</button>
+          </div>
+        `;
+      }
+    }
+    
+    // ========== تحميل الفئات ==========
+    async function loadCategories() {
+      try {
+        const { data, error } = await supabaseClient
+          .from('categories')
+          .select('*')
+          .order('name');
+        
+        if (error) throw error;
+        
+        categories = data || [];
+        renderCategories();
+        
+      } catch (err) {
+        console.error('❌ Error loading categories:', err);
+      }
+    }
+    
+    // ========== عرض الفئات في الـ sidebar ==========
+    function renderCategories() {
+      const container = document.getElementById('categoriesList');
+      if (!container) return;
+      
+      container.innerHTML = `
+        <button data-category="" class="category-filter w-full text-right px-3 py-2 rounded-lg hover:bg-gray-700 transition ${!currentFilters.category ? 'bg-gray-700' : ''}" style="color: var(--text-muted);">
+          📦 جميع المنتجات
+        </button>
+        ${categories.map(cat => `
+          <button data-category="${cat.id}" class="category-filter w-full text-right px-3 py-2 rounded-lg hover:bg-gray-700 transition ${currentFilters.category === cat.id ? 'bg-gray-700' : ''}" style="color: var(--text-muted);">
+            📂 ${cat.name}
+          </button>
+        `).join('')}
+      `;
+      
+      // إضافة الأحداث
+      document.querySelectorAll('.category-filter').forEach(btn => {
+        btn.addEventListener('click', () => {
+          currentFilters.category = btn.dataset.category;
+          currentPage = 1;
+          loadProducts();
+          renderCategories();
+        });
+      });
+    }
+    
+    // ========== عرض المنتجات ==========
+    function renderProducts() {
+      const grid = document.getElementById('productsGrid');
+      const start = (currentPage - 1) * itemsPerPage;
+      const end = start + itemsPerPage;
+      const paginatedProducts = allProducts.slice(start, end);
+      const totalPages = Math.ceil(allProducts.length / itemsPerPage);
+      
+      // تحديث عدد النتائج
+      document.getElementById('resultsCount').innerHTML = `🎯 ${allProducts.length} منتج`;
+      
+      if (paginatedProducts.length === 0) {
+        grid.innerHTML = `
+          <div class="col-span-full text-center py-12">
+            <i class="fas fa-box-open text-4xl mb-3" style="color: var(--blue-primary);"></i>
+            <p>لا توجد منتجات مطابقة للبحث</p>
+          </div>
+        `;
+        document.getElementById('pagination').innerHTML = '';
+        return;
+      }
+      
+      // عرض المنتجات
+      grid.innerHTML = paginatedProducts.map(product => {
+        const stockStatus = product.stock === 0 ? 'غير متوفر' : (product.stock <= product.low_stock_threshold ? `متبقي ${product.stock} قطع` : 'متوفر');
+        const stockClass = product.stock === 0 ? 'stock-out' : (product.stock <= product.low_stock_threshold ? 'stock-low' : '');
+        
+        return `
+          <div class="product-card relative" onclick="window.location.href='product.html?id=${product.id}'" data-aos="fade-up">
+            <div class="relative">
+              <img src="${product.images && product.images[0] ? product.images[0] : 'https://placehold.co/400x400/1a1a2e/0057b3?text=' + encodeURIComponent(product.name)}" 
+                   alt="${product.name}" class="product-image">
+              ${product.is_featured ? '<div class="product-badge"><i class="fas fa-star"></i> مميز</div>' : ''}
+              <div class="stock-badge ${stockClass}">${stockStatus}</div>
+            </div>
+            <div class="p-4">
+              <div class="text-xs mb-1" style="color: var(--blue-primary);">${product.categories?.name || 'منتج'}</div>
+              <h3 class="font-bold mb-1 line-clamp-1" style="color: var(--text-light);">${product.name}</h3>
+              <div class="flex items-center gap-2 mb-2">
+                <span class="text-lg font-bold" style="color: var(--blue-primary);">${product.price} درهم</span>
+                ${product.old_price ? `<span class="text-xs line-through" style="color: var(--text-dim);">${product.old_price} درهم</span>` : ''}
+              </div>
+              ${product.rating_avg > 0 ? `
+                <div class="flex items-center gap-1 text-sm" style="color: var(--text-muted);">
+                  <i class="fas fa-star text-yellow-500"></i>
+                  <span>${product.rating_avg.toFixed(1)}</span>
+                  <span class="text-xs">(${product.rating_count})</span>
+                </div>
+              ` : ''}
+            </div>
+          </div>
+        `;
+      }).join('');
+      
+      // الترقيم
+      renderPagination(totalPages);
+    }
+    
+    // ========== الترقيم ==========
+    function renderPagination(totalPages) {
+      const container = document.getElementById('pagination');
+      if (totalPages <= 1) {
+        container.innerHTML = '';
+        return;
+      }
+      
+      let html = '';
+      for (let i = 1; i <= Math.min(totalPages, 5); i++) {
+        html += `<button class="pagination-btn ${currentPage === i ? 'active' : ''}" data-page="${i}">${i}</button>`;
+      }
+      
+      container.innerHTML = html;
+      
+      document.querySelectorAll('.pagination-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          currentPage = parseInt(btn.dataset.page);
+          renderProducts();
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+      });
+    }
+    
+    // ========== أحداث ==========
+    function setupEvents() {
+      // بحث
+      const searchInput = document.getElementById('searchInput');
+      searchInput.addEventListener('input', (e) => {
+        currentFilters.search = e.target.value;
+        currentPage = 1;
+        loadProducts();
+      });
+      
+      // فلترة السعر
+      document.getElementById('applyPriceBtn')?.addEventListener('click', () => {
+        currentFilters.minPrice = document.getElementById('minPrice').value;
+        currentFilters.maxPrice = document.getElementById('maxPrice').value;
+        currentPage = 1;
+        loadProducts();
+      });
+      
+      // فلترة المخزون
+      document.querySelectorAll('.stock-filter').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.stock-filter').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          currentFilters.stock = btn.dataset.stock;
+          currentPage = 1;
+          loadProducts();
+        });
+      });
+      
+      // الترتيب
+      document.getElementById('sortSelect')?.addEventListener('change', (e) => {
+        currentFilters.sort = e.target.value;
+        loadProducts();
+      });
+      
+      // إعادة تعيين
+      document.getElementById('resetFilters')?.addEventListener('click', () => {
+        currentFilters = {
+          search: '',
+          category: '',
+          minPrice: '',
+          maxPrice: '',
+          stock: 'all',
+          sort: 'newest'
+        };
+        document.getElementById('searchInput').value = '';
+        document.getElementById('minPrice').value = '';
+        document.getElementById('maxPrice').value = '';
+        document.getElementById('sortSelect').value = 'newest';
+        document.querySelectorAll('.stock-filter').forEach(b => b.classList.remove('active'));
+        document.querySelector('.stock-filter[data-stock="all"]')?.classList.add('active');
+        currentPage = 1;
+        loadProducts();
+        renderCategories();
+      });
+    }
+    
+    function showLoader() {
+      const grid = document.getElementById('productsGrid');
+      if (grid && grid.children.length === 0) {
+        grid.innerHTML = '<div class="loader-spinner" style="grid-column:1/-1"></div>';
+      }
+    }
+    
+    // ========== INIT ==========
+    document.addEventListener('DOMContentLoaded', () => {
+      loadCategories();
+      loadProducts();
+      setupEvents();
+    });
+  </script>
+  
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+</body>
+</html>
