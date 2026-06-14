@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>MarnissaMall – أول سوق إلكتروني في مرنيسة قرية</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Tajawal', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            color: #1e2a3e;
+            line-height: 1.5;
+        }
+
+        /* تنسيق عام */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* الهيدر */
+        header {
+            background: linear-gradient(135deg, #0f3b2c, #1e5a3a);
+            color: white;
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header-flex {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .logo h1 {
+            font-size: 1.8rem;
+            letter-spacing: -0.5px;
+        }
+        .logo p {
+            font-size: 0.8rem;
+            color: #d1e7dd;
+        }
+
+        .search-bar {
+            flex: 1;
+            max-width: 400px;
+            display: flex;
+        }
+        .search-bar input {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 30px 0 0 30px;
+            font-size: 1rem;
+        }
+        .search-bar button {
+            background-color: #ff9800;
+            border: none;
+            padding: 0 20px;
+            border-radius: 0 30px 30px 0;
+            cursor: pointer;
+            font-weight: bold;
+            color: #1e2a3e;
+        }
+        .cart-icon {
+            background-color: #ff9800;
+            padding: 8px 15px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: bold;
+            display: flex;
+            gap: 8px;
+        }
+
+        /* الـ hero section */
+        .hero {
+            background: url('https://via.placeholder.com/1200x300?text=مرنيسة+قرية+ترحب+بكم') center/cover;
+            background-color: #2c5f2d;
+            color: white;
+            text-align: center;
+            padding: 60px 20px;
+            margin-bottom: 30px;
+        }
+        .hero h2 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            text-shadow: 1px 1px 3px black;
+        }
+
+        /* قسم المنتجات */
+        .section-title {
+            font-size: 1.8rem;
+            margin: 30px 0 20px;
+            border-right: 6px solid #ff9800;
+            padding-right: 15px;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+        }
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.12);
+        }
+        .product-img {
+            width: 100%;
+            height: 180px;
+            background-color: #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+        }
+        .product-info {
+            padding: 15px;
+        }
+        .product-title {
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+        }
+        .product-price {
+            color: #1e5a3a;
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin: 10px 0;
+        }
+        .btn-buy {
+            background-color: #ff9800;
+            border: none;
+            padding: 8px 0;
+            width: 100%;
+            border-radius: 30px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn-buy:hover {
+            background-color: #e68900;
+        }
+
+        /* عروض خاصة */
+        .offer-badge {
+            background-color: #e63946;
+            color: white;
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            margin-bottom: 8px;
+        }
+
+        /* قسم الباعة */
+        .seller-section {
+            background-color: #e9f5e9;
+            padding: 40px 0;
+            margin: 40px 0;
+            border-radius: 24px;
+        }
+        .seller-box {
+            background: white;
+            padding: 25px;
+            border-radius: 24px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        footer {
+            background-color: #0f3b2c;
+            color: #ddd;
+            text-align: center;
+            padding: 30px 0;
+            margin-top: 40px;
+        }
+
+        @media (max-width: 768px) {
+            .header-flex {
+                flex-direction: column;
+                text-align: center;
+            }
+            .hero h2 {
+                font-size: 1.6rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="container header-flex">
+        <div class="logo">
+            <h1>🛍️ MarnissaMall</h1>
+            <p>أول سوق إلكتروني في مرنيسة قرية - تاونات</p>
+        </div>
+        <div class="search-bar">
+            <input type="text" id="searchInput" placeholder="ابحث عن منتج... زيت زيتون، عسل، حرف يدوية">
+            <button id="searchBtn">🔍 بحث</button>
+        </div>
+        <div class="cart-icon" id="cartBtn">
+            🛒 السلة (<span id="cartCount">0</span>)
+        </div>
+    </div>
+</header>
+
+<div class="hero">
+    <div class="container">
+        <h2>🌟 مَرْنِيسَة مَول 🌟</h2>
+        <p>من منتجات قرية مرنيسة إلى بيتك – دعم للحرفي والمنتج المحلي</p>
+    </div>
+</div>
+
+<div class="container">
+    <!-- قسم المنتجات المحلية -->
+    <h3 class="section-title">✨ منتجات مرنيسة الأصلية</h3>
+    <div class="products-grid" id="productsContainer">
+        <!-- المنتجات ستظهر هنا عبر JS -->
+    </div>
+
+    <!-- عروض خاصة -->
+    <h3 class="section-title">🔥 عروض خاصة (سوق مرنيسة)</h3>
+    <div class="products-grid" id="offersContainer"></div>
+
+    <!-- قسم خاص بالباعة المحليين -->
+    <div class="seller-section">
+        <div class="container seller-box">
+            <h2>🌿 أنت صاحب حانوت في مرنيسة؟</h2>
+            <p>انضم إلى MarnissaMall كبائع محلي. اعرض منتجاتك (عسل، زيت، حرف يدوية، ملابس تقليدية) ووصل لكل المغرب.</p>
+            <button id="becomeSellerBtn" style="background:#1e5a3a; color:white; padding:12px 30px; border:none; border-radius:40px; margin-top:15px; font-weight:bold;">📢 سجل حانوتك الآن</button>
+        </div>
+    </div>
+</div>
+
+<footer>
+    <div class="container">
+        <p>© 2026 MarnissaMall – أول منصة إلكترونية في مرنيسة قرية، إقليم تاونات</p>
+        <p>للتواصل: marnissamall@example.com | هاتف: 05 XX XX XX XX</p>
+    </div>
+</footer>
+
+<script>
+    // قائمة المنتجات (مستوحاة من منتجات قروية)
+    const products = [
+        { id: 1, name: "زيت الزيتون البكر (1 لتر)", price: 55, category: "local", image: "🫒", isOffer: false, originalPrice: null },
+        { id: 2, name: "عسل جبلي طبيعي (500 غ)", price: 85, category: "local", image: "🍯", isOffer: true, originalPrice: 110 },
+        { id: 3, name: "الحناء مرنيسة (250 غ)", price: 20, category: "local", image: "🌿", isOffer: false },
+        { id: 4, name: "كسكس تقليدي (منتوج محلي)", price: 35, category: "local", image: "🍚", isOffer: false },
+        { id: 5, name: "طاجين فخار مرسوم يدوي", price: 120, category: "handmade", image: "🏺", isOffer: true, originalPrice: 160 },
+        { id: 6, name: "زعتر بري مجفف", price: 18, category: "local", image: "🌱", isOffer: false },
+        { id: 7, name: "ملحمة تقليدية (مزركشة)", price: 250, category: "handmade", image: "🧣", isOffer: false },
+        { id: 8, name: "أملاڤ (خبز تقليدي)", price: 12, category: "local", image: "🥖", isOffer: false }
+    ];
+
+    // عروض خاصة (منتجات فيها تخفيض)
+    let cart = JSON.parse(localStorage.getItem('marnissaCart')) || [];
+
+    function updateCartUI() {
+        document.getElementById('cartCount').innerText = cart.length;
+        localStorage.setItem('marnissaCart', JSON.stringify(cart));
+    }
+
+    function addToCart(productId) {
+        const product = products.find(p => p.id === productId);
+        if(product) {
+            cart.push(product);
+            updateCartUI();
+            alert(`✅ تمت إضافة "${product.name}" إلى سلتك!`);
+        }
+    }
+
+    function renderProducts() {
+        const container = document.getElementById('productsContainer');
+        const offersContainer = document.getElementById('offersContainer');
+        
+        // المنتجات العادية (غير عروض خاصة) محدثين حسب البحث
+        let filteredProducts = products.filter(p => !p.isOffer);
+        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+        if(searchTerm) {
+            filteredProducts = filteredProducts.filter(p => p.name.includes(searchTerm));
+        }
+
+        container.innerHTML = '';
+        filteredProducts.forEach(prod => {
+            const card = document.createElement('div');
+            card.className = 'product-card';
+            card.innerHTML = `
+                <div class="product-img">${prod.image}</div>
+                <div class="product-info">
+                    <div class="product-title">${prod.name}</div>
+                    <div class="product-price">${prod.price} درهم</div>
+                    <button class="btn-buy" data-id="${prod.id}">🛒 أضف للسلة</button>
+                </div>
+            `;
+            container.appendChild(card);
+        });
+
+        // العروض الخاصة
+        const offers = products.filter(p => p.isOffer === true);
+        offersContainer.innerHTML = '';
+        offers.forEach(offer => {
+            const card = document.createElement('div');
+            card.className = 'product-card';
+            card.innerHTML = `
+                <div class="product-img">${offer.image}</div>
+                <div class="product-info">
+                    <div class="offer-badge">🔥 عرض خاص</div>
+                    <div class="product-title">${offer.name}</div>
+                    <div class="product-price" style="color:#e63946;">${offer.price} درهم <span style="text-decoration:line-through; color:gray; font-size:0.9rem;">${offer.originalPrice} درهم</span></div>
+                    <button class="btn-buy" data-id="${offer.id}">🛒 أضف للسلة</button>
+                </div>
+            `;
+            offersContainer.appendChild(card);
+        });
+
+        // إضافة مستمعي الأزرار بعد إعادة الرسم
+        document.querySelectorAll('.btn-buy').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const id = parseInt(btn.getAttribute('data-id'));
+                addToCart(id);
+            });
+        });
+    }
+
+    // البحث
+    document.getElementById('searchBtn').addEventListener('click', () => {
+        renderProducts();
+    });
+    document.getElementById('searchInput').addEventListener('keyup', (e) => {
+        if(e.key === 'Enter') renderProducts();
+    });
+
+    // زر السلة (عرض محتوى السلة)
+    document.getElementById('cartBtn').addEventListener('click', () => {
+        if(cart.length === 0) {
+            alert("السلة فارغة حالياً. أضف بعض المنتجات من مرنيسة 🛍️");
+        } else {
+            let msg = "🛒 منتجاتك:\n";
+            cart.forEach((item, idx) => { msg += `${idx+1}. ${item.name} - ${item.price} درهم\n`; });
+            msg += `\nالمجموع: ${cart.reduce((sum, p) => sum + p.price, 0)} درهم\nشكراً لدعم المنتج المحلي ❤️`;
+            alert(msg);
+        }
+    });
+
+    // زر الانضمام كبائع محلي
+    document.getElementById('becomeSellerBtn').addEventListener('click', () => {
+        alert("📢 مرحبا بك في MarnissaMall كبائع.\nللإستفسار: تواصل معنا عبر واتساب 06XXXXXXXX أو زر أقرب نقطة لوجيستيك في تاونات.\nسنضيف حانوتك قريباً!");
+    });
+
+    renderProducts();
+    updateCartUI();
+</script>
+</body>
+</html>
