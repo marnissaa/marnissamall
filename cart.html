@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>سلة التسوق | MarnissaMall</title>
+  <link rel="icon" href="images/logo.png" type="image/png">
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root { --blue-primary: #0057b3; --blue-dark: #003d80; --blue-light: #3a8fd4; --success: #25D366; --danger: #ff4757; }
+    body {
+      --bg: #0a0a0a; --bg2: #0d1117; --gray: #161b22; --text: #ffffff;
+      --text-muted: #c9d1d9; --text-dim: #8b949e;
+      --border: rgba(0,87,179,0.35); --border2: rgba(0,87,179,0.5);
+      --card: rgba(13,17,23,0.85);
+    }
+    body.blue-theme {
+      --bg: #e8f0fe; --bg2: #ffffff; --gray: #f0f4fa; --text: #0a0a0a;
+      --text-muted: #1a3a5c; --text-dim: #4a6a8c;
+      --border: rgba(0,87,179,0.2); --border2: rgba(0,87,179,0.3);
+      --card: rgba(255,255,255,0.9);
+    }
+    body { background: var(--bg); font-family: 'Tajawal', sans-serif; color: var(--text); transition: background-color 0.5s ease, color 0.5s ease; }
+    .darija-text { font-family: 'Tajawal', sans-serif; }
+    .page-wrap { max-width: 1100px; margin: 0 auto; padding: clamp(30px,5vh,60px) 1.5rem; }
+
+    .section-title { position: relative; display: inline-block; font-size: clamp(1.5rem, 5vw, 2rem); font-weight: 800; margin-bottom: 2rem; }
+    .section-title::after { content: ''; position: absolute; bottom: -10px; right: 0; width: 50px; height: 2px; background: var(--blue-primary); }
+
+    .cart-item {
+      display: flex; align-items: center; gap: 1rem; padding: 1rem;
+      background: var(--card); border: 1px solid var(--border); border-radius: 16px; margin-bottom: 1rem;
+    }
+    .cart-item img { width: 80px; height: 80px; border-radius: 12px; object-fit: cover; background: var(--gray); flex-shrink: 0; }
+    .cart-item-info { flex: 1; min-width: 0; }
+    .cart-item-name { font-weight: 700; margin-bottom: 0.3rem; }
+    .cart-item-price { color: var(--blue-primary); font-weight: 700; font-size: 0.9rem; }
+
+    .qty-selector { display: flex; align-items: center; gap: 0.5rem; }
+    .qty-btn {
+      width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--border2);
+      background: rgba(0,87,179,0.05); color: var(--text); cursor: pointer; font-size: 0.85rem;
+      display: flex; align-items: center; justify-content: center; transition: all 0.2s;
+    }
+    .qty-btn:hover { border-color: var(--blue-primary); color: var(--blue-primary); }
+    .qty-value { font-size: 0.95rem; font-weight: 700; min-width: 28px; text-align: center; }
+
+    .remove-item-btn {
+      width: 36px; height: 36px; border-radius: 10px; border: 1px solid rgba(255,71,87,0.3);
+      background: rgba(255,71,87,0.08); color: var(--danger); cursor: pointer; font-size: 0.9rem;
+      display: flex; align-items: center; justify-content: center; transition: all 0.2s; flex-shrink: 0;
+    }
+    .remove-item-btn:hover { background: rgba(255,71,87,0.18); }
+
+    .summary-card {
+      background: var(--card); border: 1px solid var(--border); border-radius: 20px;
+      padding: clamp(1.25rem, 4vw, 2rem); position: sticky; top: 90px;
+    }
+    .summary-row { display: flex; justify-content: space-between; margin-bottom: 0.85rem; font-size: 0.9rem; color: var(--text-muted); }
+    .summary-row.total { font-size: 1.2rem; font-weight: 800; color: var(--text); border-top: 1px solid var(--border); padding-top: 0.85rem; margin-top: 0.85rem; }
+    .summary-row .val-blue { color: var(--blue-primary); }
+
+    .gold-btn {
+      background: transparent; border: 1.5px solid var(--blue-primary); color: var(--text);
+      letter-spacing: 1px; font-weight: 600; position: relative; overflow: hidden;
+      transition: all 0.4s; cursor: pointer; padding: 0.85rem 2rem; border-radius: 50px;
+      font-size: 0.9rem; display: inline-flex; align-items: center; gap: 0.6rem; width: 100%; justify-content: center;
+    }
+    .gold-btn::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(0,87,179,0.2), transparent); transition: left 0.5s; }
+    .gold-btn:hover::before { left: 100%; }
+    .gold-btn.filled { background: var(--blue-primary); color: white; }
+    .gold-btn.filled:hover { background: var(--blue-dark); color: white; border-color: var(--blue-dark); }
+    .gold-btn:hover { transform: translateY(-2px); border-color: var(--blue-light); color: var(--blue-light); }
+    .gold-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .empty-cart { text-align: center; padding: 4rem 1rem; color: var(--text-dim); }
+
+    @media (max-width: 768px) {
+      .cart-item { flex-wrap: wrap; }
+      .cart-item-info { width: calc(100% - 96px); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="page-wrap">
+    <h1 class="section-title darija-text" style="color:var(--text);">سلة التسوق</h1>
+
+    <div class="grid md:grid-cols-3 gap-8">
+      <div class="md:col-span-2" id="cartItemsContainer">
+        <!-- يُملأ بـ JS -->
+      </div>
+
+      <div>
+        <div class="summary-card" data-aos="fade-up">
+          <h3 class="font-bold mb-4 darija-text" style="color:var(--text);">ملخص الطلب</h3>
+          <div class="summary-row darija-text"><span>المجموع الفرعي</span><span class="val-blue" id="subtotalVal">0 درهم</span></div>
+          <div class="summary-row darija-text"><span>الشحن</span><span class="val-blue" id="shippingVal">0 درهم</span></div>
+          <div class="summary-row total darija-text"><span>الإجمالي</span><span class="val-blue" id="totalVal">0 درهم</span></div>
+          <a href="checkout.html" class="gold-btn filled darija-text" id="checkoutBtn">
+            <i class="fas fa-credit-card"></i> إتمام الطلب
+          </a>
+          <a href="products.html" class="gold-btn darija-text mt-3">
+            <i class="fas fa-arrow-right"></i> تابع التسوق
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="header.js"></script>
+  <script src="footer.js"></script>
+
+  <script>
+    AOS.init({ duration: 700, once: true });
+
+    function getCart() {
+      return JSON.parse(localStorage.getItem('marnissaCart')) || [];
+    }
+    function saveCart(cart) {
+      localStorage.setItem('marnissaCart', JSON.stringify(cart));
+      if (window.updateCartCount) window.updateCartCount();
+    }
+
+    function renderCart() {
+      const cart = getCart();
+      const container = document.getElementById('cartItemsContainer');
+
+      if (cart.length === 0) {
+        container.innerHTML = `
+          <div class="empty-cart darija-text">
+            <i class="fas fa-cart-shopping text-5xl mb-4 block opacity-40"></i>
+            السلة فارغة حالياً. <a href="products.html" style="color:var(--blue-primary);">تصفح المنتجات</a>
+          </div>
+        `;
+        document.getElementById('checkoutBtn').setAttribute('disabled', 'true');
+        document.getElementById('checkoutBtn').style.opacity = '0.4';
+        document.getElementById('checkoutBtn').style.pointerEvents = 'none';
+        updateSummary(0);
+        return;
+      }
+
+      container.innerHTML = cart.map((item, index) => `
+        <div class="cart-item" data-aos="fade-up">
+          <img src="${item.image || 'https://placehold.co/80x80/1a1a2e/0057b3?text=M'}" alt="${escapeHtml(item.name)}" onerror="this.src='https://placehold.co/80x80/1a1a2e/0057b3?text=M'">
+          <div class="cart-item-info">
+            <div class="cart-item-name darija-text">${escapeHtml(item.name)}</div>
+            <div class="cart-item-price darija-text">${item.price} درهم</div>
+          </div>
+          <div class="qty-selector">
+            <button class="qty-btn" onclick="changeQty(${index}, -1)"><i class="fas fa-minus"></i></button>
+            <span class="qty-value">${item.qty}</span>
+            <button class="qty-btn" onclick="changeQty(${index}, 1)"><i class="fas fa-plus"></i></button>
+          </div>
+          <button class="remove-item-btn" onclick="removeItem(${index})"><i class="fas fa-trash"></i></button>
+        </div>
+      `).join('');
+
+      document.getElementById('checkoutBtn').removeAttribute('disabled');
+      document.getElementById('checkoutBtn').style.opacity = '1';
+      document.getElementById('checkoutBtn').style.pointerEvents = 'auto';
+
+      const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+      updateSummary(subtotal);
+    }
+
+    function updateSummary(subtotal) {
+      const freeShippingAbove = (typeof MARNISSA_CONFIG !== 'undefined') ? MARNISSA_CONFIG.FREE_SHIPPING_ABOVE : 300;
+      const shippingCost = (typeof MARNISSA_CONFIG !== 'undefined') ? MARNISSA_CONFIG.SHIPPING_COST : 25;
+      const shipping = subtotal === 0 ? 0 : (subtotal >= freeShippingAbove ? 0 : shippingCost);
+      const total = subtotal + shipping;
+
+      document.getElementById('subtotalVal').textContent = subtotal + ' درهم';
+      document.getElementById('shippingVal').textContent = shipping === 0 ? 'مجاني 🎉' : shipping + ' درهم';
+      document.getElementById('totalVal').textContent = total + ' درهم';
+    }
+
+    window.changeQty = function (index, delta) {
+      const cart = getCart();
+      const item = cart[index];
+      if (!item) return;
+
+      const newQty = item.qty + delta;
+      if (newQty < 1) return;
+      if (newQty > item.stock) {
+        showToast && showToast('⚠️ الكمية تتجاوز المخزون المتاح', 'error');
+        return;
+      }
+
+      item.qty = newQty;
+      saveCart(cart);
+      renderCart();
+    };
+
+    window.removeItem = function (index) {
+      const cart = getCart();
+      cart.splice(index, 1);
+      saveCart(cart);
+      renderCart();
+    };
+
+    function escapeHtml(s) {
+      if (!s) return '';
+      return String(s).replace(/[&<>"']/g, m => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]));
+    }
+
+    document.addEventListener('DOMContentLoaded', renderCart);
+  </script>
+</body>
+</html>

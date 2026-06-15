@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>إتمام الطلب | MarnissaMall</title>
+  <link rel="icon" href="images/logo.png" type="image/png">
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root { --blue-primary: #0057b3; --blue-dark: #003d80; --blue-light: #3a8fd4; --success: #25D366; --danger: #ff4757; }
+    body {
+      --bg: #0a0a0a; --bg2: #0d1117; --gray: #161b22; --text: #ffffff;
+      --text-muted: #c9d1d9; --text-dim: #8b949e;
+      --border: rgba(0,87,179,0.35); --border2: rgba(0,87,179,0.5);
+      --card: rgba(13,17,23,0.85);
+    }
+    body.blue-theme {
+      --bg: #e8f0fe; --bg2: #ffffff; --gray: #f0f4fa; --text: #0a0a0a;
+      --text-muted: #1a3a5c; --text-dim: #4a6a8c;
+      --border: rgba(0,87,179,0.2); --border2: rgba(0,87,179,0.3);
+      --card: rgba(255,255,255,0.9);
+    }
+    body { background: var(--bg); font-family: 'Tajawal', sans-serif; color: var(--text); transition: background-color 0.5s ease, color 0.5s ease; }
+    .darija-text { font-family: 'Tajawal', sans-serif; }
+    .page-wrap { max-width: 1100px; margin: 0 auto; padding: clamp(30px,5vh,60px) 1.5rem; }
+
+    .section-title { position: relative; display: inline-block; font-size: clamp(1.5rem, 5vw, 2rem); font-weight: 800; margin-bottom: 2rem; }
+    .section-title::after { content: ''; position: absolute; bottom: -10px; right: 0; width: 50px; height: 2px; background: var(--blue-primary); }
+
+    .form-card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: clamp(1.25rem, 4vw, 2rem); }
+    .form-group { margin-bottom: 1.1rem; }
+    .form-label { display: block; font-size: 0.8rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.4rem; }
+    .form-label .req { color: var(--danger); }
+    .form-input, .form-textarea {
+      background: rgba(0,0,0,0.05); border: 1px solid var(--border2); border-radius: 12px;
+      padding: 0.75rem 1rem; color: var(--text); width: 100%; font-family: inherit; transition: all 0.3s;
+    }
+    .form-input:focus, .form-textarea:focus { outline: none; border-color: var(--blue-primary); }
+    .form-input::placeholder, .form-textarea::placeholder { color: var(--text-dim); }
+    .form-textarea { resize: vertical; min-height: 80px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    @media (max-width: 600px) { .form-row { grid-template-columns: 1fr; } }
+
+    .payment-options { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+    .payment-option {
+      flex: 1; min-width: 140px; border: 1.5px solid var(--border2); border-radius: 14px;
+      padding: 1rem; cursor: pointer; transition: all 0.25s; text-align: center;
+    }
+    .payment-option.active { border-color: var(--blue-primary); background: rgba(0,87,179,0.08); }
+    .payment-option i { font-size: 1.5rem; color: var(--blue-primary); display: block; margin-bottom: 0.5rem; }
+
+    .summary-card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: clamp(1.25rem, 4vw, 2rem); position: sticky; top: 90px; }
+    .summary-item { display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.6rem; }
+    .summary-row { display: flex; justify-content: space-between; margin-bottom: 0.85rem; font-size: 0.9rem; color: var(--text-muted); }
+    .summary-row.total { font-size: 1.2rem; font-weight: 800; color: var(--text); border-top: 1px solid var(--border); padding-top: 0.85rem; margin-top: 0.85rem; }
+    .val-blue { color: var(--blue-primary); }
+
+    .gold-btn {
+      background: transparent; border: 1.5px solid var(--blue-primary); color: var(--text);
+      letter-spacing: 1px; font-weight: 600; position: relative; overflow: hidden;
+      transition: all 0.4s; cursor: pointer; padding: 0.85rem 2rem; border-radius: 50px;
+      font-size: 0.9rem; display: inline-flex; align-items: center; gap: 0.6rem; width: 100%; justify-content: center;
+    }
+    .gold-btn::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(0,87,179,0.2), transparent); transition: left 0.5s; }
+    .gold-btn:hover::before { left: 100%; }
+    .gold-btn.filled { background: var(--blue-primary); color: white; }
+    .gold-btn.filled:hover { background: var(--blue-dark); color: white; border-color: var(--blue-dark); }
+    .gold-btn:hover { transform: translateY(-2px); border-color: var(--blue-light); color: var(--blue-light); }
+    .gold-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .bank-info { background: rgba(0,87,179,0.06); border: 1px solid var(--border); border-radius: 12px; padding: 0.85rem; font-size: 0.8rem; margin-top: 0.75rem; display: none; }
+    .bank-info.show { display: block; }
+
+    .success-screen { text-align: center; padding: 4rem 1rem; }
+    .success-screen i { font-size: 4rem; color: var(--success); margin-bottom: 1rem; }
+  </style>
+</head>
+<body>
+
+  <div class="page-wrap" id="checkoutWrap">
+    <h1 class="section-title darija-text" style="color:var(--text);">إتمام الطلب</h1>
+
+    <div class="grid md:grid-cols-3 gap-8">
+      <div class="md:col-span-2">
+        <div class="form-card" data-aos="fade-up">
+          <h3 class="font-bold mb-4 darija-text" style="color:var(--text);">معلومات التوصيل</h3>
+          <form id="checkoutForm">
+            <div class="form-group">
+              <label class="form-label darija-text">الاسم الكامل <span class="req">*</span></label>
+              <input type="text" id="customerName" class="form-input darija-text" placeholder="مثال: أحمد العلوي" required>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label darija-text">رقم الهاتف <span class="req">*</span></label>
+                <input type="tel" id="customerPhone" class="form-input" placeholder="06XXXXXXXX" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label darija-text">المدينة <span class="req">*</span></label>
+                <input type="text" id="customerCity" class="form-input darija-text" placeholder="مثال: تاونات" required>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label darija-text">العنوان الكامل <span class="req">*</span></label>
+              <textarea id="customerAddress" class="form-textarea darija-text" placeholder="الحي، الشارع، رقم المنزل..." required></textarea>
+            </div>
+            <div class="form-group">
+              <label class="form-label darija-text">ملاحظات إضافية (اختياري)</label>
+              <textarea id="customerNotes" class="form-textarea darija-text" placeholder="مثال: التوصيل بعد العصر..."></textarea>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label darija-text">طريقة الدفع <span class="req">*</span></label>
+              <div class="payment-options">
+                <div class="payment-option active darija-text" data-payment="cod">
+                  <i class="fas fa-money-bill-wave"></i>
+                  الدفع عند الاستلام
+                </div>
+                <div class="payment-option darija-text" data-payment="bank_transfer">
+                  <i class="fas fa-building-columns"></i>
+                  التحويل البنكي
+                </div>
+              </div>
+              <div class="bank-info darija-text" id="bankInfo">
+                <p>💳 بعد تأكيد الطلب، تواصل معنا عبر واتساب لإرسال معلومات التحويل البنكي.</p>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div>
+        <div class="summary-card" data-aos="fade-up">
+          <h3 class="font-bold mb-4 darija-text" style="color:var(--text);">ملخص الطلب</h3>
+          <div id="orderItemsSummary"></div>
+          <div class="summary-row darija-text"><span>المجموع الفرعي</span><span class="val-blue" id="subtotalVal">0 درهم</span></div>
+          <div class="summary-row darija-text"><span>الشحن</span><span class="val-blue" id="shippingVal">0 درهم</span></div>
+          <div class="summary-row total darija-text"><span>الإجمالي</span><span class="val-blue" id="totalVal">0 درهم</span></div>
+          <button class="gold-btn filled darija-text" id="confirmOrderBtn">
+            <i class="fas fa-check-circle"></i> تأكيد الطلب
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="header.js"></script>
+  <script src="footer.js"></script>
+
+  <script>
+    AOS.init({ duration: 700, once: true });
+
+    let selectedPayment = 'cod';
+    let cart = [];
+    let subtotal = 0, shipping = 0, total = 0;
+
+    function getCart() { return JSON.parse(localStorage.getItem('marnissaCart')) || []; }
+
+    function init() {
+      cart = getCart();
+      if (cart.length === 0) {
+        document.getElementById('checkoutWrap').innerHTML = `
+          <div class="success-screen darija-text">
+            <i class="fas fa-cart-shopping" style="color:var(--blue-primary);"></i>
+            <h2 class="text-xl font-bold mb-3" style="color:var(--text);">السلة فارغة</h2>
+            <p style="color:var(--text-dim);">المرجو إضافة منتجات للسلة قبل إتمام الطلب.</p>
+            <a href="products.html" class="gold-btn filled darija-text" style="max-width:220px;margin:1.5rem auto;display:flex;">تصفح المنتجات</a>
+          </div>
+        `;
+        return;
+      }
+
+      renderSummary();
+      setupPaymentOptions();
+      document.getElementById('confirmOrderBtn').addEventListener('click', submitOrder);
+    }
+
+    function renderSummary() {
+      const itemsContainer = document.getElementById('orderItemsSummary');
+      itemsContainer.innerHTML = cart.map(item => `
+        <div class="summary-item darija-text">
+          <span>${escapeHtml(item.name)} × ${item.qty}</span>
+          <span>${item.price * item.qty} درهم</span>
+        </div>
+      `).join('');
+
+      subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+      const freeShippingAbove = (typeof MARNISSA_CONFIG !== 'undefined') ? MARNISSA_CONFIG.FREE_SHIPPING_ABOVE : 300;
+      const shippingCost = (typeof MARNISSA_CONFIG !== 'undefined') ? MARNISSA_CONFIG.SHIPPING_COST : 25;
+      shipping = subtotal >= freeShippingAbove ? 0 : shippingCost;
+      total = subtotal + shipping;
+
+      document.getElementById('subtotalVal').textContent = subtotal + ' درهم';
+      document.getElementById('shippingVal').textContent = shipping === 0 ? 'مجاني 🎉' : shipping + ' درهم';
+      document.getElementById('totalVal').textContent = total + ' درهم';
+    }
+
+    function setupPaymentOptions() {
+      document.querySelectorAll('.payment-option').forEach(opt => {
+        opt.addEventListener('click', () => {
+          document.querySelectorAll('.payment-option').forEach(o => o.classList.remove('active'));
+          opt.classList.add('active');
+          selectedPayment = opt.dataset.payment;
+          document.getElementById('bankInfo').classList.toggle('show', selectedPayment === 'bank_transfer');
+        });
+      });
+    }
+
+    async function submitOrder() {
+      const name = document.getElementById('customerName').value.trim();
+      const phone = document.getElementById('customerPhone').value.trim();
+      const city = document.getElementById('customerCity').value.trim();
+      const address = document.getElementById('customerAddress').value.trim();
+      const notes = document.getElementById('customerNotes').value.trim();
+
+      if (!name || !phone || !city || !address) {
+        alert('⚠️ المرجو تعبئة جميع الحقول المطلوبة');
+        return;
+      }
+
+      const btn = document.getElementById('confirmOrderBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري إرسال الطلب...';
+
+      // جلب المستخدم الحالي (إن وجد)
+      let userId = null;
+      if (window.sb) {
+        const { data: userData } = await sb.auth.getUser();
+        userId = userData?.user?.id || null;
+      }
+
+      // 1. إنشاء الطلب
+      const { data: order, error: orderError } = await sb.from('orders').insert({
+        user_id: userId,
+        customer_name: name,
+        customer_phone: phone,
+        customer_city: city,
+        customer_address: address,
+        notes: notes,
+        payment_method: selectedPayment,
+        status: 'pending',
+        subtotal: subtotal,
+        shipping_cost: shipping,
+        total: total
+      }).select().single();
+
+      if (orderError || !order) {
+        alert('❌ حدث خطأ فإرسال الطلب: ' + (orderError?.message || 'غير معروف'));
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-check-circle"></i> تأكيد الطلب';
+        return;
+      }
+
+      // 2. جلب seller_id لكل منتج
+      const productIds = cart.map(item => item.id);
+      const { data: productsData } = await sb.from('products').select('id, seller_id').in('id', productIds);
+      const sellerMap = {};
+      (productsData || []).forEach(p => sellerMap[p.id] = p.seller_id);
+
+      // 3. إنشاء order_items (يقلل المخزون تلقائياً عبر trigger)
+      const orderItems = cart.map(item => ({
+        order_id: order.id,
+        product_id: item.id,
+        seller_id: sellerMap[item.id] || null,
+        product_name: item.name,
+        product_image: item.image,
+        price: item.price,
+        quantity: item.qty,
+        subtotal: item.price * item.qty
+      }));
+
+      const { error: itemsError } = await sb.from('order_items').insert(orderItems);
+
+      if (itemsError) {
+        alert('⚠️ تم إنشاء الطلب لكن حدث خطأ فتسجيل المنتجات: ' + itemsError.message);
+      }
+
+      // 4. تفريغ السلة وعرض شاشة النجاح
+      localStorage.removeItem('marnissaCart');
+      if (window.updateCartCount) window.updateCartCount();
+
+      document.getElementById('checkoutWrap').innerHTML = `
+        <div class="success-screen darija-text">
+          <i class="fas fa-circle-check"></i>
+          <h2 class="text-xl font-bold mb-3" style="color:var(--text);">تم استلام طلبك بنجاح! 🎉</h2>
+          <p style="color:var(--text-dim);">رقم الطلب: <strong style="color:var(--blue-primary);">${order.id.slice(0,8)}</strong></p>
+          <p class="mt-2" style="color:var(--text-dim);">سنتواصل معك قريباً لتأكيد التوصيل.</p>
+          <a href="index.html" class="gold-btn filled darija-text" style="max-width:220px;margin:1.5rem auto;display:flex;">العودة للرئيسية</a>
+        </div>
+      `;
+    }
+
+    function escapeHtml(s) {
+      if (!s) return '';
+      return String(s).replace(/[&<>"']/g, m => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]));
+    }
+
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>

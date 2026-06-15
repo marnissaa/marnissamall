@@ -65,7 +65,7 @@
 
     .page-header {
       padding: clamp(40px, 6vh, 70px) 1.5rem 1.5rem;
-      max-width: 900px;
+      max-width: 1000px;
       margin: 0 auto;
     }
 
@@ -85,7 +85,7 @@
     }
 
     .container-wrap {
-      max-width: 900px;
+      max-width: 1000px;
       margin: 0 auto;
       padding: 0 1.5rem clamp(60px, 8vh, 100px);
     }
@@ -107,6 +107,7 @@
       margin-bottom: 0.5rem;
     }
     .form-label .req { color: var(--danger); }
+    .form-label .hint { font-size: 0.7rem; color: var(--text-dim); font-weight: normal; margin-right: 0.5rem; }
 
     .form-input, .form-textarea, .form-select {
       background: rgba(0,0,0,0.05);
@@ -126,11 +127,12 @@
     .form-select option { background: var(--bg2); color: var(--text); }
 
     .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-    @media (max-width: 600px) { .form-row { grid-template-columns: 1fr; } }
+    .form-row-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+    @media (max-width: 768px) { .form-row, .form-row-3 { grid-template-columns: 1fr; } }
 
     .form-hint { font-size: 0.7rem; color: var(--text-dim); margin-top: 0.4rem; }
 
-    /* ===== Toggle switch ===== */
+    /* Toggle switch */
     .toggle-row {
       display: flex; align-items: center; justify-content: space-between;
       background: rgba(0,87,179,0.05);
@@ -155,7 +157,7 @@
     .toggle-switch input:checked + .toggle-slider { background: var(--success); }
     .toggle-switch input:checked + .toggle-slider::before { transform: translateX(-22px); }
 
-    /* ===== Media Upload Zones ===== */
+    /* Media Upload Zones */
     .media-section { margin-bottom: 1.25rem; }
     .dropzone {
       border: 2px dashed var(--border2);
@@ -224,7 +226,7 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* ===== Buttons ===== */
+    /* Buttons */
     .gold-btn {
       background: transparent;
       border: 1.5px solid var(--blue-primary);
@@ -277,7 +279,7 @@
       flex-wrap: wrap;
     }
 
-    /* ===== Toast ===== */
+    /* Toast */
     .toast-msg {
       position: fixed;
       bottom: 30px; left: 50%;
@@ -297,105 +299,280 @@
     .toast-msg.show { transform: translateX(-50%) translateY(0); opacity: 1; }
     .toast-msg.success { border-color: var(--success); color: var(--success); }
     .toast-msg.error { border-color: var(--danger); color: var(--danger); }
+
+    .accordion {
+      background: rgba(0,87,179,0.05);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      margin-bottom: 1rem;
+    }
+    .accordion-header {
+      padding: 1rem;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 600;
+    }
+    .accordion-content {
+      padding: 0 1rem 1rem 1rem;
+      display: none;
+      border-top: 1px solid var(--border);
+    }
+    .accordion.open .accordion-content { display: block; }
   </style>
 </head>
 <body>
 
-  <!-- الهيدر -->
+  <div id="header-placeholder"></div>
 
   <div class="page-header">
     <span class="text-xs tracking-[0.3em] darija-text" style="color:var(--blue-primary);">✦ لوحة تحكم البائع ✦</span>
     <h1 class="section-title font-bold darija-text mt-2" id="pageTitle" style="color:var(--text);">إضافة منتج جديد</h1>
-    <p class="text-sm mt-4 darija-text" style="color:var(--text-dim);">عمر المعلومات وحمّل صور وفيديو المنتج</p>
+    <p class="text-sm mt-4 darija-text" style="color:var(--text-dim);">عمر جميع المعلومات لتسويق أفضل لمنتجك</p>
   </div>
 
   <div class="container-wrap">
     <div class="form-card" data-aos="fade-up">
       <form id="productForm">
 
-        <!-- اسم المنتج -->
-        <div class="form-group">
-          <label class="form-label darija-text">اسم المنتج <span class="req">*</span></label>
-          <input type="text" id="productName" class="form-input darija-text" placeholder="مثال: زيت الزيتون البكر (1 لتر)" required>
-        </div>
-
-        <!-- الوصف -->
-        <div class="form-group">
-          <label class="form-label darija-text">الوصف</label>
-          <textarea id="productDescription" class="form-textarea darija-text" placeholder="اكتب وصفاً تفصيلياً للمنتج..."></textarea>
-        </div>
-
-        <!-- السعر والسعر القديم -->
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label darija-text">السعر (درهم) <span class="req">*</span></label>
-            <input type="number" id="productPrice" class="form-input" placeholder="55" min="0" step="0.01" required>
+        <!-- ========== المعلومات الأساسية ========== -->
+        <div class="accordion open">
+          <div class="accordion-header" onclick="toggleAccordion(this)">
+            <span><i class="fas fa-info-circle ml-2"></i> المعلومات الأساسية</span>
+            <i class="fas fa-chevron-down"></i>
           </div>
-          <div class="form-group">
-            <label class="form-label darija-text">السعر القديم (اختياري)</label>
-            <input type="number" id="productOldPrice" class="form-input" placeholder="70" min="0" step="0.01">
-            <p class="form-hint darija-text">يظهر مشطوباً للإشارة لعرض/تخفيض</p>
+          <div class="accordion-content">
+            
+            <!-- SKU + اسم المنتج -->
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label darija-text">رقم المنتج (SKU) <span class="req">*</span></label>
+                <input type="text" id="productSku" class="form-input darija-text" placeholder="مثال: MS-OLIVE-001" required>
+                <p class="form-hint">كود فريد للمنتج، يستخدم للتتبع</p>
+              </div>
+              <div class="form-group">
+                <label class="form-label darija-text">اسم المنتج <span class="req">*</span></label>
+                <input type="text" id="productName" class="form-input darija-text" placeholder="مثال: زيت الزيتون البكر (1 لتر)" required>
+              </div>
+            </div>
+
+            <!-- الوصف -->
+            <div class="form-group">
+              <label class="form-label darija-text">الوصف القصير</label>
+              <textarea id="productDescription" class="form-textarea darija-text" rows="3" placeholder="وصف مختصر للمنتج يظهر في بطاقة المنتج..."></textarea>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label darija-text">الوصف الطويل</label>
+              <textarea id="productLongDescription" class="form-textarea darija-text" rows="6" placeholder="وصف مفصل للمنتج، المميزات، الفوائد، طريقة الاستخدام..."></textarea>
+            </div>
+
+            <!-- السعر -->
+            <div class="form-row-3">
+              <div class="form-group">
+                <label class="form-label darija-text">السعر (درهم) <span class="req">*</span></label>
+                <input type="number" id="productPrice" class="form-input" placeholder="55" min="0" step="0.01" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label darija-text">السعر قبل التخفيض</label>
+                <input type="number" id="productOldPrice" class="form-input" placeholder="70" min="0" step="0.01">
+                <p class="form-hint">يظهر مشطوباً للإشارة لعرض</p>
+              </div>
+              <div class="form-group">
+                <label class="form-label darija-text">سعر التكلفة</label>
+                <input type="number" id="productCostPrice" class="form-input" placeholder="35" min="0" step="0.01">
+                <p class="form-hint">لحساب الأرباح (غير ظاهر للزبون)</p>
+              </div>
+            </div>
+
+            <!-- المخزون -->
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label darija-text">الكمية المتوفرة <span class="req">*</span></label>
+                <input type="number" id="productStock" class="form-input" placeholder="20" min="0" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label darija-text">الحد الأدنى للمخزون</label>
+                <input type="number" id="productLowStock" class="form-input" placeholder="5" min="0" value="5">
+                <p class="form-hint">للتنبيه عند انخفاض المخزون</p>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label darija-text">الحد الأقصى للطلب</label>
+                <input type="number" id="productMaxOrder" class="form-input" placeholder="10" min="1" value="10">
+                <p class="form-hint">أقصى كمية يمكن للزبون شراؤها في طلب واحد</p>
+              </div>
+              <div class="form-group">
+                <label class="form-label darija-text">وقت التجهيز (أيام)</label>
+                <input type="number" id="productProcessingTime" class="form-input" placeholder="2" min="1" value="2">
+                <p class="form-hint">المدة اللازمة لتجهيز الطلب</p>
+              </div>
+            </div>
           </div>
         </div>
 
-        <!-- الفئة والمخزون -->
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label darija-text">الفئة <span class="req">*</span></label>
-            <select id="productCategory" class="form-select darija-text" required>
-              <option value="">-- اختر الفئة --</option>
-            </select>
+        <!-- ========== التفاصيل الفنية ========== -->
+        <div class="accordion">
+          <div class="accordion-header" onclick="toggleAccordion(this)">
+            <span><i class="fas fa-cogs ml-2"></i> التفاصيل الفنية</span>
+            <i class="fas fa-chevron-down"></i>
           </div>
-          <div class="form-group">
-            <label class="form-label darija-text">الكمية المتوفرة (Stock) <span class="req">*</span></label>
-            <input type="number" id="productStock" class="form-input" placeholder="20" min="0" required>
+          <div class="accordion-content">
+            <div class="form-row-3">
+              <div class="form-group">
+                <label class="form-label darija-text">الوزن</label>
+                <input type="text" id="productWeight" class="form-input" placeholder="1 كغ">
+              </div>
+              <div class="form-group">
+                <label class="form-label darija-text">الأبعاد</label>
+                <input type="text" id="productDimensions" class="form-input" placeholder="20×15×10 سم">
+              </div>
+              <div class="form-group">
+                <label class="form-label darija-text">المواد</label>
+                <input type="text" id="productMaterials" class="form-input" placeholder="زيت زيتون بكر، زجاجة زجاجية">
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label darija-text">العلامة التجارية</label>
+                <input type="text" id="productBrand" class="form-input" placeholder="MarnissaMall">
+              </div>
+              <div class="form-group">
+                <label class="form-label darija-text">بلد المنشأ</label>
+                <select id="productOrigin" class="form-select">
+                  <option value="">-- اختر --</option>
+                  <option value="المغرب">🇲🇦 المغرب</option>
+                  <option value="تونس">🇹🇳 تونس</option>
+                  <option value="الجزائر">🇩🇿 الجزائر</option>
+                  <option value="مصر">🇪🇬 مصر</option>
+                  <option value="أخرى">أخرى</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label darija-text">الضمان</label>
+              <input type="text" id="productWarranty" class="form-input" placeholder="سنتان">
+            </div>
           </div>
         </div>
 
-        <!-- الحد الأدنى للمخزون -->
-        <div class="form-group">
-          <label class="form-label darija-text">حد التنبيه للمخزون المنخفض</label>
-          <input type="number" id="productLowStock" class="form-input" placeholder="5" min="0" value="5">
-          <p class="form-hint darija-text">عند وصول المخزون لهاد العدد، غادي يبان كـ "منخفض" فلوحة التحكم</p>
-        </div>
-
-        <!-- التوفر -->
-        <div class="toggle-row">
-          <span class="darija-text" style="color:var(--text-muted);">المنتج متوفر للبيع</span>
-          <label class="toggle-switch">
-            <input type="checkbox" id="productAvailable" checked>
-            <span class="toggle-slider"></span>
-          </label>
-        </div>
-
-        <!-- ===== رفع الصور ===== -->
-        <div class="media-section">
-          <label class="form-label darija-text">صور المنتج <span class="req">*</span></label>
-          <div class="dropzone" id="imageDropzone">
-            <i class="fas fa-images"></i>
-            <p class="darija-text">اضغط أو اسحب الصور هنا</p>
-            <p class="sub darija-text">يمكن اختيار عدة صور (JPG, PNG, WEBP)</p>
+        <!-- ========== التصنيف وال SEO ========== -->
+        <div class="accordion">
+          <div class="accordion-header" onclick="toggleAccordion(this)">
+            <span><i class="fas fa-tags ml-2"></i> التصنيف و SEO</span>
+            <i class="fas fa-chevron-down"></i>
           </div>
-          <input type="file" id="imageInput" accept="image/*" multiple hidden>
-          <div class="media-grid" id="imageGrid"></div>
-        </div>
+          <div class="accordion-content">
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label darija-text">الفئة <span class="req">*</span></label>
+                <select id="productCategory" class="form-select darija-text" required>
+                  <option value="">-- اختر الفئة --</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label darija-text">الفئة الفرعية</label>
+                <select id="productSubcategory" class="form-select darija-text">
+                  <option value="">-- اختر --</option>
+                </select>
+              </div>
+            </div>
 
-        <!-- ===== رفع الفيديو ===== -->
-        <div class="media-section">
-          <label class="form-label darija-text">فيديو المنتج (اختياري)</label>
-          <div class="dropzone" id="videoDropzone">
-            <i class="fas fa-video"></i>
-            <p class="darija-text">اضغط أو اسحب فيديو هنا</p>
-            <p class="sub darija-text">فيديو واحد قصير يعرض المنتج (MP4)</p>
+            <div class="form-group">
+              <label class="form-label darija-text">وسوم (Tags)</label>
+              <input type="text" id="productTags" class="form-input" placeholder="زيت زيتون, طبيعي, مرنيسة">
+              <p class="form-hint">افصل بين الوسوم بفاصلة (،)</p>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label darija-text">كلمات مفتاحية (SEO)</label>
+              <input type="text" id="productMetaKeywords" class="form-input" placeholder="زيت زيتون، زيت زيتون بكر، زيت مرنيسة">
+              <p class="form-hint">لتحسين ظهور المنتج في محركات البحث</p>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label darija-text">Slug (رابط المنتج)</label>
+              <input type="text" id="productSlug" class="form-input darija-text" placeholder="zit-zitoun-bker-marnissa">
+              <p class="form-hint">يترك فارغاً لإنشائه تلقائياً</p>
+            </div>
           </div>
-          <input type="file" id="videoInput" accept="video/*" hidden>
-          <div class="media-grid" id="videoGrid"></div>
         </div>
 
-        <!-- ===== الأزرار ===== -->
+        <!-- ========== الإعدادات ========== -->
+        <div class="accordion">
+          <div class="accordion-header" onclick="toggleAccordion(this)">
+            <span><i class="fas fa-sliders-h ml-2"></i> إعدادات العرض</span>
+            <i class="fas fa-chevron-down"></i>
+          </div>
+          <div class="accordion-content">
+            <div class="toggle-row">
+              <span class="darija-text" style="color:var(--text-muted);">المنتج متوفر للبيع</span>
+              <label class="toggle-switch">
+                <input type="checkbox" id="productAvailable" checked>
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+
+            <div class="toggle-row">
+              <span class="darija-text" style="color:var(--text-muted);">منتج مميز (يظهر في الرئيسية)</span>
+              <label class="toggle-switch">
+                <input type="checkbox" id="productFeatured">
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+
+            <div class="toggle-row">
+              <span class="darija-text" style="color:var(--text-muted);">السماح بالمراجعات</span>
+              <label class="toggle-switch">
+                <input type="checkbox" id="productAllowReviews" checked>
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- ========== الوسائط ========== -->
+        <div class="accordion open">
+          <div class="accordion-header" onclick="toggleAccordion(this)">
+            <span><i class="fas fa-images ml-2"></i> الصور والفيديو</span>
+            <i class="fas fa-chevron-down"></i>
+          </div>
+          <div class="accordion-content">
+            <!-- رفع الصور -->
+            <div class="media-section">
+              <label class="form-label darija-text">صور المنتج <span class="req">*</span> <span class="hint">(أول صورة ستكون الرئيسية)</span></label>
+              <div class="dropzone" id="imageDropzone">
+                <i class="fas fa-images"></i>
+                <p class="darija-text">اضغط أو اسحب الصور هنا</p>
+                <p class="sub darija-text">يمكن اختيار عدة صور (JPG, PNG, WEBP)</p>
+              </div>
+              <input type="file" id="imageInput" accept="image/*" multiple hidden>
+              <div class="media-grid" id="imageGrid"></div>
+            </div>
+
+            <!-- رفع الفيديو -->
+            <div class="media-section">
+              <label class="form-label darija-text">فيديو المنتج</label>
+              <div class="dropzone" id="videoDropzone">
+                <i class="fas fa-video"></i>
+                <p class="darija-text">اضغط أو اسحب فيديو هنا</p>
+                <p class="sub darija-text">فيديو واحد قصير يعرض المنتج (MP4)</p>
+              </div>
+              <input type="file" id="videoInput" accept="video/*" hidden>
+              <div class="media-grid" id="videoGrid"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- الأزرار -->
         <div class="form-actions">
-          <a href="dashboard.html" class="btn-outline-cancel darija-text">
-            <i class="fas fa-arrow-right"></i> رجوع
+          <a href="admin.html" class="btn-outline-cancel darija-text">
+            <i class="fas fa-arrow-right"></i> إلغاء
           </a>
           <button type="submit" class="gold-btn darija-text" id="submitBtn">
             <i class="fas fa-check"></i> <span id="submitBtnText">حفظ المنتج</span>
@@ -406,108 +583,192 @@
     </div>
   </div>
 
-  <!-- Toast -->
   <div class="toast-msg" id="toastMsg"></div>
 
-  <!-- ========== SCRIPTS ========== -->
   <script src="header.js"></script>
   <script src="footer.js"></script>
 
   <script>
     AOS.init({ duration: 700, once: true, offset: 60 });
 
-    // ========== الحالة العامة ==========
-    let uploadedImages = []; // { url, public_id }
-    let uploadedVideo = null; // { url, public_id }
-    let editingProductId = null; // إذا كنا فوضعية التعديل
+    // ========== Supabase Client ==========
+    let sb = null;
 
-    // ========== التحقق من وضعية التعديل (عبر ?id=) ==========
-    const urlParams = new URLSearchParams(window.location.search);
-    editingProductId = urlParams.get('id');
-
-    // ========== جلب الفئات وتعميرها فـ select ==========
-    async function loadCategories() {
-      const { data, error } = await sb.from('categories').select('id, name').order('name');
-      const select = document.getElementById('productCategory');
-
-      if (error) {
-        showToast('❌ خطأ فجلب الفئات: ' + error.message, 'error');
-        return;
+    function initSupabase() {
+      try {
+        if (typeof MARNISSA_CONFIG !== 'undefined' && MARNISSA_CONFIG.SUPABASE_URL && MARNISSA_CONFIG.SUPABASE_ANON_KEY) {
+          sb = supabase.createClient(MARNISSA_CONFIG.SUPABASE_URL, MARNISSA_CONFIG.SUPABASE_ANON_KEY);
+          console.log('✅ Supabase client initialized');
+        } else {
+          console.error('❌ Supabase config manquante');
+          showToast('❌ خطأ: تأكد من إعدادات Supabase في config.js', 'error');
+        }
+      } catch(e) {
+        console.error('❌ Supabase init error:', e);
+        showToast('❌ خطأ في الاتصال بـ Supabase', 'error');
       }
-
-      (data || []).forEach(cat => {
-        const opt = document.createElement('option');
-        opt.value = cat.id;
-        opt.textContent = cat.name;
-        select.appendChild(opt);
-      });
     }
 
- 
-    // ========== إذا كنا فوضعية التعديل، جلب بيانات المنتج ==========
+    // ========== المتغيرات ==========
+    let uploadedImages = [];
+    let uploadedVideo = null;
+    let editingProductId = null;
+    let categories = [];
+    let subcategories = {};
+
+    // ========== جلب البائع الحالي ==========
+    async function getCurrentSellerId() {
+      try {
+        const { data, error } = await sb.from('sellers').select('id').limit(1);
+        if (error) throw error;
+        if (data && data.length > 0) return data[0].id;
+        
+        const { data: newSeller, error: insertError } = await sb
+          .from('sellers')
+          .insert({ store_name: 'متجر MarnissaMall', phone: '0612345678', is_approved: true })
+          .select()
+          .single();
+        
+        if (insertError) throw insertError;
+        return newSeller.id;
+      } catch(e) {
+        console.error('Error getting seller:', e);
+        showToast('❌ خطأ: تأكد من وجود بائع في قاعدة البيانات', 'error');
+        return null;
+      }
+    }
+
+    // ========== جلب الفئات ==========
+    async function loadCategories() {
+      try {
+        const { data, error } = await sb.from('categories').select('*').order('name');
+        if (error) throw error;
+        
+        categories = data || [];
+        const select = document.getElementById('productCategory');
+        
+        select.innerHTML = '<option value="">-- اختر الفئة --</option>';
+        categories.forEach(cat => {
+          const opt = document.createElement('option');
+          opt.value = cat.id;
+          opt.textContent = cat.name;
+          select.appendChild(opt);
+          
+          // تخزين الفئات الفرعية
+          if (cat.subcategories) {
+            subcategories[cat.id] = cat.subcategories;
+          }
+        });
+      } catch(e) {
+        console.error('Error loading categories:', e);
+        showToast('❌ خطأ في جلب الفئات', 'error');
+      }
+    }
+
+    // ========== جلب بيانات المنتج للتعديل ==========
     async function loadProductForEdit() {
       if (!editingProductId) return;
 
       document.getElementById('pageTitle').textContent = 'تعديل المنتج';
       document.getElementById('submitBtnText').textContent = 'حفظ التعديلات';
+      
+      document.getElementById('productStock').closest('.form-group').style.opacity = '0.5';
+      document.getElementById('productStock').disabled = true;
 
-      const { data, error } = await sb
-        .from('products')
-        .select('*')
-        .eq('id', editingProductId)
-        .single();
+      try {
+        const { data, error } = await sb
+          .from('products')
+          .select('*')
+          .eq('id', editingProductId)
+          .single();
 
-      if (error || !data) {
+        if (error || !data) throw error;
+
+        // المعلومات الأساسية
+        document.getElementById('productSku').value = data.sku || '';
+        document.getElementById('productName').value = data.name || '';
+        document.getElementById('productDescription').value = data.description || '';
+        document.getElementById('productLongDescription').value = data.long_description || '';
+        document.getElementById('productPrice').value = data.price || '';
+        document.getElementById('productOldPrice').value = data.old_price || '';
+        document.getElementById('productCostPrice').value = data.cost_price || '';
+        document.getElementById('productStock').value = data.stock || 0;
+        document.getElementById('productLowStock').value = data.low_stock_threshold || 5;
+        document.getElementById('productMaxOrder').value = data.max_order_quantity || 10;
+        document.getElementById('productProcessingTime').value = data.processing_time || 2;
+        
+        // التفاصيل الفنية
+        document.getElementById('productWeight').value = data.weight || '';
+        document.getElementById('productDimensions').value = data.dimensions || '';
+        document.getElementById('productMaterials').value = data.materials || '';
+        document.getElementById('productBrand').value = data.brand || '';
+        document.getElementById('productOrigin').value = data.origin || '';
+        document.getElementById('productWarranty').value = data.warranty || '';
+        
+        // التصنيف
+        document.getElementById('productCategory').value = data.category_id || '';
+        document.getElementById('productTags').value = (data.tags || []).join(', ');
+        document.getElementById('productMetaKeywords').value = data.meta_keywords || '';
+        document.getElementById('productSlug').value = data.slug || '';
+        
+        // الإعدادات
+        document.getElementById('productAvailable').checked = data.is_available !== false;
+        document.getElementById('productFeatured').checked = data.is_featured || false;
+        document.getElementById('productAllowReviews').checked = data.allow_reviews !== false;
+        
+        // الصور والفيديو
+        uploadedImages = (data.images || []).map(url => ({ url }));
+        renderImageGrid();
+        
+        if (data.video_url) {
+          uploadedVideo = { url: data.video_url };
+          renderVideoGrid();
+        }
+      } catch(e) {
+        console.error('Error loading product:', e);
         showToast('❌ لم يتم العثور على المنتج', 'error');
-        return;
-      }
-
-      document.getElementById('productName').value = data.name || '';
-      document.getElementById('productDescription').value = data.description || '';
-      document.getElementById('productPrice').value = data.price || '';
-      document.getElementById('productOldPrice').value = data.old_price || '';
-      document.getElementById('productStock').value = data.stock || 0;
-      document.getElementById('productLowStock').value = data.low_stock_threshold || 5;
-      document.getElementById('productAvailable').checked = data.is_available;
-      document.getElementById('productCategory').value = data.category_id || '';
-
-      // عرض الصور الموجودة
-      uploadedImages = (data.images || []).map(url => ({ url, public_id: null }));
-      renderImageGrid();
-
-      // عرض الفيديو الموجود (إن وجد فـ video_url)
-      if (data.video_url) {
-        uploadedVideo = { url: data.video_url, public_id: null };
-        renderVideoGrid();
       }
     }
 
-    // ========== رفع الصور ==========
+    // ========== رفع الملفات إلى Supabase Storage ==========
+    async function uploadFileToStorage(file, folder) {
+      const fileName = `${Date.now()}_${Math.random().toString(36).slice(2)}.${file.name.split('.').pop()}`;
+      const filePath = `${folder}/${fileName}`;
+      
+      const { error } = await sb.storage
+        .from('product-media')
+        .upload(filePath, file);
+
+      if (error) throw error;
+
+      const { data: publicUrl } = sb.storage
+        .from('product-media')
+        .getPublicUrl(filePath);
+
+      return publicUrl.publicUrl;
+    }
+
+    // ========== معالجة الصور ==========
     const imageDropzone = document.getElementById('imageDropzone');
     const imageInput = document.getElementById('imageInput');
     const imageGrid = document.getElementById('imageGrid');
 
     imageDropzone.addEventListener('click', () => imageInput.click());
     imageInput.addEventListener('change', (e) => handleImageFiles(e.target.files));
-
-    setupDragDrop(imageDropzone, handleImageFiles);
+    setupDragDrop(imageDropzone, (files) => handleImageFiles(files));
 
     async function handleImageFiles(files) {
-      for (const file of Array.from(files)) {
+      const filesArray = Array.from(files);
+      
+      for (const file of filesArray) {
         if (!file.type.startsWith('image/')) continue;
 
-        // إنشاء عنصر مؤقت يعرض حالة الرفع
-        const tempId = 'temp_' + Date.now() + '_' + Math.random().toString(36).slice(2);
-        const tempItem = createUploadingItem(tempId);
+        const tempItem = createUploadingItem();
         imageGrid.appendChild(tempItem);
 
         try {
-          const result = await MarnissaCloudinary.upload(file, (percent) => {
-            const progEl = tempItem.querySelector('.upload-progress');
-            if (progEl) progEl.textContent = percent + '%';
-          });
-
-          uploadedImages.push({ url: result.url, public_id: result.public_id });
+          const url = await uploadFileToStorage(file, 'products');
+          uploadedImages.push({ url });
           tempItem.remove();
           renderImageGrid();
           showToast('✅ تم رفع الصورة بنجاح', 'success');
@@ -519,9 +780,8 @@
     }
 
     function renderImageGrid() {
-      // إزالة العناصر الجاهزة فقط (الحفاظ على عناصر الرفع الجارية)
       imageGrid.querySelectorAll('.media-item.ready').forEach(el => el.remove());
-
+      
       uploadedImages.forEach((img, index) => {
         const item = document.createElement('div');
         item.className = 'media-item ready';
@@ -534,36 +794,30 @@
       });
     }
 
-    window.removeImage = function (index) {
+    window.removeImage = function(index) {
       uploadedImages.splice(index, 1);
       renderImageGrid();
     };
 
-    // ========== رفع الفيديو ==========
+    // ========== معالجة الفيديو ==========
     const videoDropzone = document.getElementById('videoDropzone');
     const videoInput = document.getElementById('videoInput');
     const videoGrid = document.getElementById('videoGrid');
 
     videoDropzone.addEventListener('click', () => videoInput.click());
     videoInput.addEventListener('change', (e) => handleVideoFile(e.target.files[0]));
-
     setupDragDrop(videoDropzone, (files) => handleVideoFile(files[0]));
 
     async function handleVideoFile(file) {
       if (!file || !file.type.startsWith('video/')) return;
 
-      const tempId = 'temp_video_' + Date.now();
-      const tempItem = createUploadingItem(tempId);
+      const tempItem = createUploadingItem();
       videoGrid.innerHTML = '';
       videoGrid.appendChild(tempItem);
 
       try {
-        const result = await MarnissaCloudinary.upload(file, (percent) => {
-          const progEl = tempItem.querySelector('.upload-progress');
-          if (progEl) progEl.textContent = percent + '%';
-        });
-
-        uploadedVideo = { url: result.url, public_id: result.public_id };
+        const url = await uploadFileToStorage(file, 'videos');
+        uploadedVideo = { url };
         tempItem.remove();
         renderVideoGrid();
         showToast('✅ تم رفع الفيديو بنجاح', 'success');
@@ -587,19 +841,18 @@
       videoGrid.appendChild(item);
     }
 
-    window.removeVideo = function () {
+    window.removeVideo = function() {
       uploadedVideo = null;
       renderVideoGrid();
     };
 
-    // ========== عناصر مساعدة ==========
-    function createUploadingItem(id) {
+    // ========== دوال مساعدة ==========
+    function createUploadingItem() {
       const div = document.createElement('div');
       div.className = 'media-item uploading';
-      div.dataset.tempId = id;
       div.innerHTML = `
         <div class="mini-spinner"></div>
-        <div class="upload-progress darija-text">0%</div>
+        <div class="upload-progress darija-text">جاري الرفع...</div>
       `;
       return div;
     }
@@ -618,11 +871,27 @@
         });
       });
       zone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        zone.classList.remove('dragover');
         if (e.dataTransfer.files.length) handler(e.dataTransfer.files);
       });
     }
 
-    // ========== حفظ المنتج (إضافة أو تعديل) ==========
+    function toggleAccordion(header) {
+      const accordion = header.closest('.accordion');
+      accordion.classList.toggle('open');
+    }
+
+    function generateSlug(text) {
+      return text
+        .toLowerCase()
+        .replace(/[^\u0621-\u064A\u0660-\u0669a-z0-9\s]/g, '')
+        .replace(/\s+/g, '-')
+        .replace(/-+/g, '-')
+        .trim();
+    }
+
+    // ========== حفظ المنتج ==========
     document.getElementById('productForm').addEventListener('submit', async (e) => {
       e.preventDefault();
 
@@ -638,31 +907,52 @@
       const sellerId = await getCurrentSellerId();
       if (!sellerId) {
         submitBtn.disabled = false;
-        submitBtn.innerHTML = '<i class="fas fa-check"></i> <span>حفظ المنتج</span>';
+        submitBtn.innerHTML = '<i class="fas fa-check"></i> <span>' + (editingProductId ? 'حفظ التعديلات' : 'حفظ المنتج') + '</span>';
         return;
+      }
+
+      // توليد slug تلقائياً إذا كان فارغاً
+      let slug = document.getElementById('productSlug').value.trim();
+      if (!slug) {
+        slug = generateSlug(document.getElementById('productName').value);
       }
 
       const productData = {
         seller_id: sellerId,
-        category_id: document.getElementById('productCategory').value,
+        sku: document.getElementById('productSku').value.trim(),
         name: document.getElementById('productName').value.trim(),
         description: document.getElementById('productDescription').value.trim(),
+        long_description: document.getElementById('productLongDescription').value.trim(),
         price: parseFloat(document.getElementById('productPrice').value),
-        old_price: document.getElementById('productOldPrice').value
-          ? parseFloat(document.getElementById('productOldPrice').value) : null,
+        old_price: document.getElementById('productOldPrice').value ? parseFloat(document.getElementById('productOldPrice').value) : null,
+        cost_price: document.getElementById('productCostPrice').value ? parseFloat(document.getElementById('productCostPrice').value) : null,
+        stock: parseInt(document.getElementById('productStock').value) || 0,
+        low_stock_threshold: parseInt(document.getElementById('productLowStock').value) || 5,
+        max_order_quantity: parseInt(document.getElementById('productMaxOrder').value) || 10,
+        processing_time: parseInt(document.getElementById('productProcessingTime').value) || 2,
+        weight: document.getElementById('productWeight').value,
+        dimensions: document.getElementById('productDimensions').value,
+        materials: document.getElementById('productMaterials').value,
+        brand: document.getElementById('productBrand').value,
+        origin: document.getElementById('productOrigin').value,
+        warranty: document.getElementById('productWarranty').value,
+        category_id: document.getElementById('productCategory').value,
+        tags: document.getElementById('productTags').value.split(',').map(t => t.trim()).filter(t => t),
+        meta_keywords: document.getElementById('productMetaKeywords').value,
+        slug: slug,
         images: uploadedImages.map(img => img.url),
         video_url: uploadedVideo ? uploadedVideo.url : null,
-        low_stock_threshold: parseInt(document.getElementById('productLowStock').value) || 5,
-        is_available: document.getElementById('productAvailable').checked
+        is_available: document.getElementById('productAvailable').checked,
+        is_featured: document.getElementById('productFeatured').checked,
+        allow_reviews: document.getElementById('productAllowReviews').checked,
+        updated_at: new Date().toISOString()
       };
 
       let result;
       if (editingProductId) {
-        // تعديل: لا نغير stock مباشرة (يتم عبر stock_movements)
+        delete productData.stock;
         result = await sb.from('products').update(productData).eq('id', editingProductId);
       } else {
-        // إضافة منتج جديد مع الكمية الابتدائية
-        productData.stock = parseInt(document.getElementById('productStock').value) || 0;
         result = await sb.from('products').insert(productData);
       }
 
@@ -675,7 +965,7 @@
       }
 
       showToast('✅ تم حفظ المنتج بنجاح', 'success');
-      setTimeout(() => { window.location.href = 'dashboard.html'; }, 1200);
+      setTimeout(() => { window.location.href = 'admin.html'; }, 1200);
     });
 
     // ========== Toast ==========
@@ -688,22 +978,19 @@
     }
 
     // ========== تهيئة الصفحة ==========
+    const urlParams = new URLSearchParams(window.location.search);
+    editingProductId = urlParams.get('id');
+
     document.addEventListener('DOMContentLoaded', async () => {
-      // فحص الاتصال مع Supabase و Cloudinary قبل أي شيء
-      if (typeof window.sb === 'undefined') {
-        showToast('❌ خطأ: لم يتم الاتصال بـ Supabase، تحقق من config.js', 'error');
-        return;
-      }
-      if (typeof window.MarnissaCloudinary === 'undefined') {
-        showToast('❌ خطأ: لم يتم تحميل Cloudinary، تحقق من config.js', 'error');
+      initSupabase();
+      
+      if (!sb) {
+        showToast('❌ خطأ في الاتصال بـ Supabase', 'error');
         return;
       }
 
       await loadCategories();
       if (editingProductId) {
-        // إخفاء حقل الكمية الابتدائية فوضعية التعديل (يتم التعديل عبر stock.html)
-        document.getElementById('productStock').closest('.form-group').style.opacity = '0.5';
-        document.getElementById('productStock').disabled = true;
         await loadProductForEdit();
       }
     });

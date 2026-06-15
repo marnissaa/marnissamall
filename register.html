@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>تسجيل بائع جديد | MarnissaMall</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" href="images/logo.png" type="image/png">
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&family=Cairo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --blue-primary: #0057b3;
+      --blue-dark: #003d80;
+      --blue-light: #3a8fd4;
+      --success: #25D366;
+      --danger: #ff4757;
+    }
+    body {
+      --bg: #0a0a0a; --bg2: #0d1117; --text: #ffffff;
+      --text-muted: #c9d1d9; --text-dim: #8b949e;
+      --border: rgba(0,87,179,0.35); --border2: rgba(0,87,179,0.5);
+      --card: rgba(13,17,23,0.85);
+    }
+    body.blue-theme {
+      --bg: #e8f0fe; --bg2: #ffffff; --text: #0a0a0a;
+      --text-muted: #1a3a5c; --text-dim: #4a6a8c;
+      --border: rgba(0,87,179,0.2); --border2: rgba(0,87,179,0.3);
+      --card: rgba(255,255,255,0.9);
+    }
+    body {
+      background: var(--bg); font-family: 'Tajawal', 'Cairo', sans-serif; color: var(--text);
+      min-height: 100vh; display: flex; align-items: center; justify-content: center;
+      padding: 1.5rem; transition: background-color 0.5s ease, color 0.5s ease;
+      position: relative; overflow: hidden;
+    }
+    body::before {
+      content: ''; position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' opacity='0.03'%3E%3Cpath fill='%230057b3' d='M50,0 L100,50 L50,100 L0,50 Z'/%3E%3Cpath fill='%233a8fd4' d='M50,25 L75,50 L50,75 L25,50 Z'/%3E%3C/svg%3E");
+      background-repeat: repeat; background-size: 45px; pointer-events: none; z-index: 0;
+    }
+    .darija-text { font-family: 'Tajawal', 'Cairo', sans-serif; }
+    .auth-card {
+      position: relative; z-index: 1; background: var(--card); backdrop-filter: blur(10px);
+      border: 1px solid var(--border); border-radius: 24px; padding: clamp(1.75rem, 5vw, 2.5rem);
+      max-width: 460px; width: 100%;
+    }
+    .auth-logo { text-align: center; margin-bottom: 1.5rem; }
+    .auth-logo img { height: 60px; border-radius: 12px; }
+    .auth-title { font-size: 1.5rem; font-weight: 800; text-align: center; margin-bottom: 0.4rem; }
+    .auth-sub { text-align: center; font-size: 0.8rem; color: var(--text-dim); margin-bottom: 1.75rem; }
+    .form-group { margin-bottom: 1.1rem; }
+    .form-label { display: block; font-size: 0.8rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.4rem; }
+    .form-input {
+      background: rgba(0,0,0,0.05); border: 1px solid var(--border2); border-radius: 12px;
+      padding: 0.75rem 1rem; color: var(--text); width: 100%; font-family: inherit; transition: all 0.3s;
+    }
+    .form-input:focus { outline: none; border-color: var(--blue-primary); }
+    .form-input::placeholder { color: var(--text-dim); }
+    .password-wrap { position: relative; }
+    .password-toggle {
+      position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+      cursor: pointer; color: var(--text-dim); background: none; border: none; font-size: 0.9rem;
+    }
+    .password-toggle:hover { color: var(--blue-primary); }
+    .gold-btn {
+      background: transparent; border: 1.5px solid var(--blue-primary); color: var(--text);
+      letter-spacing: 1px; font-weight: 600; position: relative; overflow: hidden;
+      transition: all 0.4s; cursor: pointer; width: 100%; padding: 0.8rem;
+      border-radius: 50px; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+    }
+    .gold-btn::before {
+      content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(0,87,179,0.2), transparent); transition: left 0.5s;
+    }
+    .gold-btn:hover::before { left: 100%; }
+    .gold-btn:hover { transform: translateY(-2px); border-color: var(--blue-light); color: var(--blue-light); }
+    .gold-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .auth-switch { text-align: center; font-size: 0.8rem; color: var(--text-dim); margin-top: 1.5rem; }
+    .auth-switch a { color: var(--blue-primary); text-decoration: none; font-weight: 600; }
+    .auth-switch a:hover { color: var(--blue-light); }
+    .auth-message { padding: 0.6rem 1rem; border-radius: 10px; font-size: 0.8rem; margin-bottom: 1rem; display: none; }
+    .auth-message.error { background: rgba(255,71,87,0.1); color: var(--danger); border: 1px solid rgba(255,71,87,0.3); }
+    .auth-message.success { background: rgba(37,211,102,0.1); color: var(--success); border: 1px solid rgba(37,211,102,0.3); }
+    .back-home {
+      position: fixed; top: 20px; right: 20px; z-index: 2; color: var(--text-muted);
+      text-decoration: none; font-size: 0.8rem; display: flex; align-items: center; gap: 0.4rem; transition: color 0.3s;
+    }
+    .back-home:hover { color: var(--blue-primary); }
+  </style>
+</head>
+<body>
+
+  <a href="index.html" class="back-home darija-text"><i class="fas fa-arrow-right"></i> الرئيسية</a>
+
+  <div class="auth-card">
+    <div class="auth-logo">
+      <a href="index.html"><img src="images/logo.png" alt="MarnissaMall" onerror="this.src='https://placehold.co/60x60/0057b3/ffffff?text=M'"></a>
+    </div>
+
+    <h1 class="auth-title darija-text" style="color:var(--text);">سجل كبائع جديد</h1>
+    <p class="auth-sub darija-text">انضم لـ MarnissaMall وبدا بيع منتجاتك</p>
+
+    <div id="authMessage" class="auth-message darija-text"></div>
+
+    <form id="registerForm">
+      <div class="form-group">
+        <label class="form-label darija-text">اسم المتجر <span style="color:var(--danger);">*</span></label>
+        <input type="text" id="storeName" class="form-input darija-text" placeholder="مثال: متجر مرنيسة للزيوت" required>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label darija-text">رقم الهاتف <span style="color:var(--danger);">*</span></label>
+        <input type="tel" id="storePhone" class="form-input" placeholder="06XXXXXXXX" required>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label darija-text">البريد الإلكتروني <span style="color:var(--danger);">*</span></label>
+        <input type="email" id="regEmail" class="form-input" placeholder="example@email.com" required autocomplete="email">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label darija-text">كلمة السر <span style="color:var(--danger);">*</span></label>
+        <div class="password-wrap">
+          <input type="password" id="regPassword" class="form-input" placeholder="6 خانات على الأقل" required minlength="6" autocomplete="new-password">
+          <button type="button" class="password-toggle" id="togglePassword"><i class="far fa-eye"></i></button>
+        </div>
+      </div>
+
+      <button type="submit" class="gold-btn darija-text" id="registerBtn">
+        <i class="fas fa-user-plus"></i> <span>إنشاء الحساب</span>
+      </button>
+    </form>
+
+    <p class="auth-switch darija-text">
+      عندك حساب بالفعل؟ <a href="login.html">سجل الدخول</a>
+    </p>
+  </div>
+
+  <script>
+    document.getElementById('togglePassword').addEventListener('click', function () {
+      const input = document.getElementById('regPassword');
+      const icon = this.querySelector('i');
+      if (input.type === 'password') { input.type = 'text'; icon.className = 'far fa-eye-slash'; }
+      else { input.type = 'password'; icon.className = 'far fa-eye'; }
+    });
+
+    document.getElementById('registerForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const storeName = document.getElementById('storeName').value.trim();
+      const phone = document.getElementById('storePhone').value.trim();
+      const email = document.getElementById('regEmail').value.trim();
+      const password = document.getElementById('regPassword').value;
+      const btn = document.getElementById('registerBtn');
+
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>جاري التسجيل...</span>';
+
+      // 1. إنشاء حساب Supabase Auth
+      const { data: authData, error: authError } = await sb.auth.signUp({ email, password });
+
+      if (authError) {
+        showMsg('❌ ' + authError.message, 'error');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-user-plus"></i> <span>إنشاء الحساب</span>';
+        return;
+      }
+
+      // 2. إنشاء صف في جدول sellers
+      const userId = authData.user?.id;
+      if (userId) {
+        const { error: sellerError } = await sb.from('sellers').insert({
+          user_id: userId,
+          store_name: storeName,
+          phone: phone,
+          is_approved: false
+        });
+
+        if (sellerError) {
+          showMsg('⚠️ تم إنشاء الحساب لكن حدث خطأ فإنشاء ملف البائع: ' + sellerError.message, 'error');
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fas fa-user-plus"></i> <span>إنشاء الحساب</span>';
+          return;
+        }
+      }
+
+      showMsg('✅ تم إنشاء حسابك بنجاح! المرجو تأكيد بريدك الإلكتروني، بعد ذلك راجع المسؤول لتفعيل حسابك.', 'success');
+      setTimeout(() => { window.location.href = 'login.html'; }, 2500);
+    });
+
+    function showMsg(text, type) {
+      const el = document.getElementById('authMessage');
+      el.textContent = text;
+      el.className = `auth-message ${type} darija-text`;
+      el.style.display = 'block';
+    }
+  </script>
+</body>
+</html>

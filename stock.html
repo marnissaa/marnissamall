@@ -12,8 +12,9 @@
   <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
   <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- مكتبة html5-qrcode لقراءة الباركود و QR -->
+  <script src="https://unpkg.com/html5-qrcode"></script>
   <script src="config.js"></script>
-  
 
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -22,15 +23,10 @@
       --blue-primary: #0057b3;
       --blue-dark: #003d80;
       --blue-light: #3a8fd4;
-      --black: #0a0a0a;
-      --black-light: #0d1117;
-      --gray: #161b22;
-      --text-light: #ffffff;
-      --text-muted: #c9d1d9;
-      --text-dim: #8b949e;
       --success: #25D366;
       --danger: #ff4757;
       --warning: #ffa502;
+      --info: #00bcd4;
     }
 
     body {
@@ -69,7 +65,7 @@
 
     .page-header {
       padding: clamp(40px, 6vh, 70px) 1.5rem 1.5rem;
-      max-width: 1300px;
+      max-width: 1400px;
       margin: 0 auto;
     }
 
@@ -89,12 +85,11 @@
     }
 
     .container-wrap {
-      max-width: 1300px;
+      max-width: 1400px;
       margin: 0 auto;
       padding: 0 1.5rem clamp(60px, 8vh, 100px);
     }
 
-    /* ===== KPI Cards ===== */
     .kpi-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -124,10 +119,10 @@
     .kpi-icon.success { background: rgba(37,211,102,0.15); color: var(--success); }
     .kpi-icon.warning { background: rgba(255,165,2,0.15); color: var(--warning); }
     .kpi-icon.danger { background: rgba(255,71,87,0.15); color: var(--danger); }
+    .kpi-icon.info { background: rgba(0,188,212,0.15); color: var(--info); }
     .kpi-value { font-size: 1.5rem; font-weight: 800; line-height: 1.2; }
     .kpi-label { font-size: 0.75rem; color: var(--text-dim); margin-top: 2px; }
 
-    /* ===== Toolbar ===== */
     .toolbar {
       display: flex;
       flex-wrap: wrap;
@@ -188,7 +183,34 @@
     .gold-btn:hover::before { left: 100%; }
     .gold-btn:hover { transform: translateY(-2px); border-color: var(--blue-light); color: var(--blue-light); }
 
-    /* ===== Table ===== */
+    /* Scanner button */
+    .scan-btn {
+      background: linear-gradient(135deg, #0057b3, #003d80);
+      border: none;
+      color: white;
+      letter-spacing: 1px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.65rem 1.5rem;
+      border-radius: 50px;
+      font-size: 0.85rem;
+      white-space: nowrap;
+      transition: all 0.3s;
+      animation: pulse-scan 2s infinite;
+    }
+    .scan-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 20px rgba(0,87,179,0.4);
+    }
+    @keyframes pulse-scan {
+      0% { box-shadow: 0 0 0 0 rgba(0,87,179,0.4); }
+      70% { box-shadow: 0 0 0 10px rgba(0,87,179,0); }
+      100% { box-shadow: 0 0 0 0 rgba(0,87,179,0); }
+    }
+
     .table-wrap {
       background: var(--card);
       backdrop-filter: blur(8px);
@@ -218,6 +240,7 @@
       vertical-align: middle;
     }
     .stock-table tr:hover td { background: var(--card-hover); }
+    .stock-table tr.highlight { background: rgba(0,87,179,0.3) !important; }
 
     .product-cell { display: flex; align-items: center; gap: 0.75rem; }
     .product-cell img {
@@ -225,10 +248,11 @@
       border-radius: 10px;
       object-fit: cover;
       flex-shrink: 0;
-      background: var(--black-light);
+      background: #1a1a2e;
     }
     .product-cell .pname { font-weight: 600; color: var(--text); }
     .product-cell .pcat { font-size: 0.7rem; color: var(--text-dim); }
+    .product-cell .psku { font-size: 0.65rem; color: var(--text-dim); margin-top: 2px; }
 
     .stock-badge {
       display: inline-flex;
@@ -244,11 +268,11 @@
     .stock-badge.out { background: rgba(255,71,87,0.12); color: var(--danger); }
 
     .stock-qty-input {
-      width: 70px;
+      width: 80px;
       background: rgba(0,0,0,0.05);
       border: 1px solid var(--border2);
       border-radius: 8px;
-      padding: 0.4rem;
+      padding: 0.5rem;
       color: var(--text);
       text-align: center;
       font-family: inherit;
@@ -271,13 +295,109 @@
     }
     .icon-btn:hover { border-color: var(--blue-primary); color: var(--blue-primary); background: rgba(0,87,179,0.12); }
     .icon-btn.danger:hover { border-color: var(--danger); color: var(--danger); background: rgba(255,71,87,0.12); }
+    .icon-btn.success:hover { border-color: var(--success); color: var(--success); background: rgba(37,211,102,0.12); }
 
     .actions-cell { display: flex; gap: 0.4rem; justify-content: flex-end; }
 
-    /* ===== Modal ===== */
+    /* Scanner Modal */
+    .scanner-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.95);
+      z-index: 3000;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .scanner-overlay.active { display: flex; }
+    
+    .scanner-container {
+      width: 100%;
+      max-width: 500px;
+      padding: 1rem;
+    }
+    
+    #qr-reader {
+      width: 100%;
+      border-radius: 20px;
+      overflow: hidden;
+      border: 2px solid var(--blue-primary);
+    }
+    
+    #qr-reader video {
+      border-radius: 18px;
+    }
+
+    .scanner-result {
+      background: var(--card);
+      border: 1px solid var(--border2);
+      border-radius: 16px;
+      padding: 1.25rem;
+      margin-top: 1rem;
+      text-align: center;
+      display: none;
+    }
+    .scanner-result.show { display: block; }
+
+    .scanner-actions {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1.5rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .scan-region-highlight {
+      border: 2px solid var(--blue-primary) !important;
+      border-radius: 12px;
+    }
+
+    .close-scanner {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: rgba(255,71,87,0.2);
+      border: 2px solid var(--danger);
+      color: var(--danger);
+      font-size: 1.2rem;
+      cursor: pointer;
+      z-index: 3001;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s;
+    }
+    .close-scanner:hover {
+      background: rgba(255,71,87,0.4);
+      transform: scale(1.1);
+    }
+
+    .scanner-flash {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.1);
+      border: 2px solid rgba(255,255,255,0.3);
+      color: white;
+      font-size: 1.2rem;
+      cursor: pointer;
+      z-index: 3001;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s;
+    }
+    .scanner-flash:hover { background: rgba(255,255,255,0.2); }
+
     .modal-overlay {
       position: fixed; inset: 0;
-      background: rgba(0,0,0,0.6);
+      background: rgba(0,0,0,0.7);
       backdrop-filter: blur(4px);
       display: none;
       align-items: center;
@@ -291,54 +411,55 @@
       border: 1px solid var(--border2);
       border-radius: 20px;
       padding: 1.75rem;
-      max-width: 420px;
+      max-width: 450px;
       width: 100%;
       box-shadow: 0 20px 60px rgba(0,0,0,0.4);
     }
-    .modal-box h3 { font-size: 1.1rem; margin-bottom: 0.3rem; }
-    .modal-box p { font-size: 0.8rem; color: var(--text-dim); margin-bottom: 1.25rem; }
+    .modal-box h3 { font-size: 1.2rem; margin-bottom: 0.3rem; color: var(--text); }
+    .modal-box p { font-size: 0.85rem; color: var(--text-dim); margin-bottom: 1.25rem; }
 
+    .modal-input-group { margin-bottom: 1rem; }
+    .modal-input-group label { font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 0.3rem; }
     .modal-input {
       background: rgba(0,0,0,0.05);
       border: 1px solid var(--border2);
       border-radius: 12px;
-      padding: 0.65rem 1rem;
+      padding: 0.7rem 1rem;
       color: var(--text);
       width: 100%;
       font-family: inherit;
-      margin-bottom: 0.75rem;
     }
     .modal-input:focus { outline: none; border-color: var(--blue-primary); }
 
     .modal-radio-row {
-      display: flex;
-      gap: 0.6rem;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.5rem;
       margin-bottom: 1rem;
-      flex-wrap: wrap;
     }
     .modal-radio-row label {
-      flex: 1;
       text-align: center;
-      padding: 0.5rem;
+      padding: 0.6rem;
       border: 1px solid var(--border2);
-      border-radius: 10px;
+      border-radius: 12px;
       font-size: 0.75rem;
       cursor: pointer;
       transition: all 0.2s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.3rem;
+      color: var(--text-dim);
     }
-    .modal-radio-row input { display: none; }
-    .modal-radio-row input:checked + span,
-    .modal-radio-row label:has(input:checked) {
-      color: var(--blue-primary);
-    }
-    .modal-radio-row input:checked ~ * {}
+    .modal-radio-row label i { font-size: 1rem; }
     .modal-radio-row label.active {
       border-color: var(--blue-primary);
       background: rgba(0,87,179,0.1);
       color: var(--blue-primary);
     }
+    .modal-radio-row label:hover { border-color: var(--blue-primary); }
 
-    .modal-actions { display: flex; gap: 0.75rem; margin-top: 1rem; }
+    .modal-actions { display: flex; gap: 0.75rem; margin-top: 1.5rem; }
     .modal-actions .gold-btn { flex: 1; justify-content: center; }
     .btn-cancel {
       flex: 1;
@@ -354,11 +475,11 @@
       font-family: inherit;
       display: inline-flex;
       align-items: center;
+      gap: 0.5rem;
       transition: all 0.3s;
     }
     .btn-cancel:hover { background: rgba(255,71,87,0.15); }
 
-    /* ===== Toast ===== */
     .toast-msg {
       position: fixed;
       bottom: 30px; left: 50%;
@@ -369,7 +490,7 @@
       padding: 0.8rem 1.5rem;
       font-size: 0.85rem;
       display: flex; align-items: center; gap: 0.6rem;
-      z-index: 3000;
+      z-index: 4000;
       opacity: 0;
       transition: all 0.35s;
       box-shadow: 0 8px 30px rgba(0,0,0,0.3);
@@ -377,6 +498,7 @@
     .toast-msg.show { transform: translateX(-50%) translateY(0); opacity: 1; }
     .toast-msg.success { border-color: var(--success); color: var(--success); }
     .toast-msg.error { border-color: var(--danger); color: var(--danger); }
+    .toast-msg.info { border-color: var(--info); color: var(--info); }
 
     .empty-state, .loading-state {
       text-align: center;
@@ -393,86 +515,165 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* mobile: hide some columns, allow horizontal scroll */
+    .history-section {
+      margin-top: 2rem;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 1.5rem;
+    }
+    .history-title {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      color: var(--blue-primary);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .history-table {
+      width: 100%;
+      font-size: 0.75rem;
+    }
+    .history-table th, .history-table td {
+      padding: 0.5rem;
+      text-align: right;
+      border-bottom: 1px solid var(--border);
+    }
+    .history-table th { color: var(--text-muted); font-weight: 600; }
+
+    .seller-tag {
+      font-size: 0.65rem;
+      padding: 0.15rem 0.5rem;
+      border-radius: 10px;
+      background: rgba(0,87,179,0.1);
+      color: var(--blue-light);
+    }
+
     @media (max-width: 768px) {
       .table-wrap { overflow-x: auto; }
-      .stock-table { min-width: 720px; }
+      .stock-table { min-width: 850px; }
+      .scanner-container { max-width: 100%; }
     }
   </style>
 </head>
 <body>
 
-  <!-- الهيدر -->
+  <div id="header-placeholder"></div>
+
+  <!-- ماسح الباركود -->
+  <div class="scanner-overlay" id="scannerOverlay">
+    <button class="close-scanner" onclick="stopScanner()" title="إغلاق">
+      <i class="fas fa-times"></i>
+    </button>
+    <button class="scanner-flash" id="flashToggle" onclick="toggleFlash()" title="فلاش">
+      <i class="fas fa-bolt"></i>
+    </button>
+    
+    <div class="scanner-container">
+      <div id="qr-reader"></div>
+      
+      <div class="scanner-result" id="scannerResult">
+        <div style="color: var(--success); font-size: 1.5rem; margin-bottom: 0.5rem;">
+          <i class="fas fa-check-circle"></i>
+        </div>
+        <div id="scannedCode" class="darija-text" style="font-size: 1.2rem; font-weight: bold; margin-bottom: 0.5rem;"></div>
+        <div id="scannedProductInfo" class="darija-text" style="color: var(--text-dim);"></div>
+        
+        <div class="scanner-actions">
+          <button class="gold-btn darija-text" onclick="addStockScanned()">
+            <i class="fas fa-plus"></i> +1 للمخزون
+          </button>
+          <button class="gold-btn darija-text" onclick="removeStockScanned()">
+            <i class="fas fa-minus"></i> -1 من المخزون
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <div class="page-header">
-    <span class="text-xs tracking-[0.3em] darija-text" style="color:var(--blue-primary);">✦ لوحة تحكم البائع ✦</span>
-    <h1 class="section-title font-bold darija-text mt-2" style="color:var(--text);">إدارة المخزون</h1>
-    <p class="text-sm mt-4 darija-text" style="color:var(--text-dim);">تتبع كمية كل منتج، حدّث المخزون، وتابع التنبيهات</p>
+    <span class="text-xs tracking-[0.3em] darija-text" style="color:var(--blue-primary);">✦ إدارة المخزون ✦</span>
+    <h1 class="section-title font-bold darija-text mt-2" style="color:var(--text);">تتبع وتحكم المخزون</h1>
+    <p class="text-sm mt-4 darija-text" style="color:var(--text-dim);">تحديث الكميات، مراقبة المنتجات المنخفضة، وسجل الحركات - مسح QR/Barcode</p>
   </div>
 
   <div class="container-wrap">
 
-    <!-- KPI Cards -->
-    <div class="kpi-grid">
-      <div class="kpi-card" data-aos="fade-up">
+    <div class="kpi-grid" data-aos="fade-up">
+      <div class="kpi-card">
         <div class="kpi-icon blue"><i class="fas fa-boxes-stacked"></i></div>
         <div>
           <div class="kpi-value" id="kpiTotalProducts">—</div>
           <div class="kpi-label darija-text">إجمالي المنتجات</div>
         </div>
       </div>
-      <div class="kpi-card" data-aos="fade-up" data-aos-delay="50">
+      <div class="kpi-card">
         <div class="kpi-icon success"><i class="fas fa-cubes"></i></div>
         <div>
           <div class="kpi-value" id="kpiTotalStock">—</div>
-          <div class="kpi-label darija-text">إجمالي الكميات</div>
+          <div class="kpi-label darija-text">إجمالي القطع</div>
         </div>
       </div>
-      <div class="kpi-card" data-aos="fade-up" data-aos-delay="100">
+      <div class="kpi-card">
         <div class="kpi-icon warning"><i class="fas fa-triangle-exclamation"></i></div>
         <div>
           <div class="kpi-value" id="kpiLowStock">—</div>
           <div class="kpi-label darija-text">مخزون منخفض</div>
         </div>
       </div>
-      <div class="kpi-card" data-aos="fade-up" data-aos-delay="150">
+      <div class="kpi-card">
         <div class="kpi-icon danger"><i class="fas fa-ban"></i></div>
         <div>
           <div class="kpi-value" id="kpiOutOfStock">—</div>
           <div class="kpi-label darija-text">نفذ من المخزون</div>
         </div>
       </div>
+      <div class="kpi-card">
+        <div class="kpi-icon info"><i class="fas fa-chart-line"></i></div>
+        <div>
+          <div class="kpi-value" id="kpiTotalValue">—</div>
+          <div class="kpi-label darija-text">قيمة المخزون (درهم)</div>
+        </div>
+      </div>
     </div>
 
-    <!-- Toolbar -->
     <div class="toolbar">
-      <input type="text" id="searchInput" class="search-input darija-text" placeholder="🔍 بحث عن منتج...">
+      <input type="text" id="searchInput" class="search-input darija-text" placeholder="🔍 بحث عن منتج (اسم، SKU، باركود)...">
       <select id="filterSelect" class="filter-select darija-text">
-        <option value="all">كل المنتجات</option>
-        <option value="low">مخزون منخفض</option>
-        <option value="out">نفذ من المخزون</option>
-        <option value="available">متوفر</option>
+        <option value="all">📦 كل المنتجات</option>
+        <option value="low">⚠️ مخزون منخفض</option>
+        <option value="out">❌ نفذ من المخزون</option>
+        <option value="available">✅ متوفر</option>
       </select>
-      <button class="gold-btn darija-text" onclick="window.location.href='dashboard.html#products'">
+      <select id="categoryFilter" class="filter-select darija-text">
+        <option value="all">📂 كل الفئات</option>
+      </select>
+      <button class="scan-btn darija-text" onclick="startScanner()">
+        <i class="fas fa-qrcode"></i> مسح باركود
+      </button>
+      <button class="gold-btn darija-text" onclick="window.location.href='product-form.html'">
         <i class="fas fa-plus"></i> منتج جديد
       </button>
     </div>
 
-    <!-- Table -->
     <div class="table-wrap">
       <div id="loadingState" class="loading-state">
         <div class="loader-spinner"></div>
         <p class="darija-text">جاري تحميل المخزون...</p>
       </div>
-      <div id="tableContainer" style="display:none; overflow-x:auto;">
+      <div id="tableContainer" style="display:none;">
         <table class="stock-table">
           <thead>
             <tr>
               <th>المنتج</th>
+              <th>SKU / باركود</th>
+              <th>البائع</th>
               <th>السعر</th>
-              <th>الكمية الحالية</th>
+              <th>الكمية</th>
               <th>الحالة</th>
               <th>الحد الأدنى</th>
+              <th>آخر تحديث</th>
               <th>إجراءات</th>
             </tr>
           </thead>
@@ -482,28 +683,70 @@
       <div id="emptyState" class="empty-state darija-text" style="display:none;">
         <i class="fas fa-box-open text-3xl mb-3 block opacity-40"></i>
         لا توجد منتجات حتى الآن
+        <div class="mt-4"><a href="product-form.html" class="gold-btn">➕ أضف أول منتج</a></div>
+      </div>
+    </div>
+
+    <div class="history-section" id="historySection" style="display:none;">
+      <div class="history-title">
+        <i class="fas fa-history"></i>
+        <span>سجل حركات المخزون</span>
+        <button class="icon-btn" onclick="loadStockHistory()" style="margin-right: auto;"><i class="fas fa-sync-alt"></i></button>
+      </div>
+      <div style="overflow-x: auto;">
+        <table class="history-table">
+          <thead>
+            <tr>
+              <th>المنتج</th>
+              <th>التغيير</th>
+              <th>السبب</th>
+              <th>التاريخ</th>
+              <th>ملاحظة</th>
+            </tr>
+          </thead>
+          <tbody id="historyTableBody">
+            <tr><td colspan="5" class="text-center text-dim">لا توجد حركات مسجلة بعد</td></tr>
+          </tbody>
+        </table>
       </div>
     </div>
 
   </div>
 
-  <!-- Modal: تعديل المخزون (حركة مخزون) -->
   <div class="modal-overlay" id="stockModal">
     <div class="modal-box">
-      <h3 class="darija-text" id="modalTitle" style="color:var(--text);">تحديث المخزون</h3>
+      <h3 class="darija-text">📦 تحديث المخزون</h3>
       <p class="darija-text" id="modalProductName">—</p>
 
       <div class="modal-radio-row" id="reasonRow">
-        <label class="active" data-reason="restock"><i class="fas fa-arrow-up"></i><br>توريد</label>
-        <label data-reason="adjustment"><i class="fas fa-sliders"></i><br>تصحيح</label>
-        <label data-reason="return"><i class="fas fa-rotate-left"></i><br>إرجاع</label>
+        <label data-reason="restock" class="active">
+          <i class="fas fa-arrow-up"></i>
+          <span>توريد</span>
+        </label>
+        <label data-reason="adjustment">
+          <i class="fas fa-sliders-h"></i>
+          <span>تصحيح</span>
+        </label>
+        <label data-reason="return">
+          <i class="fas fa-undo-alt"></i>
+          <span>إرجاع</span>
+        </label>
       </div>
 
-      <label class="darija-text text-xs mb-1 block" style="color:var(--text-dim);">الكمية (استعمل سالب للتقليل، مثال: -3)</label>
-      <input type="number" id="modalChangeInput" class="modal-input" placeholder="مثال: 10 أو -3">
+      <div class="modal-input-group">
+        <label class="darija-text">الكمية (استعمل - للنقصان)</label>
+        <input type="number" id="modalChangeInput" class="modal-input" placeholder="مثال: 10 أو -5" value="0">
+      </div>
+
+      <div class="modal-input-group">
+        <label class="darija-text">ملاحظة (اختياري)</label>
+        <input type="text" id="modalNote" class="modal-input" placeholder="سبب التعديل...">
+      </div>
 
       <div class="modal-actions">
-        <button class="btn-cancel darija-text" onclick="closeStockModal()">إلغاء</button>
+        <button class="btn-cancel darija-text" onclick="closeStockModal()">
+          <i class="fas fa-times"></i> إلغاء
+        </button>
         <button class="gold-btn darija-text" onclick="confirmStockChange()">
           <i class="fas fa-check"></i> تأكيد
         </button>
@@ -511,107 +754,412 @@
     </div>
   </div>
 
-  <!-- Toast -->
   <div class="toast-msg" id="toastMsg"></div>
 
-  <!-- ========== SCRIPTS ========== -->
   <script src="header.js"></script>
   <script src="footer.js"></script>
 
   <script>
     AOS.init({ duration: 700, once: true, offset: 60 });
 
+    let sb = null;
     let allProducts = [];
+    let categories = [];
+    let sellers = [];
     let currentProductId = null;
     let selectedReason = 'restock';
+    
+    // Scanner variables
+    let html5QrCode = null;
+    let scannedProductId = null;
+    let isScannerRunning = false;
 
-    // ========== التحقق من تسجيل الدخول ==========
-    // ملاحظة: تأكد أن المستخدم بائع أو مسؤول قبل عرض الصفحة (يمكن ربطها بـ sb.auth.getUser())
+    function initSupabase() {
+      try {
+        if (typeof MARNISSA_CONFIG !== 'undefined' && MARNISSA_CONFIG.SUPABASE_URL && MARNISSA_CONFIG.SUPABASE_ANON_KEY) {
+          sb = supabase.createClient(MARNISSA_CONFIG.SUPABASE_URL, MARNISSA_CONFIG.SUPABASE_ANON_KEY);
+          console.log('✅ Supabase client initialized');
+        } else {
+          console.error('❌ Supabase config manquante');
+          showToast('❌ خطأ: تأكد من إعدادات Supabase في config.js', 'error');
+        }
+      } catch(e) {
+        console.error('❌ Supabase init error:', e);
+      }
+    }
 
-  
-    // ========== جلب المنتجات والمخزون ==========
-    async function loadStock() {
-      const sellerId = await getCurrentSellerId();
-      if (!sellerId) {
-        document.getElementById('loadingState').style.display = 'none';
-        document.getElementById('emptyState').style.display = 'block';
+    // ========== BARCODE SCANNER ==========
+    function startScanner() {
+      const overlay = document.getElementById('scannerOverlay');
+      overlay.classList.add('active');
+      
+      // إخفاء النتيجة السابقة
+      document.getElementById('scannerResult').classList.remove('show');
+      scannedProductId = null;
+      
+      if (!html5QrCode) {
+        html5QrCode = new Html5Qrcode("qr-reader");
+      }
+      
+      const config = {
+        fps: 10,
+        qrbox: { width: 250, height: 250 },
+        aspectRatio: 1.0,
+        formatsToSupport: [
+          Html5QrcodeSupportedFormats.QR_CODE,
+          Html5QrcodeSupportedFormats.CODE_128,
+          Html5QrcodeSupportedFormats.CODE_39,
+          Html5QrcodeSupportedFormats.EAN_13,
+          Html5QrcodeSupportedFormats.EAN_8,
+          Html5QrcodeSupportedFormats.UPC_A,
+          Html5QrcodeSupportedFormats.UPC_E,
+          Html5QrcodeSupportedFormats.CODABAR,
+          Html5QrcodeSupportedFormats.ITF,
+          Html5QrcodeSupportedFormats.DATA_MATRIX,
+          Html5QrcodeSupportedFormats.AZTEC,
+          Html5QrcodeSupportedFormats.PDF_417,
+        ]
+      };
+      
+      html5QrCode.start(
+        { facingMode: "environment" }, // الكاميرا الخلفية
+        config,
+        onScanSuccess,
+        onScanFailure
+      ).then(() => {
+        isScannerRunning = true;
+        console.log('📷 Scanner started');
+        showToast('📷 الكاميرا جاهزة - وجه التيليفون على الباركود', 'info');
+      }).catch(err => {
+        console.error('Scanner start error:', err);
+        showToast('❌ خطأ في تشغيل الكاميرا: ' + err.message, 'error');
+      });
+    }
+    
+    function stopScanner() {
+      if (html5QrCode && isScannerRunning) {
+        html5QrCode.stop().then(() => {
+          isScannerRunning = false;
+          console.log('📷 Scanner stopped');
+        }).catch(err => {
+          console.error('Scanner stop error:', err);
+        });
+      }
+      
+      document.getElementById('scannerOverlay').classList.remove('active');
+      document.getElementById('scannerResult').classList.remove('show');
+      scannedProductId = null;
+    }
+    
+    function onScanSuccess(decodedText, decodedResult) {
+      console.log('✅ Scanned:', decodedText);
+      
+      // منع القراءة المتكررة
+      if (scannedProductId) return;
+      
+      // البحث عن المنتج بالـ SKU أو الباركود
+      const scannedCode = decodedText.trim();
+      const product = allProducts.find(p => 
+        p.sku === scannedCode || 
+        p.sku?.toLowerCase() === scannedCode.toLowerCase()
+      );
+      
+      document.getElementById('scannedCode').textContent = scannedCode;
+      document.getElementById('scannerResult').classList.add('show');
+      
+      if (product) {
+        scannedProductId = product.id;
+        document.getElementById('scannedProductInfo').innerHTML = `
+          <span style="color: var(--success);">✅ تم العثور على المنتج:</span><br>
+          <strong>${escapeHtml(product.name)}</strong><br>
+          <span style="font-size: 0.8rem;">المخزون الحالي: <strong>${product.stock}</strong></span>
+        `;
+        
+        // إيقاف السكنر مؤقتاً
+        if (html5QrCode && isScannerRunning) {
+          html5QrCode.pause(true);
+        }
+        
+        // تمييز المنتج في الجدول
+        highlightProduct(product.id);
+        
+        showToast('✅ تم التعرف على المنتج: ' + product.name, 'success');
+      } else {
+        scannedProductId = null;
+        document.getElementById('scannedProductInfo').innerHTML = `
+          <span style="color: var(--warning);">⚠️ لم يتم العثور على منتج بهذا الكود</span><br>
+          <span style="font-size: 0.8rem;">تأكد من SKU أو أضف منتج جديد</span>
+        `;
+        showToast('⚠️ كود غير معروف: ' + scannedCode, 'error');
+      }
+    }
+    
+    function onScanFailure(error) {
+      // أخطاء طبيعية أثناء المسح - لا نعرضها
+      // console.debug('Scan fail:', error);
+    }
+    
+    function toggleFlash() {
+      if (html5QrCode) {
+        html5QrCode.applyVideoConstraints({
+          advanced: [{ torch: true }]
+        }).then(() => {
+          document.getElementById('flashToggle').innerHTML = '<i class="fas fa-bolt"></i>';
+          document.getElementById('flashToggle').style.background = 'rgba(255,165,2,0.3)';
+        }).catch(() => {
+          // إطفاء الفلاش
+          html5QrCode.applyVideoConstraints({
+            advanced: [{ torch: false }]
+          }).then(() => {
+            document.getElementById('flashToggle').innerHTML = '<i class="fas fa-bolt"></i>';
+            document.getElementById('flashToggle').style.background = 'rgba(255,255,255,0.1)';
+          });
+        });
+      }
+    }
+    
+    async function addStockScanned() {
+      if (!scannedProductId) return;
+      
+      const product = allProducts.find(p => p.id === scannedProductId);
+      if (!product) return;
+      
+      const newStock = product.stock + 1;
+      
+      const { error: updateError } = await sb
+        .from('products')
+        .update({ stock: newStock, updated_at: new Date().toISOString() })
+        .eq('id', scannedProductId);
+      
+      if (updateError) {
+        showToast('❌ فشل التحديث: ' + updateError.message, 'error');
         return;
       }
+      
+      // تسجيل الحركة
+      await sb.from('stock_movements').insert({
+        product_id: scannedProductId,
+        change: 1,
+        reason: 'restock',
+        note: 'إضافة عن طريق مسح الباركود'
+      }).catch(e => console.warn('Movement record failed:', e));
+      
+      product.stock = newStock;
+      renderTable(filterProducts());
+      updateKPIs(allProducts);
+      loadStockHistory();
+      
+      document.getElementById('scannedProductInfo').innerHTML = `
+        <span style="color: var(--success);">✅ ${escapeHtml(product.name)}</span><br>
+        <span style="font-size: 0.8rem;">المخزون الجديد: <strong>${newStock}</strong> (تمت إضافة +1)</span>
+      `;
+      
+      showToast('✅ تمت إضافة 1 للمخزون', 'success');
+      
+      // استئناف المسح بعد ثانية
+      setTimeout(() => {
+        scannedProductId = null;
+        if (html5QrCode && isScannerRunning) {
+          html5QrCode.resume();
+        }
+        document.getElementById('scannerResult').classList.remove('show');
+      }, 2000);
+    }
+    
+    async function removeStockScanned() {
+      if (!scannedProductId) return;
+      
+      const product = allProducts.find(p => p.id === scannedProductId);
+      if (!product) return;
+      
+      if (product.stock <= 0) {
+        showToast('⚠️ المخزون بالفعل 0', 'error');
+        return;
+      }
+      
+      const newStock = product.stock - 1;
+      
+      const { error: updateError } = await sb
+        .from('products')
+        .update({ stock: newStock, updated_at: new Date().toISOString() })
+        .eq('id', scannedProductId);
+      
+      if (updateError) {
+        showToast('❌ فشل التحديث: ' + updateError.message, 'error');
+        return;
+      }
+      
+      // تسجيل الحركة
+      await sb.from('stock_movements').insert({
+        product_id: scannedProductId,
+        change: -1,
+        reason: 'adjustment',
+        note: 'سحب عن طريق مسح الباركود'
+      }).catch(e => console.warn('Movement record failed:', e));
+      
+      product.stock = newStock;
+      renderTable(filterProducts());
+      updateKPIs(allProducts);
+      loadStockHistory();
+      
+      document.getElementById('scannedProductInfo').innerHTML = `
+        <span style="color: var(--warning);">📤 ${escapeHtml(product.name)}</span><br>
+        <span style="font-size: 0.8rem;">المخزون الجديد: <strong>${newStock}</strong> (تم سحب -1)</span>
+      `;
+      
+      showToast('✅ تم سحب 1 من المخزون', 'info');
+      
+      // استئناف المسح بعد ثانية
+      setTimeout(() => {
+        scannedProductId = null;
+        if (html5QrCode && isScannerRunning) {
+          html5QrCode.resume();
+        }
+        document.getElementById('scannerResult').classList.remove('show');
+      }, 2000);
+    }
+    
+    function highlightProduct(productId) {
+      // إزالة التمييز من جميع الصفوف
+      document.querySelectorAll('.stock-table tr').forEach(row => row.classList.remove('highlight'));
+      
+      // تمييز الصف المطلوب
+      const row = document.querySelector(`tr[data-product-id="${productId}"]`);
+      if (row) {
+        row.classList.add('highlight');
+        row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+
+    // ========== CATEGORIES & SELLERS ==========
+    async function loadCategories() {
+      try {
+        const { data, error } = await sb.from('categories').select('id, name');
+        if (error) throw error;
+        categories = data || [];
+        
+        const select = document.getElementById('categoryFilter');
+        select.innerHTML = '<option value="all">📂 كل الفئات</option>';
+        categories.forEach(cat => {
+          const opt = document.createElement('option');
+          opt.value = cat.id;
+          opt.textContent = cat.name;
+          select.appendChild(opt);
+        });
+      } catch(e) {
+        console.error('Error loading categories:', e);
+      }
+    }
+
+    async function loadSellers() {
+      try {
+        const { data, error } = await sb.from('sellers').select('id, name');
+        if (error) {
+          console.warn('⚠️ Sellers table may not exist:', error.message);
+          sellers = [];
+          return;
+        }
+        sellers = data || [];
+        console.log('👤 Sellers loaded:', sellers.length);
+      } catch(e) {
+        console.error('Error loading sellers:', e);
+        sellers = [];
+      }
+    }
+
+    async function loadStock() {
+      document.getElementById('loadingState').style.display = 'block';
+      document.getElementById('tableContainer').style.display = 'none';
+      document.getElementById('emptyState').style.display = 'none';
 
       const { data, error } = await sb
         .from('products')
-        .select('id, name, price, stock, low_stock_threshold, is_available, images, categories(name)')
-        .eq('seller_id', sellerId)
+        .select('id, sku, name, price, stock, low_stock_threshold, is_available, images, category_id, seller_id, updated_at, created_at')
         .order('created_at', { ascending: false });
 
       document.getElementById('loadingState').style.display = 'none';
 
       if (error) {
+        console.error('❌ Supabase error:', error);
         showToast('❌ خطأ في تحميل المنتجات: ' + error.message, 'error');
         document.getElementById('emptyState').style.display = 'block';
         return;
       }
 
+      console.log('📦 Products loaded:', data?.length || 0);
       allProducts = data || [];
 
       if (allProducts.length === 0) {
         document.getElementById('emptyState').style.display = 'block';
+        document.getElementById('historySection').style.display = 'none';
         return;
       }
 
       document.getElementById('tableContainer').style.display = 'block';
-      renderTable(allProducts);
+      document.getElementById('historySection').style.display = 'block';
+      renderTable(filterProducts());
       updateKPIs(allProducts);
+      loadStockHistory();
     }
 
-    // ========== حساب وعرض الإحصائيات ==========
+    function getSellerName(sellerId) {
+      if (!sellerId) return '—';
+      const seller = sellers.find(s => s.id === sellerId);
+      return seller ? seller.name : sellerId.substring(0, 8) + '...';
+    }
+
     function updateKPIs(products) {
       const total = products.length;
       const totalStock = products.reduce((sum, p) => sum + (p.stock || 0), 0);
       const low = products.filter(p => p.stock > 0 && p.stock <= (p.low_stock_threshold || 5)).length;
       const out = products.filter(p => p.stock <= 0).length;
+      const totalValue = products.reduce((sum, p) => sum + ((p.price || 0) * (p.stock || 0)), 0);
 
       document.getElementById('kpiTotalProducts').textContent = total;
       document.getElementById('kpiTotalStock').textContent = totalStock;
       document.getElementById('kpiLowStock').textContent = low;
       document.getElementById('kpiOutOfStock').textContent = out;
+      document.getElementById('kpiTotalValue').textContent = totalValue.toFixed(0);
     }
 
-    // ========== رسم جدول المخزون ==========
     function renderTable(products) {
       const tbody = document.getElementById('stockTableBody');
 
       if (products.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" class="text-center py-8 darija-text" style="color:var(--text-dim);">لا توجد نتائج مطابقة</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="9" class="text-center py-8 darija-text" style="color:var(--text-dim);">لا توجد نتائج مطابقة</td></tr>`;
         return;
       }
 
       tbody.innerHTML = products.map(p => {
         const status = getStockStatus(p);
         const img = (p.images && p.images.length > 0) ? p.images[0] : 'https://placehold.co/46x46/1a1a2e/0057b3?text=M';
-        const catName = p.categories ? p.categories.name : '—';
+        const updatedAt = p.updated_at ? new Date(p.updated_at).toLocaleDateString('ar-MA') : '—';
+        const categoryName = categories.find(c => c.id === p.category_id)?.name || '—';
+        const sellerName = getSellerName(p.seller_id);
 
         return `
-          <tr>
+          <tr data-product-id="${p.id}">
             <td>
               <div class="product-cell">
                 <img src="${img}" alt="${escapeHtml(p.name)}" onerror="this.src='https://placehold.co/46x46/1a1a2e/0057b3?text=M'">
                 <div>
                   <div class="pname darija-text">${escapeHtml(p.name)}</div>
-                  <div class="pcat darija-text">${escapeHtml(catName)}</div>
+                  <div class="pcat darija-text">${escapeHtml(categoryName)}</div>
                 </div>
               </div>
             </td>
-            <td class="darija-text">${escapeHtml(String(p.price))} درهم</td>
+            <td class="darija-text">
+              <code>${escapeHtml(p.sku || '—')}</code>
+              ${p.sku ? `<button class="icon-btn" style="width:24px;height:24px;font-size:0.6rem;" onclick="quickScanBySKU('${escapeHtml(p.sku)}')" title="مسح"><i class="fas fa-qrcode"></i></button>` : ''}
+            </td>
+            <td class="darija-text"><span class="seller-tag">${escapeHtml(sellerName)}</span></td>
+            <td class="darija-text">${p.price} درهم</td>
             <td>
               <input type="number" class="stock-qty-input" value="${p.stock}" data-id="${p.id}" onchange="quickUpdateStock(this)">
             </td>
-            <td>
-              <span class="stock-badge ${status.cls} darija-text">
-                <i class="fas ${status.icon}"></i> ${status.label}
-              </span>
-            </td>
+            <td><span class="stock-badge ${status.cls} darija-text"><i class="fas ${status.icon}"></i> ${status.label}</span></td>
             <td class="darija-text">${p.low_stock_threshold || 5}</td>
+            <td class="darija-text" style="font-size:0.7rem;">${updatedAt}</td>
             <td>
               <div class="actions-cell">
                 <button class="icon-btn" title="إضافة/سحب كمية" onclick="openStockModal('${p.id}', '${escapeHtml(p.name)}')">
@@ -620,14 +1168,16 @@
                 <button class="icon-btn" title="عرض المنتج" onclick="window.location.href='product.html?id=${p.id}'">
                   <i class="fas fa-eye"></i>
                 </button>
+                <button class="icon-btn success" title="سجل الحركات" onclick="showProductHistory('${p.id}')">
+                  <i class="fas fa-history"></i>
+                </button>
               </div>
             </td>
-          </tr>
+           </tr>
         `;
       }).join('');
     }
 
-    // ========== تحديد حالة المخزون ==========
     function getStockStatus(p) {
       const threshold = p.low_stock_threshold || 5;
       if (p.stock <= 0) return { cls: 'out', icon: 'fa-ban', label: 'نفذ' };
@@ -635,8 +1185,16 @@
       return { cls: 'ok', icon: 'fa-check', label: 'متوفر' };
     }
 
-    // ========== تحديث سريع للكمية (تصحيح مباشر) ==========
-    async function quickUpdateStock(input) {
+    // دالة للبحث السريع بالـ SKU
+    window.quickScanBySKU = function(sku) {
+      const product = allProducts.find(p => p.sku === sku);
+      if (product) {
+        highlightProduct(product.id);
+        showToast('✅ المنتج: ' + product.name + ' | المخزون: ' + product.stock, 'info');
+      }
+    };
+
+    window.quickUpdateStock = async function(input) {
       const productId = input.dataset.id;
       const newValue = parseInt(input.value);
       const product = allProducts.find(p => p.id === productId);
@@ -651,42 +1209,53 @@
       const diff = newValue - product.stock;
       if (diff === 0) return;
 
-      const { error } = await sb.from('stock_movements').insert({
-        product_id: productId,
-        change: diff,
-        reason: 'adjustment'
-      });
+      const { error: updateError } = await sb
+        .from('products')
+        .update({ stock: newValue, updated_at: new Date().toISOString() })
+        .eq('id', productId);
 
-      if (error) {
-        showToast('❌ فشل التحديث: ' + error.message, 'error');
+      if (updateError) {
+        console.error('❌ Update error:', updateError);
+        showToast('❌ فشل تحديث المخزون: ' + updateError.message, 'error');
         input.value = product.stock;
         return;
+      }
+
+      const { error: insertError } = await sb.from('stock_movements').insert({
+        product_id: productId,
+        change: diff,
+        reason: 'adjustment',
+        note: 'تحديث سريع من لوحة المخزون'
+      });
+
+      if (insertError) {
+        console.warn('⚠️ Could not insert movement record:', insertError.message);
       }
 
       product.stock = newValue;
       renderTable(filterProducts());
       updateKPIs(allProducts);
+      loadStockHistory();
       showToast('✅ تم تحديث المخزون بنجاح', 'success');
-    }
+    };
 
-    // ========== فتح نافذة تحديث المخزون ==========
-    function openStockModal(productId, productName) {
+    window.openStockModal = function(productId, productName) {
       currentProductId = productId;
       document.getElementById('modalProductName').textContent = productName;
       document.getElementById('modalChangeInput').value = '';
+      document.getElementById('modalNote').value = '';
       selectedReason = 'restock';
       document.querySelectorAll('#reasonRow label').forEach(l => l.classList.remove('active'));
       document.querySelector('#reasonRow label[data-reason="restock"]').classList.add('active');
       document.getElementById('stockModal').classList.add('open');
-    }
+    };
 
-    function closeStockModal() {
+    window.closeStockModal = function() {
       document.getElementById('stockModal').classList.remove('open');
       currentProductId = null;
-    }
+    };
 
-    // ========== تأكيد تغيير المخزون من النافذة ==========
-    async function confirmStockChange() {
+    window.confirmStockChange = async function() {
       const changeVal = parseInt(document.getElementById('modalChangeInput').value);
       if (isNaN(changeVal) || changeVal === 0) {
         showToast('⚠️ ادخل قيمة صحيحة', 'error');
@@ -696,37 +1265,148 @@
       const product = allProducts.find(p => p.id === currentProductId);
       if (!product) return;
 
-      // التحقق من عدم النزول تحت 0
-      if (product.stock + changeVal < 0) {
+      const newStock = product.stock + changeVal;
+      if (newStock < 0) {
         showToast('⚠️ لا يمكن أن يكون المخزون أقل من 0', 'error');
         return;
       }
 
-      const { error } = await sb.from('stock_movements').insert({
-        product_id: currentProductId,
-        change: changeVal,
-        reason: selectedReason
-      });
+      const note = document.getElementById('modalNote').value;
 
-      if (error) {
-        showToast('❌ فشل التحديث: ' + error.message, 'error');
+      const { error: updateError } = await sb
+        .from('products')
+        .update({ stock: newStock, updated_at: new Date().toISOString() })
+        .eq('id', currentProductId);
+
+      if (updateError) {
+        console.error('❌ Update error:', updateError);
+        showToast('❌ فشل تحديث المخزون: ' + updateError.message, 'error');
         return;
       }
 
-      product.stock += changeVal;
+      const { error: insertError } = await sb.from('stock_movements').insert({
+        product_id: currentProductId,
+        change: changeVal,
+        reason: selectedReason,
+        note: note || null
+      });
+
+      if (insertError) {
+        console.warn('⚠️ Movement record failed:', insertError.message);
+      }
+
+      product.stock = newStock;
       renderTable(filterProducts());
       updateKPIs(allProducts);
+      loadStockHistory();
       closeStockModal();
       showToast('✅ تم تحديث المخزون بنجاح', 'success');
+    };
+
+    async function loadStockHistory(productId = null) {
+      try {
+        let query = sb
+          .from('stock_movements')
+          .select('*')
+          .order('created_at', { ascending: false })
+          .limit(50);
+
+        if (productId) {
+          query = query.eq('product_id', productId);
+        }
+
+        const { data, error } = await query;
+
+        if (error) {
+          console.error('❌ History error:', error);
+          throw error;
+        }
+
+        const tbody = document.getElementById('historyTableBody');
+        
+        if (!data || data.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="5" class="text-center text-dim">لا توجد حركات مسجلة</td></tr>';
+          return;
+        }
+
+        const productIds = [...new Set(data.map(m => m.product_id))];
+        const productNames = {};
+        
+        allProducts.forEach(p => {
+          if (productIds.includes(p.id)) {
+            productNames[p.id] = p.name;
+          }
+        });
+
+        const missingIds = productIds.filter(id => !productNames[id]);
+        if (missingIds.length > 0) {
+          try {
+            const { data: missingProducts } = await sb
+              .from('products')
+              .select('id, name')
+              .in('id', missingIds);
+            
+            if (missingProducts) {
+              missingProducts.forEach(p => {
+                productNames[p.id] = p.name;
+              });
+            }
+          } catch(e) {
+            console.warn('Could not fetch missing product names:', e);
+          }
+        }
+
+        const reasonLabels = {
+          restock: '🟢 توريد',
+          adjustment: '🔵 تصحيح',
+          return: '🟠 إرجاع',
+          sale: '🔴 بيع'
+        };
+
+        tbody.innerHTML = data.map(m => {
+          const changeClass = m.change > 0 ? 'success' : 'danger';
+          const changeSign = m.change > 0 ? `+${m.change}` : m.change;
+          const productName = productNames[m.product_id] || m.product_id?.substring(0, 8) || '—';
+          
+          return `
+            <tr>
+              <td>${escapeHtml(productName)}</td>
+              <td style="color: var(--${changeClass}); font-weight: bold;">${changeSign}</td>
+              <td>${reasonLabels[m.reason] || m.reason || '—'}</td>
+              <td style="font-size:0.7rem;">${m.created_at ? new Date(m.created_at).toLocaleString('ar-MA') : '—'}</td>
+              <td style="font-size:0.7rem;">${escapeHtml(m.note || '—')}</td>
+            </tr>
+          `;
+        }).join('');
+        
+      } catch(e) {
+        console.error('❌ Error loading stock history:', e);
+        document.getElementById('historyTableBody').innerHTML = 
+          '<tr><td colspan="5" class="text-center text-danger">❌ خطأ في تحميل السجل</td></tr>';
+      }
     }
 
-    // ========== فلترة وبحث ==========
+    window.showProductHistory = function(productId) {
+      loadStockHistory(productId);
+      document.getElementById('historySection').scrollIntoView({ behavior: 'smooth' });
+      showToast('📋 جاري عرض سجل هذا المنتج', 'info');
+    };
+
     function filterProducts() {
       const search = document.getElementById('searchInput').value.trim().toLowerCase();
       const filter = document.getElementById('filterSelect').value;
+      const categoryId = document.getElementById('categoryFilter').value;
 
       return allProducts.filter(p => {
-        const matchesSearch = !search || p.name.toLowerCase().includes(search);
+        const sellerName = getSellerName(p.seller_id);
+        
+        const matchesSearch = !search || 
+          p.name.toLowerCase().includes(search) || 
+          (p.sku && p.sku.toLowerCase().includes(search)) ||
+          sellerName.toLowerCase().includes(search);
+        
+        const matchesCategory = categoryId === 'all' || p.category_id === categoryId;
+        
         let matchesFilter = true;
         const threshold = p.low_stock_threshold || 5;
 
@@ -734,11 +1414,10 @@
         else if (filter === 'out') matchesFilter = p.stock <= 0;
         else if (filter === 'available') matchesFilter = p.is_available && p.stock > 0;
 
-        return matchesSearch && matchesFilter;
+        return matchesSearch && matchesFilter && matchesCategory;
       });
     }
 
-    // ========== Toast ==========
     function showToast(text, type) {
       const toast = document.getElementById('toastMsg');
       toast.textContent = text;
@@ -749,15 +1428,23 @@
 
     function escapeHtml(s) {
       if (!s) return '';
-      return String(s).replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+      return String(s).replace(/[&<>"']/g, m => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]));
     }
 
-    // ========== ربط الأحداث ==========
-    document.addEventListener('DOMContentLoaded', () => {
-      loadStock();
+    document.addEventListener('DOMContentLoaded', async () => {
+      initSupabase();
+      
+      if (!sb) {
+        showToast('❌ خطأ في الاتصال بـ Supabase', 'error');
+        return;
+      }
+
+      await Promise.all([loadCategories(), loadSellers()]);
+      await loadStock();
 
       document.getElementById('searchInput').addEventListener('input', () => renderTable(filterProducts()));
       document.getElementById('filterSelect').addEventListener('change', () => renderTable(filterProducts()));
+      document.getElementById('categoryFilter').addEventListener('change', () => renderTable(filterProducts()));
 
       document.querySelectorAll('#reasonRow label').forEach(label => {
         label.addEventListener('click', () => {
@@ -769,6 +1456,13 @@
 
       document.getElementById('stockModal').addEventListener('click', (e) => {
         if (e.target.id === 'stockModal') closeStockModal();
+      });
+      
+      // إغلاق السكنر بزر ESC
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && document.getElementById('scannerOverlay').classList.contains('active')) {
+          stopScanner();
+        }
       });
     });
   </script>
