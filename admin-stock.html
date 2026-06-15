@@ -560,7 +560,7 @@
 <body>
 
   <div id="header-placeholder"></div>
-
+<div id="admin-navbar-placeholder"></div>
   <!-- ماسح الباركود -->
   <div class="scanner-overlay" id="scannerOverlay">
     <button class="close-scanner" onclick="stopScanner()" title="إغلاق">
@@ -652,7 +652,7 @@
       <button class="scan-btn darija-text" onclick="startScanner()">
         <i class="fas fa-qrcode"></i> مسح باركود
       </button>
-      <button class="gold-btn darija-text" onclick="window.location.href='product-form.html'">
+      <button class="gold-btn darija-text" onclick="window.location.href='admin-product-form.html'">
         <i class="fas fa-plus"></i> منتج جديد
       </button>
     </div>
@@ -683,7 +683,7 @@
       <div id="emptyState" class="empty-state darija-text" style="display:none;">
         <i class="fas fa-box-open text-3xl mb-3 block opacity-40"></i>
         لا توجد منتجات حتى الآن
-        <div class="mt-4"><a href="product-form.html" class="gold-btn">➕ أضف أول منتج</a></div>
+        <div class="mt-4"><a href="admin-product-form.html" class="gold-btn">➕ أضف أول منتج</a></div>
       </div>
     </div>
 
@@ -756,6 +756,7 @@
 
   <div class="toast-msg" id="toastMsg"></div>
 
+<script src="admin.js"></script>
   <script src="header.js"></script>
   <script src="footer.js"></script>
 

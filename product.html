@@ -39,7 +39,7 @@
 
     .page-wrap { max-width: 1200px; margin: 0 auto; padding: clamp(30px,5vh,60px) 1.5rem; }
 
-    /* صور المنتج */
+    /* Gallery */
     .gallery-main {
       width: 100%; aspect-ratio: 1; border-radius: 20px; overflow: hidden;
       background: var(--gray); border: 1px solid var(--border); margin-bottom: 1rem;
@@ -53,14 +53,36 @@
     .gallery-thumb.active { border-color: var(--blue-primary); }
     .gallery-thumb img, .gallery-thumb video { width: 100%; height: 100%; object-fit: cover; }
 
-    /* معلومات المنتج */
+    /* Product Info */
     .product-category-tag { color: var(--blue-primary); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 600; margin-bottom: 0.5rem; }
     .product-title { font-size: clamp(1.5rem, 4vw, 2.2rem); font-weight: 800; margin-bottom: 0.75rem; }
+    .product-sku { font-size: 0.7rem; color: var(--text-dim); margin-bottom: 0.75rem; }
     .product-rating { display: flex; align-items: center; gap: 0.4rem; margin-bottom: 1rem; font-size: 0.85rem; color: var(--text-muted); }
     .product-price-row { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.25rem; }
     .product-price { font-size: 2rem; font-weight: 800; color: var(--blue-primary); }
     .product-old-price { font-size: 1.1rem; color: var(--text-dim); text-decoration: line-through; }
+    .sale-badge { background: var(--danger); color: white; padding: 3px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; }
     .product-desc { font-size: 0.95rem; line-height: 1.9; color: var(--text-muted); margin-bottom: 1.5rem; }
+
+    /* Variants */
+    .variant-section { margin-bottom: 1.25rem; }
+    .variant-label { font-size: 0.8rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.4rem; }
+    .variant-options { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    .variant-option {
+      padding: 0.5rem 1rem; border-radius: 10px; border: 2px solid var(--border2);
+      background: rgba(0,87,179,0.03); color: var(--text-muted); cursor: pointer;
+      font-size: 0.85rem; font-weight: 500; transition: all 0.2s; font-family: inherit;
+    }
+    .variant-option:hover { border-color: var(--blue-primary); color: var(--text); }
+    .variant-option.selected {
+      border-color: var(--blue-primary); background: rgba(0,87,179,0.15);
+      color: var(--blue-primary); font-weight: 700;
+    }
+    .variant-option:disabled { opacity: 0.4; cursor: not-allowed; }
+    .color-swatch {
+      display: inline-block; width: 18px; height: 18px; border-radius: 50%;
+      margin-left: 6px; vertical-align: middle; border: 2px solid rgba(255,255,255,0.3);
+    }
 
     .stock-info { display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; margin-bottom: 1.5rem; font-weight: 600; }
     .stock-info.ok { color: var(--success); }
@@ -97,8 +119,21 @@
       margin-top: 1.5rem; padding: 1rem; border-radius: 14px; background: var(--card);
       border: 1px solid var(--border); display: flex; align-items: center; gap: 0.75rem; font-size: 0.85rem;
     }
+    .product-meta { margin-top: 1rem; display: flex; flex-wrap: wrap; gap: 1rem; font-size: 0.75rem; color: var(--text-dim); }
 
-    /* تقييمات */
+    /* Details accordion */
+    .details-accordion {
+      margin-top: 1.5rem; border-radius: 14px; background: var(--card);
+      border: 1px solid var(--border); overflow: hidden;
+    }
+    .details-accordion summary {
+      padding: 0.85rem 1.25rem; cursor: pointer; font-weight: 600; font-size: 0.9rem;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .details-accordion .details-content { padding: 0 1.25rem 1.25rem; border-top: 1px solid var(--border); }
+    .detail-row { display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.8rem; }
+
+    /* Reviews */
     .section-title {
       position: relative; display: inline-block; font-size: clamp(1.3rem, 4vw, 1.8rem);
       font-weight: 700; margin-bottom: 2rem;
@@ -138,6 +173,8 @@
 </head>
 <body>
 
+  <div id="header-placeholder"></div>
+
   <main id="productContent" class="page-wrap">
     <div class="loader-spinner"></div>
   </main>
@@ -154,15 +191,32 @@
     const productId = urlParams.get('id');
     let currentProduct = null;
     let currentQty = 1;
-    let allMedia = []; // { type: 'image'|'video', url }
+    let allMedia = [];
     let currentRating = 0;
+    let selectedVariants = {}; // { "لون": "أحمر", "حجم": "كبير" }
+    let currentVariantData = null; // الخيار المختار من variants JSON
+
+    // ========== Color map ==========
+    const colorMap = {
+      'أحمر': '#ff4757', 'أزرق': '#3742fa', 'أخضر': '#2ed573', 'أسود': '#2f3542',
+      'أبيض': '#f1f2f6', 'أصفر': '#ffa502', 'برتقالي': '#ff6348', 'بنفسجي': '#a55eea',
+      'وردي': '#ff6b81', 'رمادي': '#a4b0be', 'بني': '#8b4513', 'ذهبي': '#ffd700',
+      'فضي': '#c0c0c0', 'بيج': '#f5f5dc', 'كحلي': '#000080', 'زيتي': '#556b2f'
+    };
+
+    function getColorHex(value) {
+      return colorMap[value] || '#718093';
+    }
 
     // ========== جلب المنتج ==========
     async function loadProduct() {
-      if (!productId) {
-        renderNotFound();
-        return;
-      }
+      if (!productId) { renderNotFound(); return; }
+
+      // استخدام supabase client من config.js
+      const sb = window.sb || supabase.createClient(
+        MARNISSA_CONFIG?.SUPABASE_URL || 'https://mbzrhdszwfutwlfmldyv.supabase.co',
+        MARNISSA_CONFIG?.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1ienJoZHN6d2Z1dHdsZm1sZHl2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0MjUzNjAsImV4cCI6MjA5NzAwMTM2MH0.0XtnF-ZrhczJyUEHBpsCpsPriCrxxQyMg2d2u75XGXs'
+      );
 
       const { data, error } = await sb
         .from('products')
@@ -170,12 +224,10 @@
         .eq('id', productId)
         .single();
 
-      if (error || !data) {
-        renderNotFound();
-        return;
-      }
+      if (error || !data) { renderNotFound(); return; }
 
       currentProduct = data;
+      console.log('📦 Product loaded:', currentProduct.name, '| variants:', currentProduct.variants);
       renderProduct(data);
       loadReviews();
     }
@@ -193,12 +245,69 @@
     }
 
     function renderProduct(p) {
-      // تجميع الصور والفيديو فمصفوفة واحدة
+      // تجميع الوسائط
       allMedia = (p.images || []).map(url => ({ type: 'image', url }));
       if (p.video_url) allMedia.push({ type: 'video', url: p.video_url });
       if (allMedia.length === 0) allMedia.push({ type: 'image', url: 'https://placehold.co/600x600/1a1a2e/0057b3?text=' + encodeURIComponent(p.name) });
 
-      const stockStatus = getStockStatus(p);
+      const variants = p.variants || [];
+      const hasVariants = variants.length > 0 && variants.some(v => v.options?.length > 0);
+      const salePercent = p.old_price ? Math.round((1 - p.price / p.old_price) * 100) : 0;
+
+      // الحصول على السعر النهائي (الأساسي + المتغيرات)
+      let finalPrice = p.price;
+      let variantStock = p.stock;
+      if (selectedVariants && Object.keys(selectedVariants).length > 0) {
+        // حساب السعر الإضافي من المتغيرات المختارة
+        variants.forEach(v => {
+          if (selectedVariants[v.type]) {
+            const selectedOpt = v.options.find(o => o.value === selectedVariants[v.type]);
+            if (selectedOpt) {
+              finalPrice += (selectedOpt.price_extra || 0);
+              if (selectedOpt.stock !== undefined && selectedOpt.stock !== null && selectedOpt.stock > 0) {
+                variantStock = selectedOpt.stock;
+              }
+            }
+          }
+        });
+      }
+
+      const stockStatus = getStockStatus({ ...p, stock: variantStock });
+
+      // بناء HTML المتغيرات
+      let variantsHTML = '';
+      if (hasVariants) {
+        variantsHTML = variants.map(v => {
+          if (!v.options || v.options.length === 0) return '';
+          const isColor = v.type === 'لون' || v.type === 'اللون' || v.type === 'color';
+          return `
+            <div class="variant-section">
+              <div class="variant-label darija-text">
+                <i class="fas fa-tag"></i> ${escapeHtml(v.type)}:
+                <span style="color:var(--blue-primary);">${selectedVariants[v.type] || 'لم يختر'}</span>
+              </div>
+              <div class="variant-options">
+                ${v.options.map(opt => {
+                  const isSelected = selectedVariants[v.type] === opt.value;
+                  const isOutOfStock = opt.stock !== undefined && opt.stock <= 0;
+                  return `
+                    <button class="variant-option ${isSelected ? 'selected' : ''}" 
+                            data-group="${escapeHtml(v.type)}" 
+                            data-value="${escapeHtml(opt.value)}"
+                            ${isOutOfStock ? 'disabled' : ''}
+                            title="${opt.price_extra ? 'فرق السعر: ' + opt.price_extra + ' درهم' : ''}${isOutOfStock ? ' - غير متوفر' : ''}">
+                      ${isColor ? `<span class="color-swatch" style="background:${getColorHex(opt.value)};"></span>` : ''}
+                      ${escapeHtml(opt.value)}
+                      ${opt.price_extra ? ` <small style="opacity:0.7;">(${opt.price_extra > 0 ? '+' : ''}${opt.price_extra}dh)</small>` : ''}
+                      ${isOutOfStock ? ' <small style="color:var(--danger);">(نفذ)</small>' : ''}
+                    </button>
+                  `;
+                }).join('')}
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
 
       document.getElementById('productContent').innerHTML = `
         <div class="grid md:grid-cols-2 gap-10">
@@ -212,6 +321,7 @@
           <div data-aos="fade-up" data-aos-delay="100">
             <div class="product-category-tag darija-text">${escapeHtml(p.categories?.name || 'منتج')}</div>
             <h1 class="product-title darija-text">${escapeHtml(p.name)}</h1>
+            ${p.sku ? `<div class="product-sku darija-text">SKU: ${escapeHtml(p.sku)}</div>` : ''}
 
             <div class="product-rating darija-text">
               ${renderStars(p.rating_avg || 0)}
@@ -219,17 +329,20 @@
             </div>
 
             <div class="product-price-row">
-              <span class="product-price">${p.price} درهم</span>
+              <span class="product-price">${finalPrice.toFixed(2)} درهم</span>
               ${p.old_price ? `<span class="product-old-price">${p.old_price} درهم</span>` : ''}
+              ${salePercent > 0 ? `<span class="sale-badge">-${salePercent}%</span>` : ''}
             </div>
 
             <p class="product-desc darija-text">${escapeHtml(p.description || 'لا يوجد وصف لهذا المنتج.')}</p>
+
+            ${variantsHTML}
 
             <div class="stock-info ${stockStatus.cls} darija-text">
               <i class="fas ${stockStatus.icon}"></i> ${stockStatus.label}
             </div>
 
-            ${p.is_available && p.stock > 0 ? `
+            ${p.is_available && variantStock > 0 ? `
               <div class="qty-selector">
                 <button class="qty-btn" id="qtyMinus"><i class="fas fa-minus"></i></button>
                 <span class="qty-value" id="qtyValue">1</span>
@@ -258,6 +371,27 @@
                 <span>يُباع من طرف: <strong>${escapeHtml(p.sellers.store_name)}</strong></span>
               </div>
             ` : ''}
+
+            <!-- تفاصيل إضافية -->
+            <details class="details-accordion">
+              <summary class="darija-text"><i class="fas fa-info-circle ml-2"></i> تفاصيل أكثر <i class="fas fa-chevron-down"></i></summary>
+              <div class="details-content darija-text">
+                ${p.weight ? `<div class="detail-row"><span>الوزن</span><span>${escapeHtml(p.weight)}</span></div>` : ''}
+                ${p.dimensions ? `<div class="detail-row"><span>الأبعاد</span><span>${escapeHtml(p.dimensions)}</span></div>` : ''}
+                ${p.materials ? `<div class="detail-row"><span>المواد</span><span>${escapeHtml(p.materials)}</span></div>` : ''}
+                ${p.brand ? `<div class="detail-row"><span>العلامة</span><span>${escapeHtml(p.brand)}</span></div>` : ''}
+                ${p.origin ? `<div class="detail-row"><span>بلد المنشأ</span><span>${escapeHtml(p.origin)}</span></div>` : ''}
+                ${p.warranty ? `<div class="detail-row"><span>الضمان</span><span>${escapeHtml(p.warranty)}</span></div>` : ''}
+                ${p.processing_time ? `<div class="detail-row"><span>وقت التجهيز</span><span>${p.processing_time} أيام</span></div>` : ''}
+                ${p.max_order_quantity ? `<div class="detail-row"><span>أقصى كمية للطلب</span><span>${p.max_order_quantity}</span></div>` : ''}
+              </div>
+            </details>
+
+            ${p.tags && p.tags.length > 0 ? `
+              <div class="product-meta">
+                ${p.tags.map(tag => `<span style="background:rgba(0,87,179,0.1);padding:0.2rem 0.6rem;border-radius:12px;">#${escapeHtml(tag)}</span>`).join(' ')}
+              </div>
+            ` : ''}
           </div>
         </div>
 
@@ -284,8 +418,9 @@
       `;
 
       renderGallery();
-      setupQtyButtons(p);
-      setupAddToCart(p);
+      setupVariantButtons(p);
+      setupQtyButtons(variantStock);
+      setupAddToCart(p, finalPrice, variantStock);
       setupRatingStars();
     }
 
@@ -305,7 +440,7 @@
       return { cls: 'ok', icon: 'fa-check-circle', label: 'متوفر فالمخزون' };
     }
 
-    // ========== المعرض ==========
+    // ========== Gallery ==========
     let activeMediaIndex = 0;
     function renderGallery() {
       const main = document.getElementById('galleryMain');
@@ -334,33 +469,63 @@
       showMedia(0);
     }
 
-    // ========== الكمية ==========
-    function setupQtyButtons(p) {
+    // ========== Variants ==========
+    function setupVariantButtons(p) {
+      document.querySelectorAll('.variant-option').forEach(btn => {
+        btn.addEventListener('click', function() {
+          const group = this.dataset.group;
+          const value = this.dataset.value;
+
+          // إلغاء التحديد إذا ضغط على نفس الخيار
+          if (selectedVariants[group] === value) {
+            delete selectedVariants[group];
+          } else {
+            selectedVariants[group] = value;
+          }
+
+          // إعادة عرض المنتج مع المتغيرات المختارة
+          renderProduct(p);
+        });
+      });
+    }
+
+    // ========== Quantity ==========
+    function setupQtyButtons(maxStock) {
       const minus = document.getElementById('qtyMinus');
       const plus = document.getElementById('qtyPlus');
       const valueEl = document.getElementById('qtyValue');
       if (!minus || !plus) return;
 
+      currentQty = 1;
+      if (valueEl) valueEl.textContent = currentQty;
+
       minus.addEventListener('click', () => {
         if (currentQty > 1) { currentQty--; valueEl.textContent = currentQty; }
       });
       plus.addEventListener('click', () => {
-        if (currentQty < p.stock) { currentQty++; valueEl.textContent = currentQty; }
+        if (currentQty < maxStock) { currentQty++; valueEl.textContent = currentQty; }
         else showToast('⚠️ الكمية المطلوبة أكبر من المخزون المتاح', 'error');
       });
     }
 
-    // ========== إضافة للسلة ==========
-    function setupAddToCart(p) {
+    // ========== Add to Cart ==========
+    function setupAddToCart(p, finalPrice, maxStock) {
       const btn = document.getElementById('addToCartBtn');
       if (!btn) return;
 
       btn.addEventListener('click', () => {
         let cart = JSON.parse(localStorage.getItem('marnissaCart')) || [];
-        const existing = cart.find(item => item.id === p.id);
+
+        // بناء معرف فريد يشمل المتغيرات
+        const variantKey = Object.entries(selectedVariants)
+          .map(([k, v]) => `${k}:${v}`)
+          .join('|');
+        const uniqueId = variantKey ? `${p.id}_${variantKey}` : p.id;
+
+        const existing = cart.find(item => item.uniqueId === uniqueId);
 
         if (existing) {
-          if (existing.qty + currentQty > p.stock) {
+          if (existing.qty + currentQty > maxStock) {
             showToast('⚠️ الكمية الإجمالية تتجاوز المخزون المتاح', 'error');
             return;
           }
@@ -368,11 +533,14 @@
         } else {
           cart.push({
             id: p.id,
+            uniqueId,
             name: p.name,
-            price: p.price,
+            price: finalPrice,
             image: (p.images && p.images[0]) || '',
-            stock: p.stock,
-            qty: currentQty
+            stock: maxStock,
+            qty: currentQty,
+            variants: { ...selectedVariants },
+            sku: p.sku
           });
         }
 
@@ -382,10 +550,15 @@
       });
     }
 
-    // ========== التقييمات ==========
+    // ========== Reviews ==========
     async function loadReviews() {
       const container = document.getElementById('reviewsList');
-      const { data, error } = await sb
+      const sb2 = window.sb || supabase.createClient(
+        MARNISSA_CONFIG?.SUPABASE_URL || 'https://mbzrhdszwfutwlfmldyv.supabase.co',
+        MARNISSA_CONFIG?.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1ienJoZHN6d2Z1dHdsZm1sZHl2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0MjUzNjAsImV4cCI6MjA5NzAwMTM2MH0.0XtnF-ZrhczJyUEHBpsCpsPriCrxxQyMg2d2u75XGXs'
+      );
+
+      const { data, error } = await sb2
         .from('reviews')
         .select('*')
         .eq('product_id', productId)
@@ -425,7 +598,7 @@
         });
       });
 
-      document.getElementById('submitReview').addEventListener('click', submitReview);
+      document.getElementById('submitReview')?.addEventListener('click', submitReview);
     }
 
     async function submitReview() {
@@ -437,7 +610,12 @@
         return;
       }
 
-      const { error } = await sb.from('reviews').insert({
+      const sb2 = window.sb || supabase.createClient(
+        MARNISSA_CONFIG?.SUPABASE_URL || 'https://mbzrhdszwfutwlfmldyv.supabase.co',
+        MARNISSA_CONFIG?.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1ienJoZHN6d2Z1dHdsZm1sZHl2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0MjUzNjAsImV4cCI6MjA5NzAwMTM2MH0.0XtnF-ZrhczJyUEHBpsCpsPriCrxxQyMg2d2u75XGXs'
+      );
+
+      const { error } = await sb2.from('reviews').insert({
         product_id: productId,
         name, comment,
         rating: currentRating,
@@ -456,7 +634,7 @@
 
       showToast('✨ شكراً! تم إضافة رأيك بنجاح', 'success');
       loadReviews();
-      loadProduct(); // لتحديث المعدل
+      loadProduct();
     }
 
     function escapeHtml(s) {

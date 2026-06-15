@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
   <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js"></script>
   
   <style>
@@ -20,31 +21,41 @@
       --blue-primary: #0057b3;
       --blue-dark: #003d80;
       --blue-light: #3a8fd4;
-      --black: #0a0a0a;
-      --black-light: #0d1117;
-      --gray: #161b22;
-      --text-light: #ffffff;
-      --text-muted: #c9d1d9;
-      --text-dim: #8b949e;
+      --success: #25D366;
+      --danger: #ff4757;
+      --warning: #ffa502;
     }
     
     body {
-      background: var(--black);
-      font-family: 'Tajawal', sans-serif;
-      color: var(--text-light);
-      transition: all 0.3s ease;
+      --bg: #0a0a0a;
+      --bg2: #0d1117;
+      --text: #ffffff;
+      --text-muted: #c9d1d9;
+      --text-dim: #8b949e;
+      --border: rgba(0,87,179,0.3);
+      --card-bg: #161b22;
     }
     
     body.blue-theme {
-      --black: #f0f2f5;
-      --black-light: #ffffff;
-      --gray: #e8e8e8;
-      --text-light: #1a1a2e;
+      --bg: #f0f2f5;
+      --bg2: #ffffff;
+      --text: #1a1a2e;
       --text-muted: #3a3a5e;
       --text-dim: #6b6b8b;
+      --border: rgba(0,87,179,0.2);
+      --card-bg: #ffffff;
     }
     
-    /* المنتجات */
+    body {
+      background: var(--bg);
+      font-family: 'Tajawal', sans-serif;
+      color: var(--text);
+      min-height: 100vh;
+      transition: all 0.3s ease;
+    }
+    
+    .darija-text { font-family: 'Tajawal', sans-serif; }
+
     .products-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -52,110 +63,280 @@
     }
     
     .product-card {
-      background: var(--gray);
-      border-radius: 16px;
+      background: var(--card-bg);
+      border-radius: 20px;
       overflow: hidden;
-      transition: all 0.3s ease;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
       cursor: pointer;
-      border: 1px solid rgba(0,87,179,0.2);
+      border: 1px solid var(--border);
+      position: relative;
     }
     
     .product-card:hover {
-      transform: translateY(-5px);
+      transform: translateY(-8px);
       border-color: var(--blue-primary);
-      box-shadow: 0 10px 25px rgba(0,87,179,0.2);
+      box-shadow: 0 20px 40px rgba(0,87,179,0.25);
+    }
+    
+    .product-image-wrap {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 1;
+      overflow: hidden;
+      background: #1a1a2e;
     }
     
     .product-image {
       width: 100%;
-      aspect-ratio: 1;
+      height: 100%;
       object-fit: cover;
+      transition: transform 0.5s;
+    }
+    
+    .product-card:hover .product-image {
+      transform: scale(1.08);
     }
     
     .product-badge {
       position: absolute;
-      top: 10px;
-      right: 10px;
+      top: 12px;
+      right: 12px;
       background: var(--blue-primary);
       color: white;
-      padding: 5px 10px;
+      padding: 6px 14px;
       border-radius: 20px;
       font-size: 0.7rem;
-      font-weight: bold;
+      font-weight: 700;
+      z-index: 2;
+      backdrop-filter: blur(4px);
+    }
+    
+    .sale-badge {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      background: var(--danger);
+      color: white;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      z-index: 2;
     }
     
     .stock-badge {
       position: absolute;
-      bottom: 10px;
-      right: 10px;
-      background: rgba(0,0,0,0.7);
-      color: white;
-      padding: 3px 8px;
+      bottom: 12px;
+      right: 12px;
+      padding: 5px 12px;
       border-radius: 20px;
       font-size: 0.65rem;
+      font-weight: 600;
+      z-index: 2;
+      backdrop-filter: blur(4px);
+    }
+    
+    .stock-available {
+      background: rgba(37,211,102,0.15);
+      color: var(--success);
+      border: 1px solid rgba(37,211,102,0.3);
     }
     
     .stock-low {
-      background: #ff4757;
+      background: rgba(255,165,2,0.15);
+      color: var(--warning);
+      border: 1px solid rgba(255,165,2,0.3);
     }
     
     .stock-out {
-      background: #2a2a2a;
+      background: rgba(255,71,87,0.15);
+      color: var(--danger);
+      border: 1px solid rgba(255,71,87,0.3);
+    }
+    
+    .variants-preview {
+      position: absolute;
+      bottom: 12px;
+      left: 12px;
+      display: flex;
+      gap: 4px;
+      z-index: 2;
+    }
+    
+    .variant-dot {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      border: 2px solid white;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.3);
     }
     
     .filter-sidebar {
-      background: var(--gray);
-      border-radius: 16px;
-      padding: 1.25rem;
+      background: var(--card-bg);
+      border-radius: 20px;
+      padding: 1.5rem;
       position: sticky;
       top: 80px;
+      border: 1px solid var(--border);
     }
     
     .filter-btn {
       background: transparent;
-      border: 1px solid var(--blue-primary);
-      color: var(--text-light);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
       padding: 0.5rem 1rem;
       border-radius: 30px;
       font-size: 0.8rem;
       cursor: pointer;
       transition: all 0.3s;
+      font-family: inherit;
+      white-space: nowrap;
     }
     
     .filter-btn.active,
     .filter-btn:hover {
       background: var(--blue-primary);
+      border-color: var(--blue-primary);
       color: white;
     }
     
-    .pagination-btn {
-      background: var(--gray);
-      border: 1px solid var(--blue-primary);
-      color: var(--text-light);
-      padding: 0.5rem 1rem;
+    .search-input {
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 0.65rem 1rem;
+      color: var(--text);
+      font-family: inherit;
+      width: 100%;
+      transition: all 0.3s;
+    }
+    .search-input:focus {
+      outline: none;
+      border-color: var(--blue-primary);
+    }
+    .search-input::placeholder { color: var(--text-dim); }
+    
+    .price-input {
+      background: transparent;
+      border: 1px solid var(--border);
       border-radius: 8px;
+      padding: 0.4rem 0.5rem;
+      color: var(--text);
+      font-family: inherit;
+      text-align: center;
+      font-size: 0.8rem;
+    }
+    .price-input:focus {
+      outline: none;
+      border-color: var(--blue-primary);
+    }
+    
+    .sort-select {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 0.5rem 1rem;
+      color: var(--text);
+      font-family: inherit;
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+    .sort-select:focus { outline: none; border-color: var(--blue-primary); }
+    .sort-select option { background: var(--bg2); color: var(--text); }
+    
+    .pagination-btn {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
       cursor: pointer;
       transition: all 0.3s;
+      font-family: inherit;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     
     .pagination-btn:hover,
     .pagination-btn.active {
       background: var(--blue-primary);
+      border-color: var(--blue-primary);
       color: white;
     }
     
+    .pagination-btn:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+    
     .loader-spinner {
-      width: 40px;
-      height: 40px;
-      border: 3px solid rgba(0,87,179,0.3);
+      width: 44px;
+      height: 44px;
+      border: 3px solid rgba(0,87,179,0.2);
       border-radius: 50%;
       border-top-color: var(--blue-primary);
       animation: spin 0.8s ease-in-out infinite;
-      margin: 2rem auto;
+      margin: 3rem auto;
     }
     
     @keyframes spin {
       to { transform: rotate(360deg); }
+    }
+    
+    .category-item {
+      display: block;
+      width: 100%;
+      text-align: right;
+      padding: 0.6rem 0.75rem;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-family: inherit;
+      font-size: 0.85rem;
+    }
+    
+    .category-item:hover {
+      background: rgba(0,87,179,0.1);
+      color: var(--blue-primary);
+    }
+    
+    .category-item.active {
+      background: rgba(0,87,179,0.15);
+      color: var(--blue-primary);
+      font-weight: 600;
+    }
+    
+    .rating-stars {
+      color: #ffa502;
+      font-size: 0.8rem;
+    }
+    
+    .quick-view-btn {
+      position: absolute;
+      bottom: 50%;
+      left: 50%;
+      transform: translate(-50%, 50%) scale(0);
+      background: rgba(0,87,179,0.9);
+      color: white;
+      border: none;
+      padding: 0.6rem 1.2rem;
+      border-radius: 30px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 0.8rem;
+      transition: all 0.3s;
+      z-index: 3;
+      white-space: nowrap;
+    }
+    
+    .product-card:hover .quick-view-btn {
+      transform: translate(-50%, 50%) scale(1);
     }
     
     @media (max-width: 768px) {
@@ -172,62 +353,74 @@
 </head>
 <body>
 
-  <!-- الهيدر -->
   <div id="header-placeholder"></div>
 
   <main class="container mx-auto px-4 py-8">
     
-    <!-- العنوان -->
-    <div class="text-center mb-8" data-aos="fade-up">
-      <h1 class="text-3xl md:text-4xl font-bold" style="color: var(--text-light);">جميع المنتجات</h1>
-      <p class="text-sm mt-2" style="color: var(--text-dim);">اكتشف منتجات مرنيسة الأصلية من زيت الزيتون والعسل والحرف اليدوية</p>
-      <div class="w-16 h-0.5 bg-[#0057b3] mx-auto mt-4"></div>
+    <div class="text-center mb-10" data-aos="fade-up">
+      <span class="text-xs tracking-[0.3em] darija-text" style="color:var(--blue-primary);">✦ MARNISSA MALL ✦</span>
+      <h1 class="text-3xl md:text-4xl font-bold mt-2" style="color: var(--text);">جميع المنتجات</h1>
+      <p class="text-sm mt-3" style="color: var(--text-dim);">اكتشف منتجات مرنيسة الأصلية - زيت الزيتون، عسل جبلي، حرف يدوية ومنتجات تقليدية</p>
+      <div class="w-20 h-0.5 mx-auto mt-4" style="background: var(--blue-primary);"></div>
     </div>
 
     <div class="flex flex-col lg:flex-row gap-8">
       
-      <!-- Sidebar الفلترة -->
-      <div class="lg:w-64" data-aos="fade-left">
+      <!-- Sidebar -->
+      <div class="lg:w-72 flex-shrink-0" data-aos="fade-left">
         <div class="filter-sidebar">
-          <h3 class="font-bold mb-4" style="color: var(--blue-primary);">🔍 فلترة المنتجات</h3>
+          <h3 class="font-bold mb-5 darija-text" style="color: var(--blue-primary);">
+            <i class="fas fa-filter ml-2"></i>فلترة المنتجات
+          </h3>
           
           <!-- بحث -->
-          <div class="mb-4">
-            <input type="text" id="searchInput" placeholder="🔎 بحث عن منتج..." 
-                   class="w-full px-3 py-2 rounded-lg border border-gray-700 bg-transparent text-white focus:border-[#0057b3] outline-none">
+          <div class="mb-5">
+            <input type="text" id="searchInput" class="search-input darija-text" placeholder="🔍 بحث عن منتج...">
           </div>
           
           <!-- الفئات -->
-          <div class="mb-4">
-            <h4 class="text-sm font-semibold mb-2" style="color: var(--text-muted);">📂 الفئات</h4>
-            <div id="categoriesList" class="space-y-2">
-              <div class="loader-spinner w-6 h-6"></div>
+          <div class="mb-5">
+            <h4 class="text-sm font-semibold mb-3" style="color: var(--text-muted);">
+              <i class="fas fa-folder ml-1"></i> الفئات
+            </h4>
+            <div id="categoriesList" class="space-y-0">
+              <button class="category-item active" data-category="">
+                📦 جميع المنتجات
+              </button>
             </div>
           </div>
           
-          <!-- نطاق السعر -->
-          <div class="mb-4">
-            <h4 class="text-sm font-semibold mb-2" style="color: var(--text-muted);">💰 السعر</h4>
-            <div class="flex gap-2">
-              <input type="number" id="minPrice" placeholder="الحد الأدنى" class="w-1/2 px-2 py-1 rounded-lg border border-gray-700 bg-transparent text-white text-sm">
-              <input type="number" id="maxPrice" placeholder="الحد الأقصى" class="w-1/2 px-2 py-1 rounded-lg border border-gray-700 bg-transparent text-white text-sm">
+          <!-- السعر -->
+          <div class="mb-5">
+            <h4 class="text-sm font-semibold mb-3" style="color: var(--text-muted);">
+              <i class="fas fa-tag ml-1"></i> نطاق السعر
+            </h4>
+            <div class="flex gap-2 items-center">
+              <input type="number" id="minPrice" class="price-input w-full" placeholder="الأدنى">
+              <span style="color:var(--text-dim);">-</span>
+              <input type="number" id="maxPrice" class="price-input w-full" placeholder="الأقصى">
             </div>
-            <button id="applyPriceBtn" class="w-full mt-2 filter-btn text-sm py-1">تطبيق</button>
+            <button id="applyPriceBtn" class="w-full mt-2 filter-btn text-sm py-1.5">
+              <i class="fas fa-check ml-1"></i> تطبيق السعر
+            </button>
           </div>
           
-          <!-- حالة المنتج -->
-          <div>
-            <h4 class="text-sm font-semibold mb-2" style="color: var(--text-muted);">📦 الحالة</h4>
+          <!-- حالة المخزون -->
+          <div class="mb-5">
+            <h4 class="text-sm font-semibold mb-3" style="color: var(--text-muted);">
+              <i class="fas fa-boxes ml-1"></i> حالة المخزون
+            </h4>
             <div class="flex gap-2 flex-wrap">
-              <button data-stock="all" class="stock-filter filter-btn active text-sm py-1 px-3">الكل</button>
-              <button data-stock="available" class="stock-filter filter-btn text-sm py-1 px-3">متوفر</button>
-              <button data-stock="low" class="stock-filter filter-btn text-sm py-1 px-3">مخزون محدود</button>
-              <button data-stock="out" class="stock-filter filter-btn text-sm py-1 px-3">غير متوفر</button>
+              <button data-stock="all" class="stock-filter filter-btn active text-sm">الكل</button>
+              <button data-stock="available" class="stock-filter filter-btn text-sm">✅ متوفر</button>
+              <button data-stock="low" class="stock-filter filter-btn text-sm">⚠️ محدود</button>
+              <button data-stock="out" class="stock-filter filter-btn text-sm">❌ غير متوفر</button>
             </div>
           </div>
           
-          <button id="resetFilters" class="w-full mt-4 py-2 rounded-lg text-sm bg-gray-700 hover:bg-gray-600 transition">
-            🗑️ إعادة تعيين الفلترة
+          <button id="resetFilters" class="w-full py-2.5 rounded-xl text-sm transition-all font-semibold" 
+                  style="background: rgba(255,71,87,0.1); color: var(--danger); border: 1px solid rgba(255,71,87,0.3);">
+            <i class="fas fa-redo ml-1"></i> إعادة تعيين
           </button>
         </div>
       </div>
@@ -235,25 +428,27 @@
       <!-- المنتجات -->
       <div class="flex-1">
         
-        <!-- عدد النتائج والترتيب -->
-        <div class="flex justify-between items-center mb-4 flex-wrap gap-2">
-          <div id="resultsCount" class="text-sm" style="color: var(--text-dim);"></div>
-          <select id="sortSelect" class="px-3 py-1 rounded-lg border border-gray-700 bg-transparent text-sm">
-            <option value="newest">الأحدث</option>
-            <option value="price_asc">السعر: من الأقل إلى الأعلى</option>
-            <option value="price_desc">السعر: من الأعلى إلى الأقل</option>
-            <option value="popular">الأكثر مبيعاً</option>
-            <option value="rating">الأعلى تقييماً</option>
+        <!-- شريط النتائج -->
+        <div class="flex justify-between items-center mb-6 flex-wrap gap-3" data-aos="fade-down">
+          <div id="resultsCount" class="text-sm darija-text" style="color: var(--text-dim);">
+            جاري تحميل المنتجات...
+          </div>
+          <select id="sortSelect" class="sort-select darija-text">
+            <option value="newest">🆕 الأحدث</option>
+            <option value="price_asc">💰 السعر: من الأقل</option>
+            <option value="price_desc">💰 السعر: من الأعلى</option>
+            <option value="rating">⭐ الأعلى تقييماً</option>
+            <option value="name">🔤 الاسم</option>
           </select>
         </div>
         
         <!-- شبكة المنتجات -->
         <div id="productsGrid" class="products-grid">
-          <div class="loader-spinner"></div>
+          <div class="loader-spinner" style="grid-column: 1 / -1;"></div>
         </div>
         
         <!-- الترقيم -->
-        <div id="pagination" class="flex justify-center gap-2 mt-8 flex-wrap"></div>
+        <div id="pagination" class="flex justify-center gap-2 mt-10 flex-wrap"></div>
         
       </div>
     </div>
@@ -263,21 +458,32 @@
   <script src="footer.js"></script>
   
   <script>
-    AOS.init({ duration: 800, once: true });
+    AOS.init({ duration: 800, once: true, offset: 60 });
     
     // ========== Supabase Client ==========
-    const supabaseUrl = (typeof MARNISSA_CONFIG !== 'undefined' && MARNISSA_CONFIG.SUPABASE_URL) 
-      ? MARNISSA_CONFIG.SUPABASE_URL 
-      : 'https://your-project.supabase.co';
-    const supabaseKey = (typeof MARNISSA_CONFIG !== 'undefined' && MARNISSA_CONFIG.SUPABASE_ANON_KEY) 
-      ? MARNISSA_CONFIG.SUPABASE_ANON_KEY 
-      : 'your-anon-key';
-    
-    const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+    let sb = null;
+
+    function initSupabase() {
+      try {
+        if (typeof MARNISSA_CONFIG !== 'undefined' && MARNISSA_CONFIG.SUPABASE_URL && MARNISSA_CONFIG.SUPABASE_ANON_KEY) {
+          sb = supabase.createClient(MARNISSA_CONFIG.SUPABASE_URL, MARNISSA_CONFIG.SUPABASE_ANON_KEY);
+          console.log('✅ Supabase client ready');
+        } else {
+          console.error('❌ Config manquante');
+          sb = supabase.createClient(
+            'https://mbzrhdszwfutwlfmldyv.supabase.co',
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1ienJoZHN6d2Z1dHdsZm1sZHl2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0MjUzNjAsImV4cCI6MjA5NzAwMTM2MH0.0XtnF-ZrhczJyUEHBpsCpsPriCrxxQyMg2d2u75XGXs'
+          );
+        }
+      } catch(e) {
+        console.error('❌ Supabase init error:', e);
+      }
+    }
     
     // ========== المتغيرات ==========
     let allProducts = [];
     let categories = [];
+    let sellers = [];
     let currentFilters = {
       search: '',
       category: '',
@@ -294,81 +500,100 @@
       showLoader();
       
       try {
-        let query = supabaseClient
+        // نجيب المنتجات المتوفرة فقط
+        let query = sb
           .from('products')
-          .select(`
-            *,
-            categories (name, slug),
-            sellers (store_name)
-          `);
-        
-        // الفلترة
-        if (currentFilters.category) {
-          query = query.eq('category_id', currentFilters.category);
-        }
-        
-        if (currentFilters.search) {
-          query = query.ilike('name', `%${currentFilters.search}%`);
-        }
-        
-        if (currentFilters.minPrice) {
-          query = query.gte('price', parseFloat(currentFilters.minPrice));
-        }
-        
-        if (currentFilters.maxPrice) {
-          query = query.lte('price', parseFloat(currentFilters.maxPrice));
-        }
-        
-        // حالة المخزون
-        if (currentFilters.stock === 'available') {
-          query = query.gt('stock', 0);
-        } else if (currentFilters.stock === 'low') {
-          query = query.lte('stock', 5).gt('stock', 0);
-        } else if (currentFilters.stock === 'out') {
-          query = query.eq('stock', 0);
-        }
-        
-        // الترتيب
-        switch (currentFilters.sort) {
-          case 'price_asc':
-            query = query.order('price', { ascending: true });
-            break;
-          case 'price_desc':
-            query = query.order('price', { ascending: false });
-            break;
-          case 'popular':
-            query = query.order('orders_count', { ascending: false });
-            break;
-          case 'rating':
-            query = query.order('rating_avg', { ascending: false });
-            break;
-          default:
-            query = query.order('created_at', { ascending: false });
-        }
+          .select('*')
+          .eq('is_available', true)
+          .order('created_at', { ascending: false });
         
         const { data, error } = await query;
         
         if (error) throw error;
         
         allProducts = data || [];
-        renderProducts();
+        console.log('📦 Products loaded:', allProducts.length);
+        
+        // تطبيق الفلترة محلياً (لتفادي مشاكل الـ API)
+        applyFiltersAndRender();
         
       } catch (err) {
-        console.error('❌ Error loading products:', err);
+        console.error('❌ Error loading products:', err.message);
         document.getElementById('productsGrid').innerHTML = `
-          <div class="col-span-full text-center py-12">
-            <i class="fas fa-exclamation-triangle text-4xl mb-3" style="color: var(--blue-primary);"></i>
-            <p>حدث خطأ في تحميل المنتجات</p>
-            <button onclick="loadProducts()" class="mt-3 filter-btn">إعادة المحاولة</button>
+          <div class="col-span-full text-center py-16" style="grid-column:1/-1">
+            <i class="fas fa-exclamation-triangle text-5xl mb-4 block" style="color: var(--warning);"></i>
+            <p class="darija-text text-lg mb-3" style="color: var(--text-dim);">تعذر تحميل المنتجات</p>
+            <p class="darija-text text-sm mb-4" style="color: var(--text-dim);">${escapeHtml(err.message)}</p>
+            <button onclick="loadProducts()" class="filter-btn">🔄 إعادة المحاولة</button>
           </div>
         `;
       }
     }
     
+    // ========== تطبيق الفلترة محلياً ==========
+    function applyFiltersAndRender() {
+      let filtered = [...allProducts];
+      
+      // بحث
+      if (currentFilters.search) {
+        const searchTerm = currentFilters.search.toLowerCase();
+        filtered = filtered.filter(p => 
+          p.name.toLowerCase().includes(searchTerm) ||
+          (p.sku && p.sku.toLowerCase().includes(searchTerm)) ||
+          (p.description && p.description.toLowerCase().includes(searchTerm)) ||
+          (p.tags && p.tags.some(tag => tag.toLowerCase().includes(searchTerm)))
+        );
+      }
+      
+      // فئة
+      if (currentFilters.category) {
+        filtered = filtered.filter(p => p.category_id === currentFilters.category);
+      }
+      
+      // سعر أدنى
+      if (currentFilters.minPrice) {
+        filtered = filtered.filter(p => p.price >= parseFloat(currentFilters.minPrice));
+      }
+      
+      // سعر أقصى
+      if (currentFilters.maxPrice) {
+        filtered = filtered.filter(p => p.price <= parseFloat(currentFilters.maxPrice));
+      }
+      
+      // حالة المخزون
+      if (currentFilters.stock === 'available') {
+        filtered = filtered.filter(p => p.stock > (p.low_stock_threshold || 5));
+      } else if (currentFilters.stock === 'low') {
+        filtered = filtered.filter(p => p.stock > 0 && p.stock <= (p.low_stock_threshold || 5));
+      } else if (currentFilters.stock === 'out') {
+        filtered = filtered.filter(p => p.stock <= 0);
+      }
+      
+      // ترتيب
+      switch (currentFilters.sort) {
+        case 'price_asc':
+          filtered.sort((a, b) => a.price - b.price);
+          break;
+        case 'price_desc':
+          filtered.sort((a, b) => b.price - a.price);
+          break;
+        case 'rating':
+          filtered.sort((a, b) => (b.rating_avg || 0) - (a.rating_avg || 0));
+          break;
+        case 'name':
+          filtered.sort((a, b) => a.name.localeCompare(b.name, 'ar'));
+          break;
+        default: // newest
+          filtered.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+      }
+      
+      renderProducts(filtered);
+    }
+    
     // ========== تحميل الفئات ==========
     async function loadCategories() {
       try {
-        const { data, error } = await supabaseClient
+        const { data, error } = await sb
           .from('categories')
           .select('*')
           .order('name');
@@ -383,80 +608,167 @@
       }
     }
     
-    // ========== عرض الفئات في الـ sidebar ==========
+    // ========== تحميل البائعين ==========
+    async function loadSellers() {
+      try {
+        const { data, error } = await sb
+          .from('sellers')
+          .select('id, store_name, name');
+        
+        if (error) throw error;
+        sellers = data || [];
+      } catch (err) {
+        console.warn('⚠️ Could not load sellers:', err);
+      }
+    }
+    
+    // ========== عرض الفئات ==========
     function renderCategories() {
       const container = document.getElementById('categoriesList');
       if (!container) return;
       
       container.innerHTML = `
-        <button data-category="" class="category-filter w-full text-right px-3 py-2 rounded-lg hover:bg-gray-700 transition ${!currentFilters.category ? 'bg-gray-700' : ''}" style="color: var(--text-muted);">
+        <button class="category-item ${!currentFilters.category ? 'active' : ''}" data-category="">
           📦 جميع المنتجات
         </button>
         ${categories.map(cat => `
-          <button data-category="${cat.id}" class="category-filter w-full text-right px-3 py-2 rounded-lg hover:bg-gray-700 transition ${currentFilters.category === cat.id ? 'bg-gray-700' : ''}" style="color: var(--text-muted);">
-            📂 ${cat.name}
+          <button class="category-item ${currentFilters.category === cat.id ? 'active' : ''}" data-category="${cat.id}">
+            📂 ${escapeHtml(cat.name)}
           </button>
         `).join('')}
       `;
       
-      // إضافة الأحداث
-      document.querySelectorAll('.category-filter').forEach(btn => {
+      document.querySelectorAll('.category-item').forEach(btn => {
         btn.addEventListener('click', () => {
           currentFilters.category = btn.dataset.category;
           currentPage = 1;
-          loadProducts();
+          applyFiltersAndRender();
           renderCategories();
         });
       });
     }
     
+    // ========== الحصول على اسم البائع ==========
+    function getSellerName(sellerId) {
+      if (!sellerId) return '';
+      const seller = sellers.find(s => s.id === sellerId);
+      return seller ? (seller.store_name || seller.name || '') : '';
+    }
+    
+    // ========== الحصول على اسم الفئة ==========
+    function getCategoryName(categoryId) {
+      if (!categoryId) return 'منتج';
+      const cat = categories.find(c => c.id === categoryId);
+      return cat ? cat.name : 'منتج';
+    }
+    
     // ========== عرض المنتجات ==========
-    function renderProducts() {
+    function renderProducts(products) {
       const grid = document.getElementById('productsGrid');
       const start = (currentPage - 1) * itemsPerPage;
       const end = start + itemsPerPage;
-      const paginatedProducts = allProducts.slice(start, end);
-      const totalPages = Math.ceil(allProducts.length / itemsPerPage);
+      const paginatedProducts = products.slice(start, end);
+      const totalPages = Math.ceil(products.length / itemsPerPage);
       
-      // تحديث عدد النتائج
-      document.getElementById('resultsCount').innerHTML = `🎯 ${allProducts.length} منتج`;
+      document.getElementById('resultsCount').innerHTML = `
+        🎯 <strong>${products.length}</strong> منتج 
+        ${currentFilters.search ? `لـ "${currentFilters.search}"` : ''}
+        ${currentFilters.category ? `في ${getCategoryName(currentFilters.category)}` : ''}
+      `;
       
       if (paginatedProducts.length === 0) {
         grid.innerHTML = `
-          <div class="col-span-full text-center py-12">
-            <i class="fas fa-box-open text-4xl mb-3" style="color: var(--blue-primary);"></i>
-            <p>لا توجد منتجات مطابقة للبحث</p>
+          <div class="col-span-full text-center py-16" style="grid-column:1/-1">
+            <i class="fas fa-box-open text-5xl mb-4 block" style="color: var(--text-dim);"></i>
+            <p class="darija-text text-lg" style="color: var(--text-dim);">لا توجد منتجات مطابقة</p>
+            <p class="darija-text text-sm mt-1" style="color: var(--text-dim);">جرب تغيير معايير البحث</p>
           </div>
         `;
         document.getElementById('pagination').innerHTML = '';
         return;
       }
       
-      // عرض المنتجات
       grid.innerHTML = paginatedProducts.map(product => {
-        const stockStatus = product.stock === 0 ? 'غير متوفر' : (product.stock <= product.low_stock_threshold ? `متبقي ${product.stock} قطع` : 'متوفر');
-        const stockClass = product.stock === 0 ? 'stock-out' : (product.stock <= product.low_stock_threshold ? 'stock-low' : '');
+        const stockStatus = getStockStatus(product);
+        const salePercent = product.old_price ? Math.round((1 - product.price / product.old_price) * 100) : 0;
+        const sellerName = getSellerName(product.seller_id);
+        const categoryName = getCategoryName(product.category_id);
+        const variants = product.variants || [];
+        const hasVariants = variants.length > 0 && variants.some(v => v.options?.length > 0);
+        
+        // استخراج ألوان المتغيرات للعرض
+        let colorDots = '';
+        if (hasVariants) {
+          const colorVariant = variants.find(v => v.type === 'لون' || v.type === 'اللون' || v.type === 'color');
+          if (colorVariant && colorVariant.options) {
+            colorDots = colorVariant.options.slice(0, 5).map(opt => {
+              const colorMap = {
+                'أحمر': '#ff4757', 'أزرق': '#3742fa', 'أخضر': '#2ed573', 'أسود': '#2f3542',
+                'أبيض': '#f1f2f6', 'أصفر': '#ffa502', 'برتقالي': '#ff6348', 'بنفسجي': '#a55eea',
+                'وردي': '#ff6b81', 'رمادي': '#a4b0be', 'بني': '#8b4513', 'ذهبي': '#ffd700'
+              };
+              const color = colorMap[opt.value] || '#718093';
+              return `<span class="variant-dot" style="background:${color};" title="${opt.value}"></span>`;
+            }).join('');
+          }
+        }
         
         return `
-          <div class="product-card relative" onclick="window.location.href='product.html?id=${product.id}'" data-aos="fade-up">
-            <div class="relative">
-              <img src="${product.images && product.images[0] ? product.images[0] : 'https://placehold.co/400x400/1a1a2e/0057b3?text=' + encodeURIComponent(product.name)}" 
-                   alt="${product.name}" class="product-image">
+          <div class="product-card" onclick="window.location.href='product.html?id=${product.id}'" data-aos="fade-up">
+            <div class="product-image-wrap">
+              <img src="${product.images?.[0] || 'https://placehold.co/400x400/1a1a2e/0057b3?text=' + encodeURIComponent(product.name)}" 
+                   alt="${escapeHtml(product.name)}" 
+                   class="product-image"
+                   loading="lazy"
+                   onerror="this.src='https://placehold.co/400x400/1a1a2e/0057b3?text=M'">
+              
               ${product.is_featured ? '<div class="product-badge"><i class="fas fa-star"></i> مميز</div>' : ''}
-              <div class="stock-badge ${stockClass}">${stockStatus}</div>
+              ${salePercent > 0 ? `<div class="sale-badge">-${salePercent}%</div>` : ''}
+              
+              <span class="stock-badge ${stockStatus.cls}">${stockStatus.label}</span>
+              
+              ${colorDots ? `<div class="variants-preview">${colorDots}</div>` : ''}
+              
+              <button class="quick-view-btn" onclick="event.stopPropagation(); window.location.href='product.html?id=${product.id}'">
+                <i class="fas fa-eye ml-1"></i> عرض سريع
+              </button>
             </div>
+            
             <div class="p-4">
-              <div class="text-xs mb-1" style="color: var(--blue-primary);">${product.categories?.name || 'منتج'}</div>
-              <h3 class="font-bold mb-1 line-clamp-1" style="color: var(--text-light);">${product.name}</h3>
+              ${sellerName ? `<div class="text-xs mb-1" style="color: var(--blue-light);">${escapeHtml(sellerName)}</div>` : ''}
+              <div class="text-xs mb-1" style="color: var(--blue-primary);">${escapeHtml(categoryName)}</div>
+              
+              <h3 class="font-bold mb-2 line-clamp-2" style="color: var(--text); min-height:2.5rem;">
+                ${escapeHtml(product.name)}
+              </h3>
+              
               <div class="flex items-center gap-2 mb-2">
-                <span class="text-lg font-bold" style="color: var(--blue-primary);">${product.price} درهم</span>
-                ${product.old_price ? `<span class="text-xs line-through" style="color: var(--text-dim);">${product.old_price} درهم</span>` : ''}
+                <span class="text-xl font-extrabold" style="color: var(--blue-primary);">
+                  ${product.price.toFixed(2)} <span class="text-xs">درهم</span>
+                </span>
+                ${product.old_price ? `
+                  <span class="text-xs line-through opacity-60" style="color: var(--text-dim);">
+                    ${product.old_price.toFixed(2)} درهم
+                  </span>
+                ` : ''}
               </div>
+              
               ${product.rating_avg > 0 ? `
                 <div class="flex items-center gap-1 text-sm" style="color: var(--text-muted);">
-                  <i class="fas fa-star text-yellow-500"></i>
-                  <span>${product.rating_avg.toFixed(1)}</span>
-                  <span class="text-xs">(${product.rating_count})</span>
+                  <span class="rating-stars">
+                    ${renderStars(product.rating_avg)}
+                  </span>
+                  <span class="font-bold">${product.rating_avg.toFixed(1)}</span>
+                  <span class="text-xs opacity-70">(${product.rating_count || 0})</span>
+                </div>
+              ` : `
+                <div class="text-xs" style="color: var(--text-dim);">لا تقييمات بعد</div>
+              `}
+              
+              ${hasVariants ? `
+                <div class="mt-2 text-xs" style="color: var(--blue-light);">
+                  <i class="fas fa-layer-group ml-1"></i>
+                  ${variants.length} متغيرات
                 </div>
               ` : ''}
             </div>
@@ -464,12 +776,31 @@
         `;
       }).join('');
       
-      // الترقيم
-      renderPagination(totalPages);
+      renderPagination(totalPages, products.length);
+    }
+    
+    // ========== تحديد حالة المخزون ==========
+    function getStockStatus(product) {
+      const threshold = product.low_stock_threshold || 5;
+      if (product.stock <= 0) {
+        return { cls: 'stock-out', label: '❌ غير متوفر' };
+      } else if (product.stock <= threshold) {
+        return { cls: 'stock-low', label: `⚠️ متبقي ${product.stock}` };
+      } else {
+        return { cls: 'stock-available', label: '✅ متوفر' };
+      }
+    }
+    
+    // ========== نجوم التقييم ==========
+    function renderStars(rating) {
+      const full = Math.floor(rating);
+      const half = rating % 1 >= 0.5 ? 1 : 0;
+      const empty = 5 - full - half;
+      return '★'.repeat(full) + (half ? '½' : '') + '☆'.repeat(empty);
     }
     
     // ========== الترقيم ==========
-    function renderPagination(totalPages) {
+    function renderPagination(totalPages, totalProducts) {
       const container = document.getElementById('pagination');
       if (totalPages <= 1) {
         container.innerHTML = '';
@@ -477,29 +808,63 @@
       }
       
       let html = '';
-      for (let i = 1; i <= Math.min(totalPages, 5); i++) {
-        html += `<button class="pagination-btn ${currentPage === i ? 'active' : ''}" data-page="${i}">${i}</button>`;
+      
+      // زر السابق
+      html += `<button class="pagination-btn" onclick="goToPage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>
+        <i class="fas fa-chevron-right"></i>
+      </button>`;
+      
+      // الصفحات
+      const maxVisible = 5;
+      let startPage = Math.max(1, currentPage - Math.floor(maxVisible / 2));
+      let endPage = Math.min(totalPages, startPage + maxVisible - 1);
+      
+      if (endPage - startPage < maxVisible - 1) {
+        startPage = Math.max(1, endPage - maxVisible + 1);
       }
       
-      container.innerHTML = html;
+      if (startPage > 1) {
+        html += `<button class="pagination-btn" onclick="goToPage(1)">1</button>`;
+        if (startPage > 2) html += `<span style="color:var(--text-dim);padding:0.5rem;">...</span>`;
+      }
       
-      document.querySelectorAll('.pagination-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          currentPage = parseInt(btn.dataset.page);
-          renderProducts();
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        });
-      });
+      for (let i = startPage; i <= endPage; i++) {
+        html += `<button class="pagination-btn ${currentPage === i ? 'active' : ''}" onclick="goToPage(${i})">${i}</button>`;
+      }
+      
+      if (endPage < totalPages) {
+        if (endPage < totalPages - 1) html += `<span style="color:var(--text-dim);padding:0.5rem;">...</span>`;
+        html += `<button class="pagination-btn" onclick="goToPage(${totalPages})">${totalPages}</button>`;
+      }
+      
+      // زر التالي
+      html += `<button class="pagination-btn" onclick="goToPage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>
+        <i class="fas fa-chevron-left"></i>
+      </button>`;
+      
+      container.innerHTML = html;
     }
     
-    // ========== أحداث ==========
+    function goToPage(page) {
+      const totalPages = Math.ceil(allProducts.length / itemsPerPage);
+      if (page < 1 || page > totalPages) return;
+      currentPage = page;
+      applyFiltersAndRender();
+      document.querySelector('.products-grid').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+    
+    // ========== الأحداث ==========
     function setupEvents() {
       // بحث
       const searchInput = document.getElementById('searchInput');
-      searchInput.addEventListener('input', (e) => {
-        currentFilters.search = e.target.value;
-        currentPage = 1;
-        loadProducts();
+      let searchTimeout;
+      searchInput?.addEventListener('input', (e) => {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+          currentFilters.search = e.target.value.trim();
+          currentPage = 1;
+          applyFiltersAndRender();
+        }, 400);
       });
       
       // فلترة السعر
@@ -507,7 +872,7 @@
         currentFilters.minPrice = document.getElementById('minPrice').value;
         currentFilters.maxPrice = document.getElementById('maxPrice').value;
         currentPage = 1;
-        loadProducts();
+        applyFiltersAndRender();
       });
       
       // فلترة المخزون
@@ -517,14 +882,15 @@
           btn.classList.add('active');
           currentFilters.stock = btn.dataset.stock;
           currentPage = 1;
-          loadProducts();
+          applyFiltersAndRender();
         });
       });
       
       // الترتيب
       document.getElementById('sortSelect')?.addEventListener('change', (e) => {
         currentFilters.sort = e.target.value;
-        loadProducts();
+        currentPage = 1;
+        applyFiltersAndRender();
       });
       
       // إعادة تعيين
@@ -544,27 +910,42 @@
         document.querySelectorAll('.stock-filter').forEach(b => b.classList.remove('active'));
         document.querySelector('.stock-filter[data-stock="all"]')?.classList.add('active');
         currentPage = 1;
-        loadProducts();
+        applyFiltersAndRender();
         renderCategories();
       });
     }
     
     function showLoader() {
       const grid = document.getElementById('productsGrid');
-      if (grid && grid.children.length === 0) {
-        grid.innerHTML = '<div class="loader-spinner" style="grid-column:1/-1"></div>';
-      }
+      grid.innerHTML = '<div class="loader-spinner" style="grid-column:1/-1"></div>';
+    }
+    
+    function escapeHtml(s) {
+      if (!s) return '';
+      return String(s).replace(/[&<>"']/g, m => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+      }[m]));
     }
     
     // ========== INIT ==========
-    document.addEventListener('DOMContentLoaded', () => {
-      loadCategories();
-      loadProducts();
+    document.addEventListener('DOMContentLoaded', async () => {
+      initSupabase();
+      
+      if (!sb) {
+        document.getElementById('productsGrid').innerHTML = `
+          <div class="col-span-full text-center py-16" style="grid-column:1/-1">
+            <i class="fas fa-plug text-5xl mb-4 block" style="color: var(--danger);"></i>
+            <p class="darija-text text-lg" style="color: var(--text-dim);">خطأ في الاتصال بقاعدة البيانات</p>
+          </div>
+        `;
+        return;
+      }
+      
+      await Promise.all([loadCategories(), loadSellers()]);
+      await loadProducts();
       setupEvents();
     });
   </script>
-  
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   
 </body>
 </html>
