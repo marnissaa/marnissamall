@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>مول لاكيس | MarnissaMall</title>
+  <title>مول لاكيس | POS</title>
   <meta name="robots" content="noindex, nofollow">
   <link rel="icon" href="images/logo.png" type="image/png">
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
@@ -12,62 +12,212 @@
   <script src="config.js"></script>
 
   <style>
-    /* ==========================================
-       RESET & ROOT VARIABLES
-    ========================================== */
     * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    /* ========== الألوان الأساسية ========== */
     :root {
       --blue-primary: #0057b3;
       --blue-dark: #003d80;
       --blue-light: #3a8fd4;
+      --black: #0a0a0a;
+      --black-light: #0d1117;
+      --gray: #161b22;
+      --text-light: #ffffff;
+      --text-muted: #c9d1d9;
+      --text-dim: #8b949e;
+      --gold: #C4A06A;
       --success: #25D366;
       --danger: #ff4757;
       --warning: #ffa502;
-      --gold: #f5a623;
+    }
+
+    /* ========== الوضع الداكن (أسود + أزرق) ========== */
+    body {
       --bg: #0a0a0a;
       --bg2: #0d1117;
       --bg3: #161b22;
       --text: #ffffff;
       --text-muted: #c9d1d9;
       --text-dim: #8b949e;
-      --border: rgba(0,87,179,0.3);
+      --border: rgba(0,87,179,0.35);
       --border2: rgba(0,87,179,0.5);
+      --card: rgba(13,17,23,0.85);
+      --card-hover: rgba(0,87,179,0.2);
       --radius: 14px;
       --shadow: 0 4px 24px rgba(0,0,0,0.4);
       --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      --sidebar-width: 240px;
     }
 
-    /* ==========================================
-       SCROLLBAR
-    ========================================== */
+    /* ========== الوضع الفاتح (أزرق فاتح) ========== */
+    body.blue-theme {
+      --bg: #e8f0fe;
+      --bg2: #ffffff;
+      --bg3: #f0f5ff;
+      --text: #0a0a0a;
+      --text-muted: #1a3a5c;
+      --text-dim: #4a6a8c;
+      --border: rgba(0,87,179,0.2);
+      --border2: rgba(0,87,179,0.3);
+      --card: rgba(255,255,255,0.9);
+      --card-hover: rgba(0,87,179,0.1);
+    }
+
     ::-webkit-scrollbar { width: 5px; height: 5px; }
     ::-webkit-scrollbar-track { background: var(--bg2); border-radius: 6px; }
     ::-webkit-scrollbar-thumb { background: var(--blue-primary); border-radius: 6px; }
     ::-webkit-scrollbar-thumb:hover { background: var(--blue-dark); }
 
-    /* ==========================================
-       BODY
-    ========================================== */
     body {
       background: var(--bg);
       font-family: 'Tajawal', sans-serif;
       color: var(--text);
       min-height: 100vh;
       overflow-x: hidden;
+      display: flex;
+      transition: var(--transition);
     }
 
-    /* ==========================================
-       CONTAINER
-    ========================================== */
+    /* ===== SIDEBAR ===== */
+    .sidebar {
+      width: var(--sidebar-width);
+      background: var(--bg3);
+      border-left: 2px solid var(--border);
+      min-height: 100vh;
+      padding: 16px 12px;
+      position: fixed;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      z-index: 100;
+      overflow-y: auto;
+      transition: var(--transition);
+    }
+    .sidebar .brand {
+      font-size: 1.3rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--text) 60%, var(--blue-light));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-align: center;
+      padding: 12px 0 20px 0;
+      border-bottom: 2px solid var(--border);
+      margin-bottom: 16px;
+    }
+    .sidebar .brand small {
+      font-size: 0.6rem;
+      display: block;
+      -webkit-text-fill-color: var(--text-dim);
+      background: none;
+    }
+    .sidebar .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      border-radius: 10px;
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 500;
+      transition: var(--transition);
+      margin-bottom: 4px;
+      cursor: pointer;
+    }
+    .sidebar .nav-item:hover {
+      background: var(--card-hover);
+      color: var(--text);
+    }
+    .sidebar .nav-item.active {
+      background: var(--blue-primary);
+      color: #fff;
+      box-shadow: 0 4px 16px rgba(0,87,179,0.2);
+    }
+    .sidebar .nav-item i {
+      width: 22px;
+      text-align: center;
+      font-size: 1rem;
+    }
+    .sidebar .nav-item .badge-nav {
+      margin-right: auto;
+      background: rgba(255,71,87,0.15);
+      color: var(--danger);
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 0.6rem;
+    }
+    .sidebar .nav-item.active .badge-nav {
+      background: rgba(255,255,255,0.15);
+      color: #fff;
+    }
+    .sidebar .sidebar-footer {
+      border-top: 1px solid var(--border);
+      margin-top: 20px;
+      padding-top: 16px;
+      text-align: center;
+      font-size: 0.6rem;
+      color: var(--text-dim);
+    }
+    .sidebar .sidebar-footer .online-status {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      font-size: 0.7rem;
+      padding: 4px 12px;
+      border-radius: 20px;
+      margin-bottom: 8px;
+    }
+    .sidebar .sidebar-footer .online-status.online {
+      color: var(--success);
+      border: 1px solid rgba(37,211,102,0.3);
+      background: rgba(37,211,102,0.08);
+    }
+    .sidebar .sidebar-footer .online-status.offline {
+      color: var(--danger);
+      border: 1px solid rgba(255,71,87,0.3);
+      background: rgba(255,71,87,0.08);
+    }
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+    .status-dot.online { background: var(--success); }
+    .status-dot.offline { background: var(--danger); }
+
+    /* ===== TOGGLE THEME ===== */
+    .theme-toggle {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: 6px 10px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 0.7rem;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .theme-toggle:hover {
+      background: var(--card-hover);
+      color: var(--text);
+      border-color: var(--blue-primary);
+    }
+
+    /* ===== MAIN CONTENT ===== */
+    .main-content {
+      margin-right: var(--sidebar-width);
+      flex: 1;
+      padding: 12px 16px;
+      min-height: 100vh;
+      background: var(--bg);
+      transition: var(--transition);
+    }
+
     .container {
       max-width: 1600px;
       margin: 0 auto;
-      padding: 12px 16px;
     }
 
-    /* ==========================================
-       HEADER (مع المحفظة)
-    ========================================== */
+    /* ===== HEADER ===== */
     .header {
       padding: 10px 0;
       border-bottom: 2px solid var(--border);
@@ -88,7 +238,7 @@
       font-size: 1.5rem;
       border-right: 4px solid var(--blue-primary);
       padding-right: 12px;
-      background: linear-gradient(135deg, #fff 60%, var(--blue-light));
+      background: linear-gradient(135deg, var(--text) 60%, var(--blue-light));
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
@@ -97,6 +247,7 @@
       padding: 4px 14px;
       border-radius: 20px;
       font-size: 0.75rem;
+      color: #fff;
     }
     .header .stats-bar {
       display: flex;
@@ -112,30 +263,12 @@
       border: 1px solid var(--border);
     }
     .header .stats-bar .num { color: var(--blue-primary); font-weight: bold; }
-    .header .online-status {
-      display: flex; align-items: center; gap: 6px; font-size: 0.7rem;
-      padding: 4px 12px; border-radius: 20px;
-    }
-    .header .online-status.online {
-      color: var(--success); border: 1px solid rgba(37,211,102,0.3);
-      background: rgba(37,211,102,0.08);
-    }
-    .header .online-status.offline {
-      color: var(--danger); border: 1px solid rgba(255,71,87,0.3);
-      background: rgba(255,71,87,0.08);
-    }
-    .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
-    .status-dot.online { background: var(--success); }
-    .status-dot.offline { background: var(--danger); }
 
-    /* ==========================================
-       WALLET SECTION (داخل الهيدر)
-    ========================================== */
     .wallet-inline {
       display: flex;
       align-items: center;
       gap: 12px;
-      background: linear-gradient(135deg, var(--bg3), var(--bg2));
+      background: var(--bg3);
       border: 1px solid var(--border);
       border-radius: var(--radius);
       padding: 6px 14px;
@@ -148,30 +281,9 @@
       color: var(--gold);
     }
     .wallet-inline .balance span {
-      color: #fff;
+      color: var(--text);
       font-size: 0.65rem;
       font-weight: normal;
-    }
-    .wallet-inline .wallet-stats {
-      display: flex;
-      gap: 10px;
-      font-size: 0.6rem;
-      color: var(--text-dim);
-    }
-    .wallet-inline .wallet-stats .stat {
-      text-align: center;
-      background: var(--bg);
-      padding: 2px 8px;
-      border-radius: 8px;
-    }
-    .wallet-inline .wallet-stats .stat .val {
-      color: var(--blue-primary);
-      font-weight: bold;
-      font-size: 0.7rem;
-    }
-    .wallet-inline .wallet-stats .stat .label {
-      font-size: 0.5rem;
-      color: var(--text-dim);
     }
     .btn-transfer {
       padding: 4px 14px;
@@ -186,21 +298,15 @@
       white-space: nowrap;
     }
     .btn-transfer:hover {
-      background: #e09515;
+      background: #b8925a;
       transform: scale(1.04);
-      box-shadow: 0 4px 16px rgba(245, 166, 35, 0.3);
+      box-shadow: 0 4px 16px rgba(196, 160, 106, 0.3);
     }
-    .btn-transfer:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+    .btn-transfer:disabled { opacity: 0.5; cursor: not-allowed; }
 
-    /* ==========================================
-       MAIN GRID
-    ========================================== */
     .pos-layout { display: grid; grid-template-columns: 1fr 380px; gap: 16px; }
     .left-col, .right-col { display: flex; flex-direction: column; gap: 12px; }
 
-    /* ==========================================
-       SECTION HEADER
-    ========================================== */
     .section-header {
       display: flex; justify-content: space-between; align-items: center;
       margin-bottom: 4px; flex-wrap: wrap; gap: 6px;
@@ -209,18 +315,11 @@
       color: var(--blue-primary); font-size: 0.95rem; font-weight: bold;
       border-right: 3px solid var(--blue-primary); padding-right: 8px;
     }
-    .section-header .badge-sm {
-      background: rgba(0,87,179,0.12); color: var(--blue-primary);
-      padding: 2px 10px; border-radius: 20px; font-size: 0.6rem; font-weight: 500;
-    }
     .section-divider {
       height: 1px; background: linear-gradient(to left, transparent, var(--blue-primary), transparent);
       margin: 3px 0 8px 0; opacity: 0.25;
     }
 
-    /* ==========================================
-       SEARCH BOX
-    ========================================== */
     .search-box { display: flex; gap: 8px; flex-wrap: wrap; }
     .search-box input {
       flex: 1; padding: 8px 14px; border-radius: 30px;
@@ -240,11 +339,8 @@
     }
     .search-box .btn-search:hover { background: var(--blue-dark); transform: translateY(-1px); }
     .search-box .btn-search.gray { background: var(--bg3); border: 1px solid var(--border); }
-    .search-box .btn-search.gray:hover { background: #2a2a2a; }
+    .search-box .btn-search.gray:hover { background: var(--card-hover); }
 
-    /* ==========================================
-       BARCODE
-    ========================================== */
     .barcode-section {
       background: var(--bg3); border: 2px dashed var(--border);
       border-radius: var(--radius); padding: 14px 18px;
@@ -283,1467 +379,1779 @@
     }
     .barcode-manual button:hover { background: var(--blue-dark); transform: scale(1.02); }
 
-    /* ==========================================
-       CART
-    ========================================== */
     .cart-section {
-      background: var(--bg3); border: 2px solid var(--border);
-      border-radius: var(--radius); padding: 14px 16px;
-      display: flex; flex-direction: column; max-height: 450px; min-height: 280px;
+      background: var(--bg3);
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      max-height: 450px;
+      min-height: 280px;
     }
     .cart-section .cart-header {
-      display: flex; justify-content: space-between; align-items: center;
-      margin-bottom: 10px; flex-wrap: wrap; gap: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+      gap: 6px;
     }
-    .cart-section .cart-header .title { font-size: 1.05rem; font-weight: bold; color: var(--blue-primary); }
-    .cart-items { flex: 1; overflow-y: auto; padding: 2px 0; }
+    .cart-section .cart-header .title {
+      font-size: 1.05rem;
+      font-weight: bold;
+      color: var(--blue-primary);
+    }
+    .cart-items {
+      flex: 1;
+      overflow-y: auto;
+      padding: 2px 0;
+    }
     .cart-item {
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 6px 4px; border-bottom: 1px solid var(--border);
-      flex-wrap: wrap; gap: 4px; font-size: 0.82rem; transition: var(--transition);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 4px;
+      border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
+      gap: 4px;
+      font-size: 0.82rem;
+      transition: var(--transition);
     }
-    .cart-item:hover { background: rgba(0,87,179,0.05); border-radius: 6px; }
-    .cart-item .item-name { flex: 2; font-weight: 500; }
-    .cart-item .item-price { flex: 1; text-align: center; color: var(--blue-primary); font-weight: bold; }
-    .cart-item .item-qty { display: flex; gap: 4px; align-items: center; }
+    .cart-item:hover {
+      background: var(--card-hover);
+      border-radius: 6px;
+    }
+    .cart-item .item-name {
+      flex: 2;
+      font-weight: 500;
+    }
+    .cart-item .item-price {
+      flex: 1;
+      text-align: center;
+      color: var(--blue-primary);
+      font-weight: bold;
+    }
+    .cart-item .item-qty {
+      display: flex;
+      gap: 4px;
+      align-items: center;
+    }
     .cart-item .item-qty button {
-      background: var(--bg2); border: none; color: var(--text);
-      width: 26px; height: 26px; border-radius: 50%; cursor: pointer;
-      font-size: 0.9rem; transition: var(--transition); border: 1px solid var(--border);
+      background: var(--bg2);
+      border: none;
+      color: var(--text);
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: var(--transition);
+      border: 1px solid var(--border);
     }
-    .cart-item .item-qty button:hover { background: var(--blue-primary); border-color: var(--blue-primary); }
-    .cart-item .item-qty .qty-num { width: 22px; text-align: center; font-weight: bold; }
+    .cart-item .item-qty button:hover {
+      background: var(--blue-primary);
+      border-color: var(--blue-primary);
+      color: #fff;
+    }
+    .cart-item .item-qty .qty-num {
+      width: 22px;
+      text-align: center;
+      font-weight: bold;
+    }
     .cart-item .btn-remove {
-      background: rgba(255,71,87,0.12); border: none; color: var(--danger);
-      width: 26px; height: 26px; border-radius: 50%; cursor: pointer;
-      font-size: 0.85rem; transition: var(--transition); border: 1px solid transparent;
+      background: rgba(255, 71, 87, 0.12);
+      border: none;
+      color: var(--danger);
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: var(--transition);
+      border: 1px solid transparent;
     }
-    .cart-item .btn-remove:hover { background: rgba(255,71,87,0.25); border-color: var(--danger); }
+    .cart-item .btn-remove:hover {
+      background: rgba(255, 71, 87, 0.25);
+      border-color: var(--danger);
+    }
     .cart-total {
-      display: flex; justify-content: space-between; font-size: 1.15rem;
-      font-weight: bold; padding-top: 10px; border-top: 2px solid var(--border); margin-top: 8px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 1.15rem;
+      font-weight: bold;
+      padding-top: 10px;
+      border-top: 2px solid var(--border);
+      margin-top: 8px;
     }
-    .cart-total .total-value { color: var(--blue-primary); }
+    .cart-total .total-value {
+      color: var(--blue-primary);
+    }
     .btn-clear-cart {
-      padding: 4px 10px; border-radius: 6px;
-      background: rgba(255,71,87,0.12); border: 1px solid rgba(255,71,87,0.3);
-      color: var(--danger); cursor: pointer; transition: var(--transition); font-size: 0.7rem;
+      padding: 4px 10px;
+      border-radius: 6px;
+      background: rgba(255, 71, 87, 0.12);
+      border: 1px solid rgba(255, 71, 87, 0.3);
+      color: var(--danger);
+      cursor: pointer;
+      transition: var(--transition);
+      font-size: 0.7rem;
     }
-    .btn-clear-cart:hover { background: rgba(255,71,87,0.25); }
+    .btn-clear-cart:hover {
+      background: rgba(255, 71, 87, 0.25);
+    }
     .btn-validate {
-      width: 100%; padding: 10px; border-radius: 10px;
-      background: var(--success); border: none; color: white;
-      font-size: 1rem; font-weight: bold; cursor: pointer; transition: var(--transition); margin-top: 8px;
+      width: 100%;
+      padding: 10px;
+      border-radius: 10px;
+      background: var(--success);
+      border: none;
+      color: white;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: var(--transition);
+      margin-top: 8px;
     }
-    .btn-validate:hover { background: #1ea952; transform: scale(1.01);
-      box-shadow: 0 4px 16px rgba(37,211,102,0.25); }
-    .btn-validate:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+    .btn-validate:hover {
+      background: #1ea952;
+      transform: scale(1.01);
+      box-shadow: 0 4px 16px rgba(37, 211, 102, 0.25);
+    }
+    .btn-validate:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
     .cart-empty {
-      text-align: center; padding: 20px 10px; color: var(--text-dim);
+      text-align: center;
+      padding: 20px 10px;
+      color: var(--text-dim);
     }
-    .cart-empty i { font-size: 2.5rem; margin-bottom: 6px; opacity: 0.3; display: block; }
+    .cart-empty i {
+      font-size: 2.5rem;
+      margin-bottom: 6px;
+      opacity: 0.3;
+      display: block;
+    }
 
-    /* ==========================================
-       PRODUCTS GRID
-    ========================================== */
-    .products-scroll { max-height: 340px; overflow-y: auto; }
+    .products-scroll {
+      max-height: 340px;
+      overflow-y: auto;
+    }
     .product-grid {
-      display: grid; grid-template-columns: repeat(auto-fill, minmax(185px, 1fr)); gap: 10px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(185px, 1fr));
+      gap: 10px;
     }
     .product-card {
-      background: var(--bg2); border: 1px solid var(--border);
-      border-radius: 10px; padding: 10px 12px; transition: var(--transition); cursor: default;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      transition: var(--transition);
+      cursor: default;
     }
-    .product-card:hover { border-color: var(--blue-primary); transform: translateY(-2px);
-      box-shadow: 0 4px 16px rgba(0,87,179,0.12); }
-    .product-card .p-name { font-size: 0.85rem; font-weight: bold; color: var(--text); }
-    .product-card .p-price { color: var(--blue-primary); font-size: 0.9rem; font-weight: bold; margin: 2px 0; }
-    .product-card .p-stock-info { display: flex; align-items: center; gap: 4px; margin-top: 2px; font-size: 0.7rem; }
-    .product-card .p-stock .stock-ok { color: var(--success); }
-    .product-card .p-stock .stock-low { color: var(--warning); }
-    .product-card .p-stock .stock-out { color: var(--danger); }
-    .product-card .p-sku { font-size: 0.55rem; color: var(--text-dim); direction: ltr; }
+    .product-card:hover {
+      border-color: var(--blue-primary);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(0, 87, 179, 0.12);
+    }
+    .product-card .p-name {
+      font-size: 0.85rem;
+      font-weight: bold;
+      color: var(--text);
+    }
+    .product-card .p-price {
+      color: var(--blue-primary);
+      font-size: 0.9rem;
+      font-weight: bold;
+      margin: 2px 0;
+    }
+    .product-card .p-stock-info {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 2px;
+      font-size: 0.7rem;
+    }
+    .product-card .p-stock .stock-ok {
+      color: var(--success);
+    }
+    .product-card .p-stock .stock-low {
+      color: var(--warning);
+    }
+    .product-card .p-stock .stock-out {
+      color: var(--danger);
+    }
+    .product-card .p-sku {
+      font-size: 0.55rem;
+      color: var(--text-dim);
+      direction: ltr;
+    }
     .product-card .btn-add-stock {
-      width: 100%; padding: 4px; border-radius: 6px; border: 1px solid var(--border);
-      background: rgba(0,87,179,0.08); color: var(--blue-primary);
-      cursor: pointer; font-weight: bold; transition: var(--transition); margin-top: 4px; font-size: 0.75rem;
+      width: 100%;
+      padding: 4px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: rgba(0, 87, 179, 0.08);
+      color: var(--blue-primary);
+      cursor: pointer;
+      font-weight: bold;
+      transition: var(--transition);
+      margin-top: 4px;
+      font-size: 0.75rem;
     }
-    .product-card .btn-add-stock:hover { background: var(--blue-primary); color: white; border-color: var(--blue-primary); }
-    .product-card .btn-add-stock:disabled { opacity: 0.4; cursor: not-allowed; }
-    .product-card .product-img { width: 32px; height: 32px; border-radius: 6px; object-fit: cover; flex-shrink: 0; }
+    .product-card .btn-add-stock:hover {
+      background: var(--blue-primary);
+      color: white;
+      border-color: var(--blue-primary);
+    }
+    .product-card .btn-add-stock:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+    .product-card .product-img {
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      object-fit: cover;
+      flex-shrink: 0;
+    }
 
-    /* ==========================================
-       ORDERS LIST
-    ========================================== */
-    .orders-scroll { max-height: 320px; overflow-y: auto; }
-    .order-card {
-      background: var(--bg2); border: 1px solid var(--border);
-      border-radius: 10px; padding: 10px 12px; margin-bottom: 8px; transition: var(--transition);
+    .empty-state {
+      text-align: center;
+      padding: 20px 12px;
+      color: var(--text-dim);
     }
-    .order-card:hover { border-color: var(--blue-primary); }
-    .order-card .order-header {
-      display: flex; justify-content: space-between; align-items: center;
-      flex-wrap: wrap; gap: 4px; margin-bottom: 4px;
+    .empty-state i {
+      font-size: 2.2rem;
+      margin-bottom: 8px;
+      opacity: 0.3;
+      display: block;
     }
-    .order-card .customer-name { font-size: 0.9rem; font-weight: bold; color: var(--blue-primary); }
-    .order-card .customer-phone { color: var(--text-dim); font-size: 0.7rem; }
-    .order-card .order-id { font-size: 0.6rem; color: var(--text-dim); }
-    .order-status {
-      padding: 2px 8px; border-radius: 20px; font-size: 0.6rem; font-weight: bold;
+    .empty-state p {
+      font-size: 0.85rem;
     }
-    .order-status.pending { background: rgba(255,165,2,0.15); color: var(--warning); }
-    .order-status.confirmed { background: rgba(0,87,179,0.15); color: var(--blue-primary); }
-    .order-status.completed { background: rgba(37,211,102,0.15); color: var(--success); }
-    .btn-validate-order {
-      padding: 5px 12px; border-radius: 8px; background: var(--success);
-      border: none; color: white; font-size: 0.75rem; font-weight: bold;
-      cursor: pointer; transition: var(--transition); width: 100%; margin-top: 4px;
-    }
-    .btn-validate-order:hover { background: #1ea952; transform: scale(1.01); }
-
-    /* ==========================================
-       TRANSACTIONS
-    ========================================== */
-    .transactions-section {
-      background: var(--bg3); border: 1px solid var(--border);
-      border-radius: var(--radius); padding: 10px 14px;
-      max-height: 200px; display: flex; flex-direction: column;
-    }
-    .transactions-section .trans-header {
-      display: flex; justify-content: space-between; align-items: center;
-      margin-bottom: 4px; flex-wrap: wrap; gap: 4px;
-    }
-    .transactions-section .trans-header h3 { color: var(--blue-primary); font-size: 0.85rem; font-weight: bold; }
-    .transactions-section .trans-header .trans-stats { font-size: 0.6rem; color: var(--text-dim); }
-    .transactions-section .trans-header .trans-stats span { color: var(--blue-primary); font-weight: bold; }
-    .transactions-scroll { flex: 1; overflow-y: auto; max-height: 150px; }
-    .transactions-table { width: 100%; border-collapse: collapse; font-size: 0.65rem; }
-    .transactions-table th {
-      text-align: right; padding: 4px 6px; background: rgba(0,87,179,0.06);
-      color: var(--text-dim); font-size: 0.55rem; text-transform: uppercase;
-      border-bottom: 1px solid var(--border); position: sticky; top: 0; background: var(--bg3); z-index: 2;
-    }
-    .transactions-table td { padding: 4px 6px; border-bottom: 1px solid var(--border); }
-    .transactions-table tr:hover td { background: rgba(0,87,179,0.04); }
-    .transactions-table .amount { color: var(--blue-primary); font-weight: bold; }
-    .transactions-empty {
-      text-align: center; padding: 12px; color: var(--text-dim); font-size: 0.7rem;
-    }
-    .transactions-empty i { font-size: 1.5rem; margin-bottom: 4px; opacity: 0.3; display: block; }
-
-    /* ==========================================
-       EMPTY STATE
-    ========================================== */
-    .empty-state { text-align: center; padding: 20px 12px; color: var(--text-dim); }
-    .empty-state i { font-size: 2.2rem; margin-bottom: 8px; opacity: 0.3; display: block; }
-    .empty-state p { font-size: 0.85rem; }
-
-    /* ==========================================
-       TOAST
-    ========================================== */
-    .toast-msg {
-      position: fixed; bottom: 30px; left: 50%;
-      transform: translateX(-50%) translateY(100px);
-      background: var(--bg3); border: 2px solid var(--border);
-      border-radius: 14px; padding: 12px 28px; z-index: 9999;
-      opacity: 0; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      font-size: 0.9rem; box-shadow: var(--shadow);
-      display: flex; align-items: center; gap: 10px; font-weight: 500;
-    }
-    .toast-msg.show { transform: translateX(-50%) translateY(0); opacity: 1; }
-    .toast-msg.success { border-color: var(--success); color: var(--success); }
-    .toast-msg.success i { color: var(--success); }
-    .toast-msg.error { border-color: var(--danger); color: var(--danger); }
-    .toast-msg.error i { color: var(--danger); }
-    .toast-msg.info { border-color: var(--blue-primary); color: var(--blue-primary); }
-    .toast-msg.info i { color: var(--blue-primary); }
-    .toast-msg.warning { border-color: var(--warning); color: var(--warning); }
-    .toast-msg.warning i { color: var(--warning); }
 
     .low-stock-alert {
-      background: rgba(255,71,87,0.1); border: 1px solid var(--danger);
-      border-radius: 6px; padding: 2px 8px; color: var(--danger); font-size: 0.55rem; display: inline-block;
+      background: rgba(255, 71, 87, 0.1);
+      border: 1px solid var(--danger);
+      border-radius: 6px;
+      padding: 2px 8px;
+      color: var(--danger);
+      font-size: 0.55rem;
+      display: inline-block;
     }
 
-    /* ==========================================
-       RESPONSIVE
-    ========================================== */
-    @media (max-width: 1100px) { .pos-layout { grid-template-columns: 1fr 340px; gap: 12px; } }
+    .toast-msg {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: var(--bg3);
+      border: 2px solid var(--border);
+      border-radius: 14px;
+      padding: 12px 28px;
+      z-index: 9999;
+      opacity: 0;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      font-size: 0.9rem;
+      box-shadow: var(--shadow);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 500;
+    }
+    .toast-msg.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+    .toast-msg.success {
+      border-color: var(--success);
+      color: var(--success);
+    }
+    .toast-msg.error {
+      border-color: var(--danger);
+      color: var(--danger);
+    }
+    .toast-msg.info {
+      border-color: var(--blue-primary);
+      color: var(--blue-primary);
+    }
+    .toast-msg.warning {
+      border-color: var(--warning);
+      color: var(--warning);
+    }
+
+    /* ===== RETURN MODAL ===== */
+    .return-modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.85);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 10000;
+      padding: 20px;
+      backdrop-filter: blur(4px);
+    }
+    .return-modal {
+      background: var(--bg3);
+      border-radius: var(--radius);
+      padding: 24px;
+      max-width: 600px;
+      width: 100%;
+      border: 2px solid var(--border);
+      max-height: 90vh;
+      overflow-y: auto;
+      position: relative;
+    }
+    .return-modal .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    .return-modal .modal-header h2 {
+      color: var(--blue-primary);
+      font-size: 1.1rem;
+    }
+    .return-modal .modal-close {
+      background: none;
+      border: none;
+      color: var(--text-dim);
+      font-size: 1.8rem;
+      cursor: pointer;
+      transition: var(--transition);
+      padding: 0 8px;
+    }
+    .return-modal .modal-close:hover {
+      color: var(--text);
+      transform: rotate(90deg);
+    }
+    .return-modal .search-input {
+      width: 100%;
+      padding: 10px 16px;
+      border-radius: 30px;
+      border: 2px solid var(--border);
+      background: var(--bg2);
+      color: var(--text);
+      font-size: 0.85rem;
+      margin-top: 4px;
+      transition: var(--transition);
+    }
+    .return-modal .search-input:focus {
+      outline: none;
+      border-color: var(--blue-primary);
+      box-shadow: 0 0 0 3px rgba(0, 87, 179, 0.15);
+    }
+    .return-modal .search-input::placeholder {
+      color: var(--text-dim);
+    }
+    .return-modal .btn-search-full {
+      width: 100%;
+      padding: 10px;
+      border-radius: 10px;
+      background: var(--blue-primary);
+      border: none;
+      color: white;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: bold;
+      transition: var(--transition);
+      margin-top: 8px;
+    }
+    .return-modal .btn-search-full:hover {
+      background: var(--blue-dark);
+      transform: translateY(-1px);
+    }
+    .return-modal .return-results {
+      max-height: 300px;
+      overflow-y: auto;
+      margin-top: 12px;
+    }
+    .return-modal .return-result-item {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 8px;
+      transition: var(--transition);
+    }
+    .return-modal .return-result-item:hover {
+      border-color: var(--blue-primary);
+    }
+    .return-modal .return-result-item .order-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 4px;
+    }
+    .return-modal .return-result-item .order-id {
+      font-weight: bold;
+      color: var(--blue-primary);
+    }
+    .return-modal .return-result-item .order-customer {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+    }
+    .return-modal .return-result-item .order-date {
+      font-size: 0.7rem;
+      color: var(--text-dim);
+    }
+    .return-modal .return-result-item .order-total {
+      color: var(--gold);
+      font-weight: bold;
+      font-size: 0.9rem;
+    }
+    .return-modal .return-result-item .btn-select-order {
+      background: var(--blue-primary);
+      border: none;
+      color: white;
+      padding: 4px 14px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 0.7rem;
+      transition: var(--transition);
+      margin-top: 4px;
+    }
+    .return-modal .return-result-item .btn-select-order:hover {
+      background: var(--blue-dark);
+      transform: scale(1.02);
+    }
+    .return-modal .return-result-item .order-products {
+      margin-top: 6px;
+      font-size: 0.7rem;
+      color: var(--text-dim);
+    }
+    .return-modal .return-items-list .return-item-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .return-modal .return-items-list .return-item-row input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+      accent-color: var(--blue-primary);
+    }
+    .return-modal .return-items-list .return-item-row .item-info {
+      flex: 1;
+    }
+    .return-modal .return-items-list .return-item-row .item-info .name {
+      font-size: 0.8rem;
+    }
+    .return-modal .return-items-list .return-item-row .item-info .details {
+      font-size: 0.65rem;
+      color: var(--text-dim);
+    }
+    .return-modal .return-items-list .return-item-row .qty-input {
+      width: 50px;
+      padding: 4px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text);
+      text-align: center;
+      font-size: 0.7rem;
+    }
+    .return-modal .return-items-list .return-item-row .qty-input:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+    .return-modal .return-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+    .return-modal .btn-return-confirm {
+      flex: 1;
+      padding: 10px;
+      border-radius: 10px;
+      background: var(--danger);
+      border: none;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .return-modal .btn-return-confirm:hover {
+      background: #cc1122;
+      transform: scale(1.01);
+    }
+    .return-modal .btn-return-confirm:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+    .return-modal .btn-return-cancel {
+      flex: 1;
+      padding: 10px;
+      border-radius: 10px;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .return-modal .btn-return-cancel:hover {
+      background: var(--bg);
+    }
+    .return-modal .order-summary-box {
+      padding: 8px 12px;
+      background: var(--bg2);
+      border-radius: 8px;
+      margin-bottom: 12px;
+    }
+    .return-modal .order-summary-box .line {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+    }
+    .return-modal .order-summary-box .line .highlight {
+      color: var(--gold);
+      font-weight: bold;
+    }
+    .return-modal .empty-results {
+      text-align: center;
+      color: var(--text-dim);
+      padding: 20px;
+    }
+    .return-modal .empty-results i {
+      font-size: 2rem;
+      display: block;
+      margin-bottom: 8px;
+      opacity: 0.3;
+    }
+
+    /* ===== BUTTONS ===== */
+    .btn-return-cart {
+      padding: 4px 10px;
+      border-radius: 6px;
+      background: rgba(255, 71, 87, 0.12);
+      border: 1px solid rgba(255, 71, 87, 0.3);
+      color: var(--danger);
+      cursor: pointer;
+      transition: var(--transition);
+      font-size: 0.7rem;
+      margin-right: 4px;
+    }
+    .btn-return-cart:hover {
+      background: rgba(255, 71, 87, 0.25);
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 1100px) {
+      .pos-layout {
+        grid-template-columns: 1fr 340px;
+        gap: 12px;
+      }
+      .sidebar {
+        width: 60px;
+        padding: 12px 6px;
+      }
+      .sidebar .brand {
+        font-size: 0.8rem;
+      }
+      .sidebar .brand small {
+        display: none;
+      }
+      .sidebar .nav-item {
+        padding: 10px 8px;
+        font-size: 0.7rem;
+        justify-content: center;
+      }
+      .sidebar .nav-item span {
+        display: none;
+      }
+      .sidebar .nav-item .badge-nav {
+        display: none;
+      }
+      .sidebar .sidebar-footer .online-status span:last-child {
+        display: none;
+      }
+      .main-content {
+        margin-right: 60px;
+      }
+    }
     @media (max-width: 850px) {
-      .pos-layout { grid-template-columns: 1fr; gap: 12px; }
-      .cart-section { max-height: 300px; min-height: 200px; }
-      .right-col { order: -1; }
-      .product-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
-      .transactions-section { max-height: 160px; }
-      .header h1 { font-size: 1.2rem; }
-      .header .stats-bar { font-size: 0.65rem; gap: 4px; }
-      .header .stats-bar span { padding: 2px 8px; }
-      .barcode-manual input { width: 140px; }
-      .wallet-inline { flex-wrap: wrap; justify-content: center; }
-      .wallet-inline .wallet-stats { gap: 6px; }
+      .pos-layout {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+      .cart-section {
+        max-height: 300px;
+        min-height: 200px;
+      }
+      .right-col {
+        order: -1;
+      }
+      .product-grid {
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      }
+      .header h1 {
+        font-size: 1.2rem;
+      }
+      .header .stats-bar {
+        font-size: 0.65rem;
+        gap: 4px;
+      }
+      .header .stats-bar span {
+        padding: 2px 8px;
+      }
+      .barcode-manual input {
+        width: 140px;
+      }
+      .wallet-inline {
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      .sidebar {
+        width: 50px;
+        padding: 8px 4px;
+      }
+      .sidebar .brand {
+        font-size: 0.7rem;
+        padding: 8px 0;
+      }
+      .sidebar .nav-item {
+        padding: 8px 6px;
+        font-size: 0.6rem;
+      }
+      .main-content {
+        margin-right: 50px;
+        padding: 8px 10px;
+      }
+      .return-modal {
+        max-width: 95%;
+        padding: 16px;
+      }
     }
     @media (max-width: 480px) {
-      .container { padding: 8px 10px; }
-      .header h1 { font-size: 1rem; padding-right: 8px; }
-      .header .stats-bar { font-size: 0.6rem; gap: 4px; }
-      .header .stats-bar span { padding: 2px 6px; }
-      .product-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 6px; }
-      .product-card { padding: 8px; }
-      .product-card .p-name { font-size: 0.75rem; }
-      .product-card .p-price { font-size: 0.8rem; }
-      .cart-section { padding: 10px; }
-      .cart-item { font-size: 0.75rem; }
-      .wallet-inline { padding: 4px 10px; }
-      .wallet-inline .balance { font-size: 0.9rem; }
-      .barcode-section { padding: 12px; }
-      .barcode-manual input { width: 100px; font-size: 0.75rem; }
+      .header h1 {
+        font-size: 1rem;
+        padding-right: 8px;
+      }
+      .header .stats-bar {
+        font-size: 0.6rem;
+        gap: 4px;
+      }
+      .header .stats-bar span {
+        padding: 2px 6px;
+      }
+      .product-grid {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 6px;
+      }
+      .product-card {
+        padding: 8px;
+      }
+      .product-card .p-name {
+        font-size: 0.75rem;
+      }
+      .product-card .p-price {
+        font-size: 0.8rem;
+      }
+      .cart-section {
+        padding: 10px;
+      }
+      .cart-item {
+        font-size: 0.75rem;
+      }
+      .wallet-inline {
+        padding: 4px 10px;
+      }
+      .wallet-inline .balance {
+        font-size: 0.9rem;
+      }
+      .barcode-section {
+        padding: 12px;
+      }
+      .barcode-manual input {
+        width: 100px;
+        font-size: 0.75rem;
+      }
+      .sidebar {
+        width: 44px;
+        padding: 6px 2px;
+      }
+      .sidebar .brand {
+        font-size: 0.6rem;
+        padding: 6px 0;
+      }
+      .sidebar .nav-item {
+        padding: 6px 4px;
+        font-size: 0.5rem;
+      }
+      .sidebar .nav-item i {
+        font-size: 0.8rem;
+        width: 18px;
+      }
+      .main-content {
+        margin-right: 44px;
+        padding: 6px 8px;
+      }
+      .return-modal {
+        padding: 12px;
+      }
+      .return-modal .return-items-list .return-item-row {
+        flex-wrap: wrap;
+      }
     }
   </style>
 </head>
 <body>
 
-<div class="container">
-  <!-- ===== HEADER (مع المحفظة) ===== -->
-  <div class="header">
-    <div class="header-left">
-      <div>
-        <h1>🧾 مول لاكيس</h1>
-        <p style="color: var(--text-dim); font-size: 0.7rem; margin-top: 2px;">استلام وتأكيد الطلبات</p>
-      </div>
-      <span class="badge"><i class="fas fa-store"></i> Marnissa</span>
-    </div>
-    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-      
-      <!-- ===== WALLET (داخل الهيدر) ===== -->
-      <div class="wallet-inline">
-        <div>
-          <span style="color:var(--text-dim);font-size:0.55rem;">💰 رصيد</span>
-          <div class="balance" id="walletBalance">0.00 <span>درهم</span></div>
-        </div>
-        <div class="wallet-stats">
-          <div class="stat">
-            <div class="val" id="todayProfit">0.00</div>
-            <div class="label">اليوم</div>
-          </div>
-          <div class="stat">
-            <div class="val" id="monthProfit">0.00</div>
-            <div class="label">الشهر</div>
-          </div>
-          <div class="stat">
-            <div class="val" id="totalProfit">0.00</div>
-            <div class="label">الإجمالي</div>
-          </div>
-        </div>
-        <button class="btn-transfer" id="transferBtn" onclick="transferToProject()">
-          <i class="fas fa-arrow-up"></i> تحويل
-        </button>
-      </div>
-
-      <!-- ===== STATS ===== -->
-      <div class="stats-bar">
-        <span>📦 اليوم: <span class="num" id="todayOrders">0</span></span>
-        <span>💰 المبيعات: <span class="num" id="todaySales">0</span> درهم</span>
-        <span>⚠️ <span class="num" id="lowStockCount">0</span></span>
-      </div>
-
-      <!-- ===== ONLINE STATUS ===== -->
-      <div class="online-status online" id="onlineStatus">
-        <span class="status-dot online" id="statusDot"></span>
-        <span id="statusText">متصل</span>
-      </div>
-
-      <!-- ===== REFRESH ===== -->
-      <button onclick="location.reload()" style="background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:4px 12px;border-radius:20px;cursor:pointer;font-size:0.7rem;transition:var(--transition);"><i class="fas fa-sync-alt"></i></button>
-    </div>
-  </div>
-
-  <!-- ===== MAIN LAYOUT ===== -->
-  <div class="pos-layout">
-
-    <!-- ===== LEFT COLUMN ===== -->
-    <div class="left-col">
-
-      <!-- BARCODE -->
-      <div class="barcode-section">
-        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;margin-bottom:6px;">
-          <span style="font-size:0.9rem;font-weight:bold;"><i class="fas fa-camera"></i> قارئ الباركود <span style="font-size:0.6rem;color:var(--text-dim);font-weight:normal;">(F1)</span></span>
-          <button class="btn-scanner" id="scannerBtn" onclick="toggleScanner()"><i class="fas fa-play"></i> تشغيل</button>
-        </div>
-        <div class="scanner-container" id="scannerContainer" style="display:none;">
-          <video id="barcodeVideo" autoplay playsinline></video>
-          <div class="scan-overlay"></div>
-        </div>
-        <div class="scan-status" id="scanStatus">📷 الكاميرا متوقفة</div>
-        <div class="barcode-manual">
-          <input type="text" id="manualBarcode" placeholder="📱 اكتب الباركود (F2)" onkeyup="if(event.key==='Enter') addByBarcode(this.value)">
-          <button onclick="addByBarcode(document.getElementById('manualBarcode').value)"><i class="fas fa-plus"></i> إضافة</button>
-        </div>
-      </div>
-
-      <!-- PRODUCTS -->
-      <div style="flex:1;display:flex;flex-direction:column;min-height:0;">
-        <div class="section-header">
-          <h2><i class="fas fa-search"></i> البحث السريع</h2>
-          <span class="badge-sm">قراءة فقط</span>
-        </div>
-        <div class="section-divider"></div>
-
-        <div class="search-box">
-          <input type="text" id="stockSearchInput" placeholder="🔍 ابحث بالاسم أو SKU..." onkeyup="if(event.key==='Enter') searchStock()">
-          <button class="btn-search" onclick="searchStock()"><i class="fas fa-search"></i></button>
-          <button class="btn-search gray" onclick="loadAllStock()"><i class="fas fa-sync-alt"></i></button>
-        </div>
-
-        <div id="stockContainer" style="flex:1;display:flex;flex-direction:column;min-height:0;">
-          <div class="empty-state" id="stockEmptyState">
-            <i class="fas fa-box-open"></i>
-            <p>ابحث عن منتج</p>
-            <p style="font-size:0.65rem;margin-top:4px;">ثمن الشراء والأرباح غير ظاهرة</p>
-          </div>
-          <div class="products-scroll">
-            <div class="product-grid" id="productsGrid"></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- TRANSACTIONS -->
-      <div class="transactions-section">
-        <div class="trans-header">
-          <h3><i class="fas fa-history"></i> سجل المعاملات</h3>
-          <div class="trans-stats">
-            <span id="transCount">0</span> معاملة
-            <span style="margin:0 4px;">|</span>
-            <span id="transTotal">0</span> درهم
-          </div>
-          <button class="btn-search" style="padding:2px 8px;font-size:0.6rem;background:var(--bg);" onclick="loadTransactions()"><i class="fas fa-sync-alt"></i></button>
-        </div>
-        <div id="transLoading" style="text-align:center;padding:6px;"><i class="fas fa-spinner fa-spin"></i></div>
-        <div class="transactions-scroll" id="transScroll">
-          <table class="transactions-table" id="transTable" style="display:none;">
-            <thead><tr><th>#</th><th>الزبون</th><th>المجموع</th><th>التاريخ</th></tr></thead>
-            <tbody id="transBody"></tbody>
-          </table>
-          <div id="transEmpty" class="transactions-empty" style="display:none;">
-            <i class="fas fa-receipt"></i>
-            <p>لا توجد معاملات</p>
-          </div>
-        </div>
-      </div>
-
+  <!-- ===== SIDEBAR ===== -->
+  <aside class="sidebar">
+    <div class="brand">
+      🧾 مول لاكيس
+      <small>MarnissaMall</small>
     </div>
 
-    <!-- ===== RIGHT COLUMN ===== -->
-    <div class="right-col">
+    <nav>
+      <a href="pos.html" class="nav-item active">
+        <i class="fas fa-cash-register"></i>
+        <span>نقطة البيع</span>
+      </a>
+      <a href="pos-orders.html" class="nav-item">
+        <i class="fas fa-clipboard-list"></i>
+        <span>الطلبات</span>
+        <span class="badge-nav" id="sidebarOrdersBadge">0</span>
+      </a>
+      <a href="pos-transactions.html" class="nav-item">
+        <i class="fas fa-history"></i>
+        <span>المعاملات</span>
+      </a>
+      <a href="pos-wallet.html" class="nav-item">
+        <i class="fas fa-wallet"></i>
+        <span>المحفظة</span>
+      </a>
+    </nav>
 
-      <!-- CART -->
-      <div class="cart-section" id="cartSection">
-        <div class="cart-header">
-          <span class="title"><i class="fas fa-shopping-cart"></i> سلة الطلب</span>
+    <div class="sidebar-footer">
+      <div class="online-status online" id="sidebarStatus">
+        <span class="status-dot online" id="sidebarDot"></span>
+        <span id="sidebarStatusText">متصل</span>
+      </div>
+      <div style="font-size:0.55rem;color:var(--text-dim);">
+        <i class="fas fa-store"></i> Marnissa v2.0
+      </div>
+    </div>
+  </aside>
+
+  <!-- ===== MAIN CONTENT ===== -->
+  <div class="main-content">
+
+    <div class="container">
+
+      <!-- ===== HEADER ===== -->
+      <div class="header">
+        <div class="header-left">
           <div>
-            <span id="cartCount" style="color:var(--text-dim);font-size:0.75rem;">(0)</span>
-            <button class="btn-clear-cart" onclick="clearCart()" style="margin-right:4px;"><i class="fas fa-trash"></i></button>
+            <h1>🧾 نقطة البيع</h1>
+            <p style="color: var(--text-dim); font-size: 0.7rem; margin-top: 2px;">استلام وتأكيد الطلبات</p>
           </div>
+          <span class="badge"><i class="fas fa-store"></i> Marnissa</span>
         </div>
-        <div class="cart-items" id="cartItems">
-          <div class="cart-empty">
-            <i class="fas fa-shopping-bag"></i>
-            <p>السلة فارغة</p>
-            <p style="font-size:0.65rem;">أضف منتجات من الباركود أو البحث</p>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+          <div class="wallet-inline">
+            <div>
+              <span style="color:var(--text-dim);font-size:0.55rem;">💰 رصيد</span>
+              <div class="balance" id="walletBalance">0.00 <span>درهم</span></div>
+            </div>
+            <button class="btn-transfer" id="transferBtn" onclick="transferToProject()">
+              <i class="fas fa-arrow-up"></i> تحويل
+            </button>
           </div>
+          <div class="stats-bar">
+            <span>📦 اليوم: <span class="num" id="todayOrders">0</span></span>
+            <span>💰 المبيعات: <span class="num" id="todaySales">0</span> درهم</span>
+            <span>⚠️ <span class="num" id="lowStockCount">0</span></span>
+          </div>
+          <button class="theme-toggle" onclick="toggleTheme()">
+            <i class="fas fa-moon"></i>
+            <span id="themeLabel">داكن</span>
+          </button>
+          <button onclick="location.reload()" style="background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:4px 12px;border-radius:20px;cursor:pointer;font-size:0.7rem;transition:var(--transition);"><i class="fas fa-sync-alt"></i></button>
         </div>
-        <div class="cart-total">
-          <span>المجموع</span>
-          <span class="total-value" id="cartTotal">0 درهم</span>
-        </div>
-        <button class="btn-validate" id="validateBtn" onclick="validateCartOrder()">
-          <i class="fas fa-check-circle"></i> تم الدفع والاستلام (F3)
-        </button>
       </div>
 
-      <!-- ORDERS -->
-      <div style="flex:1;display:flex;flex-direction:column;min-height:0;">
-        <div class="section-header">
-          <h2><i class="fas fa-clipboard-list"></i> طلب الكليان</h2>
-          <span class="badge-sm">بحث</span>
-        </div>
-        <div class="section-divider"></div>
+      <!-- ===== POS LAYOUT ===== -->
+      <div class="pos-layout">
 
-        <div class="search-box">
-          <input type="text" id="searchInput" placeholder="🔍 ابحث بالاسم أو رقم الهاتف..." onkeyup="if(event.key==='Enter') searchOrders()">
-          <button class="btn-search" onclick="searchOrders()"><i class="fas fa-search"></i></button>
-          <button class="btn-search gray" onclick="loadPendingOrders()"><i class="fas fa-sync-alt"></i></button>
+        <!-- LEFT COLUMN -->
+        <div class="left-col">
+
+          <!-- BARCODE -->
+          <div class="barcode-section">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;margin-bottom:6px;">
+              <span style="font-size:0.9rem;font-weight:bold;"><i class="fas fa-camera"></i> قارئ الباركود <span style="font-size:0.6rem;color:var(--text-dim);font-weight:normal;">(F1)</span></span>
+              <button class="btn-scanner" id="scannerBtn" onclick="toggleScanner()"><i class="fas fa-play"></i> تشغيل</button>
+            </div>
+            <div class="scanner-container" id="scannerContainer" style="display:none;">
+              <video id="barcodeVideo" autoplay playsinline></video>
+              <div class="scan-overlay"></div>
+            </div>
+            <div class="scan-status" id="scanStatus">📷 الكاميرا متوقفة</div>
+            <div class="barcode-manual">
+              <input type="text" id="manualBarcode" placeholder="📱 اكتب الباركود (F2)" onkeyup="if(event.key==='Enter') addByBarcode(this.value)">
+              <button onclick="addByBarcode(document.getElementById('manualBarcode').value)"><i class="fas fa-plus"></i> إضافة</button>
+            </div>
+          </div>
+
+          <!-- PRODUCTS -->
+          <div style="flex:1;display:flex;flex-direction:column;min-height:0;">
+            <div class="section-header">
+              <h2><i class="fas fa-search"></i> البحث السريع</h2>
+              <span class="badge-sm">قراءة فقط</span>
+            </div>
+            <div class="section-divider"></div>
+
+            <div class="search-box">
+              <input type="text" id="stockSearchInput" placeholder="🔍 ابحث بالاسم أو SKU..." onkeyup="if(event.key==='Enter') searchStock()">
+              <button class="btn-search" onclick="searchStock()"><i class="fas fa-search"></i></button>
+              <button class="btn-search gray" onclick="loadAllStock()"><i class="fas fa-sync-alt"></i></button>
+            </div>
+
+            <div id="stockContainer" style="flex:1;display:flex;flex-direction:column;min-height:0;">
+              <div class="empty-state" id="stockEmptyState">
+                <i class="fas fa-box-open"></i>
+                <p>ابحث عن منتج</p>
+                <p style="font-size:0.65rem;margin-top:4px;">ثمن الشراء والأرباح غير ظاهرة</p>
+              </div>
+              <div class="products-scroll">
+                <div class="product-grid" id="productsGrid"></div>
+              </div>
+            </div>
+          </div>
+
         </div>
 
-        <div id="resultsContainer" style="flex:1;display:flex;flex-direction:column;min-height:0;">
-          <div class="empty-state" id="emptyState">
-            <i class="fas fa-shopping-bag"></i>
-            <p style="font-size:0.85rem;">ابحث عن طلب كليان</p>
-            <p style="font-size:0.65rem;margin-top:4px;">الطلبات بحالة "جاهز للاستلام"</p>
+        <!-- RIGHT COLUMN -->
+        <div class="right-col">
+
+          <!-- CART -->
+          <div class="cart-section" id="cartSection">
+            <div class="cart-header">
+              <span class="title"><i class="fas fa-shopping-cart"></i> سلة الطلب</span>
+              <div>
+                <span id="cartCount" style="color:var(--text-dim);font-size:0.75rem;">(0)</span>
+                <button class="btn-return-cart" onclick="showReturnModal()" title="إرجاع منتج من طلب سابق">
+                  <i class="fas fa-undo"></i> إرجاع
+                </button>
+                <button class="btn-clear-cart" onclick="clearCart()" style="margin-right:4px;"><i class="fas fa-trash"></i></button>
+              </div>
+            </div>
+            <div class="cart-items" id="cartItems">
+              <div class="cart-empty">
+                <i class="fas fa-shopping-bag"></i>
+                <p>السلة فارغة</p>
+                <p style="font-size:0.65rem;">أضف منتجات من الباركود أو البحث</p>
+              </div>
+            </div>
+            <div class="cart-total">
+              <span>المجموع</span>
+              <span class="total-value" id="cartTotal">0.00 درهم</span>
+            </div>
+            <button class="btn-validate" id="validateBtn" onclick="validateCartOrder()">
+              <i class="fas fa-check-circle"></i> تم الدفع والاستلام (F3)
+            </button>
           </div>
-          <div class="orders-scroll">
-            <div id="ordersList"></div>
-          </div>
+
         </div>
+
       </div>
 
     </div>
-
   </div>
-</div>
 
-<!-- ===== TOAST ===== -->
-<div class="toast-msg" id="toastMsg"><i class="fas fa-info-circle"></i> <span id="toastText"></span></div>
+  <!-- ===== TOAST ===== -->
+  <div class="toast-msg" id="toastMsg"><i class="fas fa-info-circle"></i> <span id="toastText"></span></div>
 
-<script>
-  // ==========================================
-  // MARNISSAMALL - POS SYSTEM (كامل وشغال)
-  // ==========================================
+  <script>
+    // ==========================================
+    // POS PAGE - MAIN LOGIC
+    // ==========================================
 
-  let sb = window.sb;
-  let allOrders = [];
-  let currentCart = [];
-  let currentCustomer = null;
-  let cartItemsForReceipt = [];
-  let allProducts = [];
-  let walletId = null;
-  let isOnline = navigator.onLine;
-  let networkCheckInterval = null;
+    let sb = window.sb;
+    let allOrders = [];
+    let currentCart = [];
+    let allProducts = [];
+    let walletId = null;
+    let isOnline = navigator.onLine;
+    let networkCheckInterval = null;
 
-  // ========== TOAST ==========
-  function showToast(msg, type) {
-    const toast = document.getElementById('toastMsg');
-    const icon = document.querySelector('#toastMsg i');
-    const text = document.getElementById('toastText');
-    
-    const icons = {
-      success: 'fa-check-circle',
-      error: 'fa-times-circle',
-      warning: 'fa-exclamation-triangle',
-      info: 'fa-info-circle'
-    };
-    
-    icon.className = 'fas ' + (icons[type] || icons.info);
-    text.textContent = msg;
-    toast.className = `toast-msg ${type} show`;
-    clearTimeout(window._toastTimer);
-    window._toastTimer = setTimeout(() => toast.classList.remove('show'), 3500);
-  }
-
-  // ========== NETWORK MONITOR ==========
-  function updateOnlineStatus() {
-    const statusEl = document.getElementById('onlineStatus');
-    const dot = document.getElementById('statusDot');
-    const text = document.getElementById('statusText');
-    
-    if (isOnline) {
-      statusEl.className = 'online-status online';
-      dot.className = 'status-dot online';
-      text.textContent = 'متصل';
-    } else {
-      statusEl.className = 'online-status offline';
-      dot.className = 'status-dot offline';
-      text.textContent = 'غير متصل';
-    }
-  }
-
-  window.addEventListener('online', () => {
-    isOnline = true;
-    updateOnlineStatus();
-    showToast('🌐 تم استعادة الاتصال بالإنترنت', 'success');
-    setTimeout(() => {
-      loadPendingOrders();
-      loadAllStock();
-      loadTransactions();
-      loadWallet();
-      updateStats();
-    }, 1000);
-  });
-
-  window.addEventListener('offline', () => {
-    isOnline = false;
-    updateOnlineStatus();
-    showToast('⚠️ انقطع الاتصال بالإنترنت', 'error');
-  });
-
-  function startNetworkMonitoring() {
-    if (networkCheckInterval) clearInterval(networkCheckInterval);
-    
-    networkCheckInterval = setInterval(async () => {
-      const currentStatus = navigator.onLine;
-      if (currentStatus !== isOnline) {
-        isOnline = currentStatus;
-        updateOnlineStatus();
-        if (isOnline) {
-          showToast('🌐 تم استعادة الاتصال', 'success');
-          loadPendingOrders();
-          loadAllStock();
-          loadTransactions();
-          loadWallet();
-          updateStats();
-        } else {
-          showToast('⚠️ انقطع الاتصال بالإنترنت', 'error');
-        }
-      }
-    }, 5000);
-  }
-
-  // ===== وظيفة آمنة للطلبات =====
-  async function safeSupabaseRequest(requestFn, fallbackData = null) {
-    if (!isOnline) {
-      showToast('⚠️ لا يوجد اتصال بالإنترنت', 'error');
-      return fallbackData;
-    }
-    
-    try {
-      const result = await requestFn();
-      return result;
-    } catch (error) {
-      if (error.message?.includes('Failed to fetch') || 
-          error.message?.includes('NetworkError') ||
-          error.message?.includes('ERR_INTERNET_DISCONNECTED')) {
-        isOnline = false;
-        updateOnlineStatus();
-        showToast('❌ فشل الاتصال بالخادم', 'error');
+    // ========== THEME TOGGLE ==========
+    function toggleTheme() {
+      document.body.classList.toggle('blue-theme');
+      const isBlue = document.body.classList.contains('blue-theme');
+      const icon = document.querySelector('.theme-toggle i');
+      const label = document.getElementById('themeLabel');
+      if (isBlue) {
+        icon.className = 'fas fa-sun';
+        label.textContent = 'فاتح';
+        localStorage.setItem('theme', 'blue');
       } else {
-        console.error('Supabase error:', error);
-        showToast('❌ خطأ: ' + (error.message || 'حدث خطأ'), 'error');
+        icon.className = 'fas fa-moon';
+        label.textContent = 'داكن';
+        localStorage.setItem('theme', 'dark');
       }
-      return fallbackData;
     }
-  }
 
-  // ========== KEYBOARD SHORTCUTS ==========
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'F1') { e.preventDefault(); toggleScanner(); }
-    if (e.key === 'F2') { e.preventDefault(); document.getElementById('manualBarcode').focus(); }
-    if (e.key === 'F3') { e.preventDefault(); if (currentCart.length > 0) validateCartOrder(); }
-    if (e.key === 'Escape') { if (currentCart.length > 0) clearCart(); }
-  });
-
-  // ==========================================
-  // WALLET FUNCTIONS
-  // ==========================================
-  async function loadWallet() {
-    try {
-      const result = await safeSupabaseRequest(async () => {
-        return await sb.from('wallet').select('*').limit(1);
-      }, { data: [] });
-
-      if (result && result.data && result.data.length > 0) {
-        walletId = result.data[0].id;
-        document.getElementById('walletBalance').innerHTML = (result.data[0].balance || 0).toFixed(2) + ' <span>درهم</span>';
-      } else if (isOnline) {
-        const { data: newWallet, error: insertError } = await sb
-          .from('wallet')
-          .insert({ balance: 0, total_earned: 0, total_transferred: 0 })
-          .select()
-          .single();
-        if (!insertError) {
-          walletId = newWallet.id;
-          document.getElementById('walletBalance').innerHTML = '0.00 <span>درهم</span>';
-        }
+    // تحميل الثيم المخزن
+    function loadTheme() {
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme === 'blue') {
+        document.body.classList.add('blue-theme');
+        document.querySelector('.theme-toggle i').className = 'fas fa-sun';
+        document.getElementById('themeLabel').textContent = 'فاتح';
       }
+    }
 
-      if (!isOnline) {
-        document.getElementById('walletBalance').innerHTML = '0.00 <span>درهم</span>';
-        return;
+    // ========== TOAST ==========
+    function showToast(msg, type) {
+      const toast = document.getElementById('toastMsg');
+      const icon = document.querySelector('#toastMsg i');
+      const text = document.getElementById('toastText');
+      const icons = { success: 'fa-check-circle', error: 'fa-times-circle', warning: 'fa-exclamation-triangle',
+        info: 'fa-info-circle' };
+      icon.className = 'fas ' + (icons[type] || icons.info);
+      text.textContent = msg;
+      toast.className = `toast-msg ${type} show`;
+      clearTimeout(window._toastTimer);
+      window._toastTimer = setTimeout(() => toast.classList.remove('show'), 3500);
+    }
+
+    // ========== NETWORK ==========
+    function updateOnlineStatus() {
+      const statusEl = document.getElementById('sidebarStatus');
+      const dot = document.getElementById('sidebarDot');
+      const text = document.getElementById('sidebarStatusText');
+      if (isOnline) {
+        statusEl.className = 'online-status online';
+        dot.className = 'status-dot online';
+        text.textContent = 'متصل';
+      } else {
+        statusEl.className = 'online-status offline';
+        dot.className = 'status-dot offline';
+        text.textContent = 'غير متصل';
       }
-
-      const today = new Date();
-      today.setHours(0,0,0,0);
-      const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
-
-      const todayResult = await safeSupabaseRequest(async () => {
-        return await sb.from('orders').select('total').eq('status', 'completed').gte('created_at', today.toISOString());
-      }, { data: [] });
-      const todayProfit = todayResult?.data ? todayResult.data.reduce((s, o) => s + (o.total || 0), 0) : 0;
-
-      const monthResult = await safeSupabaseRequest(async () => {
-        return await sb.from('orders').select('total').eq('status', 'completed').gte('created_at', monthStart.toISOString());
-      }, { data: [] });
-      const monthProfit = monthResult?.data ? monthResult.data.reduce((s, o) => s + (o.total || 0), 0) : 0;
-
-      const totalResult = await safeSupabaseRequest(async () => {
-        return await sb.from('orders').select('total').eq('status', 'completed');
-      }, { data: [] });
-      const totalProfit = totalResult?.data ? totalResult.data.reduce((s, o) => s + (o.total || 0), 0) : 0;
-
-      document.getElementById('todayProfit').textContent = todayProfit.toFixed(2);
-      document.getElementById('monthProfit').textContent = monthProfit.toFixed(2);
-      document.getElementById('totalProfit').textContent = totalProfit.toFixed(2);
-
-    } catch(e) { console.error('Error loading wallet:', e); }
-  }
-
-  window.transferToProject = async function() {
-    const balanceText = document.getElementById('walletBalance').textContent;
-    const currentBalance = parseFloat(balanceText) || 0;
-    
-    if (currentBalance <= 0) {
-      showToast('⚠️ لا يوجد رصيد للتحويل', 'warning');
-      return;
     }
 
-    if (!isOnline) {
-      showToast('⚠️ لا يوجد اتصال بالإنترنت', 'error');
-      return;
-    }
+    window.addEventListener('online', () => {
+      isOnline = true;
+      updateOnlineStatus();
+      showToast('🌐 تم استعادة الاتصال بالإنترنت', 'success');
+      setTimeout(() => { loadAllStock();
+        loadWallet();
+        updateStats(); }, 1000);
+    });
 
-    if (!confirm(`💰 هل تريد تحويل ${currentBalance.toFixed(2)} درهم إلى المشروع؟`)) return;
+    window.addEventListener('offline', () => {
+      isOnline = false;
+      updateOnlineStatus();
+      showToast('⚠️ انقطع الاتصال بالإنترنت', 'error');
+    });
 
-    const btn = document.getElementById('transferBtn');
-    btn.disabled = true;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري...';
-
-    try {
-      await sb.from('wallet_transfers').insert({
-        amount: currentBalance,
-        status: 'completed',
-        note: 'تحويل من لاكيس إلى المشروع'
-      });
-
-      await sb
-        .from('wallet')
-        .update({ balance: 0, total_transferred: currentBalance, updated_at: new Date() })
-        .eq('id', walletId);
-
-      document.getElementById('walletBalance').innerHTML = '0.00 <span>درهم</span>';
-      showToast(`✅ تم تحويل ${currentBalance.toFixed(2)} درهم`, 'success');
-      
-      loadTransactions();
-      loadWallet();
-
-    } catch(e) {
-      console.error(e);
-      showToast('❌ خطأ: ' + e.message, 'error');
-    }
-
-    btn.disabled = false;
-    btn.innerHTML = '<i class="fas fa-arrow-up"></i> تحويل للمشروع';
-  };
-
-  // ==========================================
-  // BARCODE SCANNER
-  // ==========================================
-  let scannerActive = false;
-  let scannerStream = null;
-  let barcodeDetector = null;
-  const supportsBarcode = 'BarcodeDetector' in window;
-
-  async function toggleScanner() {
-    const btn = document.getElementById('scannerBtn');
-    const container = document.getElementById('scannerContainer');
-    const status = document.getElementById('scanStatus');
-
-    if (scannerActive) {
-      stopScanner();
-      btn.innerHTML = '<i class="fas fa-play"></i> تشغيل';
-      btn.classList.remove('stop');
-      scannerActive = false;
-      container.style.display = 'none';
-      status.textContent = '📷 الكاميرا متوقفة';
-      return;
-    }
-
-    try {
-      if (!supportsBarcode) {
-        status.textContent = '⚠️ متصفحك لا يدعم قراءة الباركود';
-        status.style.color = '#ffa502';
-        showToast('⚠️ متصفحك لا يدعم قراءة الباركود', 'warning');
-        return;
-      }
-
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: 'environment', width: { ideal: 640 }, height: { ideal: 480 } }
-      });
-
-      const video = document.getElementById('barcodeVideo');
-      video.srcObject = stream;
-      scannerStream = stream;
-
-      container.style.display = 'block';
-      btn.innerHTML = '<i class="fas fa-stop"></i> إيقاف';
-      btn.classList.add('stop');
-      scannerActive = true;
-      status.textContent = '📷 جاري البحث عن باركود...';
-      status.style.color = '#888';
-
-      startBarcodeDetection(video);
-    } catch(e) {
-      console.error(e);
-      status.textContent = '❌ لا يمكن الوصول للكاميرا';
-      status.style.color = '#ff4757';
-      showToast('❌ لا يمكن الوصول للكاميرا', 'error');
-    }
-  }
-
-  function stopScanner() {
-    if (scannerStream) {
-      scannerStream.getTracks().forEach(track => track.stop());
-      scannerStream = null;
-    }
-    scannerActive = false;
-    document.getElementById('barcodeVideo').srcObject = null;
-  }
-
-  async function startBarcodeDetection(video) {
-    if (!supportsBarcode) return;
-
-    try {
-      barcodeDetector = new BarcodeDetector({ 
-        formats: ['ean_13', 'ean_8', 'code_128', 'code_39', 'qr_code', 'upc_a', 'upc_e'] 
-      });
-
-      const detectLoop = async () => {
-        if (!scannerActive) return;
-
-        try {
-          const barcodes = await barcodeDetector.detect(video);
-          if (barcodes.length > 0) {
-            const code = barcodes[0].rawValue;
-            document.getElementById('scanStatus').textContent = '✅ تم قراءة: ' + code;
-            document.getElementById('scanStatus').style.color = '#25D366';
-            await addByBarcode(code);
-            await new Promise(resolve => setTimeout(resolve, 1500));
+    function startNetworkMonitoring() {
+      if (networkCheckInterval) clearInterval(networkCheckInterval);
+      networkCheckInterval = setInterval(async () => {
+        const currentStatus = navigator.onLine;
+        if (currentStatus !== isOnline) {
+          isOnline = currentStatus;
+          updateOnlineStatus();
+          if (isOnline) {
+            showToast('🌐 تم استعادة الاتصال', 'success');
+            loadAllStock();
+            loadWallet();
+            updateStats();
+          } else {
+            showToast('⚠️ انقطع الاتصال بالإنترنت', 'error');
           }
-        } catch(e) { /* no barcode */ }
-
-        if (scannerActive) {
-          requestAnimationFrame(detectLoop);
         }
-      };
-
-      detectLoop();
-    } catch(e) {
-      console.error('Barcode detection error:', e);
-      document.getElementById('scanStatus').textContent = '❌ خطأ في القراءة';
-      document.getElementById('scanStatus').style.color = '#ff4757';
-    }
-  }
-
-  window.addByBarcode = async function(barcode) {
-    if (!barcode || barcode.trim() === '') {
-      showToast('⚠️ الرجاء إدخال الباركود', 'warning');
-      return;
+      }, 5000);
     }
 
-    const trimmed = barcode.trim();
-    document.getElementById('manualBarcode').value = '';
+    async function safeSupabaseRequest(requestFn, fallbackData = null) {
+      if (!isOnline) { showToast('⚠️ لا يوجد اتصال بالإنترنت', 'error'); return fallbackData; }
+      try {
+        return await requestFn();
+      } catch (error) {
+        if (error.message?.includes('Failed to fetch') || error.message?.includes('NetworkError')) {
+          isOnline = false;
+          updateOnlineStatus();
+          showToast('❌ فشل الاتصال بالخادم', 'error');
+        } else {
+          console.error('Supabase error:', error);
+          showToast('❌ خطأ: ' + (error.message || 'حدث خطأ'), 'error');
+        }
+        return fallbackData;
+      }
+    }
 
-    try {
-      const { data, error } = await sb
-        .from('products')
-        .select('id, name, price, stock, sku, low_stock_threshold')
-        .eq('sku', trimmed)
-        .maybeSingle();
+    // ========== KEYBOARD SHORTCUTS ==========
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'F1') { e.preventDefault();
+        toggleScanner(); }
+      if (e.key === 'F2') { e.preventDefault();
+        document.getElementById('manualBarcode').focus(); }
+      if (e.key === 'F3') { e.preventDefault(); if (currentCart.length > 0) validateCartOrder(); }
+      if (e.key === 'Escape') { if (currentCart.length > 0) clearCart(); }
+    });
 
-      if (error) throw error;
+    // ========== WALLET ==========
+    async function loadWallet() {
+      try {
+        const result = await safeSupabaseRequest(async () => await sb.from('wallet').select('*').limit(1), { data: [] });
+        if (result && result.data && result.data.length > 0) {
+          walletId = result.data[0].id;
+          document.getElementById('walletBalance').innerHTML = (result.data[0].balance || 0).toFixed(2) + ' <span>درهم</span>';
+        } else if (isOnline) {
+          const { data: newWallet } = await sb.from('wallet').insert({ balance: 0, total_earned: 0,
+              total_transferred: 0 }).select().single();
+          if (newWallet) { walletId = newWallet.id;
+            document.getElementById('walletBalance').innerHTML = '0.00 <span>درهم</span>'; }
+        }
+      } catch (e) { console.error('Error loading wallet:', e); }
+    }
 
-      if (!data) {
-        showToast('❌ لا يوجد منتج بهذا الباركود', 'error');
+    async function transferToProject() {
+      const balanceText = document.getElementById('walletBalance').textContent;
+      const currentBalance = parseFloat(balanceText) || 0;
+      if (currentBalance <= 0) { showToast('⚠️ لا يوجد رصيد للتحويل', 'warning'); return; }
+      if (!isOnline) { showToast('⚠️ لا يوجد اتصال بالإنترنت', 'error'); return; }
+      if (!confirm(`💰 هل تريد تحويل ${currentBalance.toFixed(2)} درهم إلى المشروع؟`)) return;
+      const btn = document.getElementById('transferBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري...';
+      try {
+        await sb.from('wallet_transfers').insert({ amount: currentBalance, status: 'completed',
+          note: 'تحويل من لاكيس إلى المشروع' });
+        await sb.from('wallet').update({ balance: 0, total_transferred: currentBalance, updated_at: new Date() }).eq('id',
+          walletId);
+        document.getElementById('walletBalance').innerHTML = '0.00 <span>درهم</span>';
+        showToast(`✅ تم تحويل ${currentBalance.toFixed(2)} درهم`, 'success');
+        loadWallet();
+      } catch (e) { console.error(e);
+        showToast('❌ خطأ: ' + e.message, 'error'); }
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fas fa-arrow-up"></i> تحويل';
+    }
+
+    // ========== BARCODE SCANNER ==========
+    let scannerActive = false,
+      scannerStream = null,
+      barcodeDetector = null;
+    const supportsBarcode = 'BarcodeDetector' in window;
+
+    async function toggleScanner() {
+      const btn = document.getElementById('scannerBtn');
+      const container = document.getElementById('scannerContainer');
+      const status = document.getElementById('scanStatus');
+      if (scannerActive) {
+        if (scannerStream) { scannerStream.getTracks().forEach(t => t.stop());
+          scannerStream = null; }
+        scannerActive = false;
+        btn.innerHTML = '<i class="fas fa-play"></i> تشغيل';
+        btn.classList.remove('stop');
+        container.style.display = 'none';
+        status.textContent = '📷 الكاميرا متوقفة';
         return;
       }
+      try {
+        if (!supportsBarcode) { status.textContent = '⚠️ متصفحك لا يدعم قراءة الباركود';
+          showToast('⚠️ متصفحك لا يدعم قراءة الباركود', 'warning'); return; }
+        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment', width: { ideal: 640 },
+            height: { ideal: 480 } } });
+        const video = document.getElementById('barcodeVideo');
+        video.srcObject = stream;
+        scannerStream = stream;
+        container.style.display = 'block';
+        btn.innerHTML = '<i class="fas fa-stop"></i> إيقاف';
+        btn.classList.add('stop');
+        scannerActive = true;
+        status.textContent = '📷 جاري البحث عن باركود...';
+        startBarcodeDetection(video);
+      } catch (e) {
+        console.error(e);
+        status.textContent = '❌ لا يمكن الوصول للكاميرا';
+        showToast('❌ لا يمكن الوصول للكاميرا', 'error');
+      }
+    }
 
-      if (data.stock <= 0) {
-        showToast('⚠️ ' + data.name + ' غير متوفر', 'warning');
+    async function startBarcodeDetection(video) {
+      if (!supportsBarcode) return;
+      try {
+        barcodeDetector = new BarcodeDetector({ formats: ['ean_13', 'ean_8', 'code_128', 'code_39', 'qr_code', 'upc_a',
+            'upc_e'
+          ] });
+        const detectLoop = async () => {
+          if (!scannerActive) return;
+          try {
+            const barcodes = await barcodeDetector.detect(video);
+            if (barcodes.length > 0) {
+              const code = barcodes[0].rawValue;
+              document.getElementById('scanStatus').textContent = '✅ تم قراءة: ' + code;
+              await addByBarcode(code);
+              await new Promise(resolve => setTimeout(resolve, 1500));
+            }
+          } catch (e) {}
+          if (scannerActive) requestAnimationFrame(detectLoop);
+        };
+        detectLoop();
+      } catch (e) { console.error('Barcode detection error:', e); }
+    }
+
+    async function addByBarcode(barcode) {
+      if (!barcode || barcode.trim() === '') { showToast('⚠️ الرجاء إدخال الباركود', 'warning'); return; }
+      const trimmed = barcode.trim();
+      document.getElementById('manualBarcode').value = '';
+      try {
+        const { data, error } = await sb.from('products').select('id, name, price, stock, sku, low_stock_threshold').eq(
+          'sku', trimmed).maybeSingle();
+        if (error) throw error;
+        if (!data) { showToast('❌ لا يوجد منتج بهذا الباركود', 'error'); return; }
+        if (data.stock <= 0) { showToast('⚠️ ' + data.name + ' غير متوفر', 'warning'); return; }
+        addToCart(data);
+        showToast('✅ تم إضافة ' + data.name, 'success');
+      } catch (e) { console.error(e);
+        showToast('❌ خطأ: ' + e.message, 'error'); }
+    }
+
+    // ========== CART ==========
+    function addToCart(product) {
+      const existing = currentCart.find(item => item.id === product.id);
+      if (existing) {
+        if (existing.quantity >= existing.stock) { showToast('⚠️ الكمية المطلوبة أكبر من المخزون', 'warning'); return; }
+        existing.quantity += 1;
+      } else {
+        currentCart.push({ id: product.id, name: product.name, price: product.price, quantity: 1, sku: product.sku,
+          stock: product.stock, low_stock_threshold: product.low_stock_threshold || 5 });
+      }
+      renderCart();
+      document.getElementById('cartCount').textContent = '(' + currentCart.reduce((sum, item) => sum + item.quantity, 0) +
+        ')';
+    }
+
+    function removeFromCart(index) { currentCart.splice(index, 1);
+      renderCart(); }
+
+    function changeQuantity(index, delta) {
+      const item = currentCart[index];
+      if (!item) return;
+      const newQty = item.quantity + delta;
+      if (newQty <= 0) { currentCart.splice(index, 1); } else if (newQty > item.stock) { showToast(
+          '⚠️ الكمية المطلوبة أكبر من المخزون', 'warning'); return; } else { item.quantity = newQty; }
+      renderCart();
+    }
+
+    function clearCart() {
+      if (currentCart.length === 0) return;
+      if (!confirm('🧹 هل تريد تفريغ السلة؟')) return;
+      currentCart = [];
+      renderCart();
+      showToast('🗑️ تم تفريغ السلة', 'info');
+    }
+
+    function renderCart() {
+      const itemsContainer = document.getElementById('cartItems');
+      const totalSpan = document.getElementById('cartTotal');
+      const countSpan = document.getElementById('cartCount');
+      
+      if (currentCart.length === 0) {
+        itemsContainer.innerHTML =
+          `<div class="cart-empty"><i class="fas fa-shopping-bag"></i><p>السلة فارغة</p><p style="font-size:0.65rem;">أضف منتجات</p></div>`;
+        totalSpan.textContent = '0.00 درهم';
+        countSpan.textContent = '(0)';
         return;
       }
-
-      const threshold = data.low_stock_threshold || 5;
-      if (data.stock <= threshold) {
-        showToast('⚠️ تنبيه: ' + data.name + ' متبقي ' + data.stock + ' قطع', 'warning');
-      }
-
-      addToCart(data);
-      showToast('✅ تم إضافة ' + data.name, 'success');
-
-    } catch(e) {
-      console.error(e);
-      showToast('❌ خطأ: ' + e.message, 'error');
-    }
-  };
-
-  // ==========================================
-  // CART FUNCTIONS
-  // ==========================================
-  function addToCart(product) {
-    const existing = currentCart.find(item => item.id === product.id);
-    if (existing) {
-      if (existing.quantity >= existing.stock) {
-        showToast('⚠️ الكمية المطلوبة أكبر من المخزون', 'warning');
-        return;
-      }
-      existing.quantity += 1;
-    } else {
-      currentCart.push({
-        id: product.id,
-        name: product.name,
-        price: product.price,
-        quantity: 1,
-        sku: product.sku,
-        stock: product.stock,
-        low_stock_threshold: product.low_stock_threshold || 5
-      });
-    }
-    renderCart();
-    document.getElementById('cartCount').textContent = '(' + currentCart.reduce((sum, item) => sum + item.quantity, 0) + ')';
-  }
-
-  function removeFromCart(index) {
-    currentCart.splice(index, 1);
-    renderCart();
-  }
-
-  function changeQuantity(index, delta) {
-    const item = currentCart[index];
-    if (!item) return;
-    const newQty = item.quantity + delta;
-    if (newQty <= 0) {
-      currentCart.splice(index, 1);
-    } else if (newQty > item.stock) {
-      showToast('⚠️ الكمية المطلوبة أكبر من المخزون', 'warning');
-      return;
-    } else {
-      item.quantity = newQty;
-    }
-    renderCart();
-  }
-
-  function clearCart() {
-    if (currentCart.length === 0) return;
-    if (!confirm('🧹 هل تريد تفريغ السلة؟')) return;
-    currentCart = [];
-    currentCustomer = null;
-    renderCart();
-    showToast('🗑️ تم تفريغ السلة', 'info');
-  }
-
-  function renderCart() {
-    const itemsContainer = document.getElementById('cartItems');
-    const totalSpan = document.getElementById('cartTotal');
-    const countSpan = document.getElementById('cartCount');
-
-    if (currentCart.length === 0) {
-      itemsContainer.innerHTML = `
-        <div class="cart-empty">
-          <i class="fas fa-shopping-bag"></i>
-          <p>السلة فارغة</p>
-          <p style="font-size:0.65rem;">أضف منتجات</p>
-        </div>
-      `;
-      totalSpan.textContent = '0 درهم';
-      countSpan.textContent = '(0)';
-      return;
-    }
-
-    const totalItems = currentCart.reduce((sum, item) => sum + item.quantity, 0);
-    countSpan.textContent = '(' + totalItems + ')';
-
-    itemsContainer.innerHTML = currentCart.map((item, index) => {
-      const isLowStock = (item.stock - item.quantity) <= (item.low_stock_threshold || 5);
-      return `
-        <div class="cart-item">
+      
+      countSpan.textContent = '(' + currentCart.reduce((sum, item) => sum + item.quantity, 0) + ')';
+      
+      itemsContainer.innerHTML = currentCart.map((item, index) => {
+        const isLowStock = (item.stock - item.quantity) <= (item.low_stock_threshold || 5);
+        return `<div class="cart-item">
           <span class="item-name">${escapeHtml(item.name)} ${isLowStock ? '<span class="low-stock-alert">⚠️</span>' : ''}</span>
-          <span class="item-price">${item.price} درهم</span>
+          <span class="item-price">${item.price.toFixed(2)} درهم</span>
           <div class="item-qty">
             <button onclick="changeQuantity(${index}, -1)">−</button>
             <span class="qty-num">${item.quantity}</span>
             <button onclick="changeQuantity(${index}, 1)">+</button>
             <button class="btn-remove" onclick="removeFromCart(${index})">×</button>
           </div>
-        </div>
-      `;
-    }).join('');
-
-    const total = currentCart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    totalSpan.textContent = total.toFixed(0) + ' درهم';
-  }
-
-  window.validateCartOrder = async function() {
-    if (currentCart.length === 0) {
-      showToast('⚠️ السلة فارغة', 'warning');
-      return;
+        </div>`;
+      }).join('');
+      
+      const total = currentCart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      totalSpan.textContent = total.toFixed(2) + ' درهم';
     }
 
-    if (!isOnline) {
-      showToast('⚠️ لا يوجد اتصال بالإنترنت', 'error');
-      return;
-    }
+    // ========== VALIDATE CART ORDER ==========
+    async function validateCartOrder() {
+      if (currentCart.length === 0) {
+        showToast('⚠️ السلة فارغة', 'warning');
+        return;
+      }
+      if (!isOnline) {
+        showToast('⚠️ لا يوجد اتصال بالإنترنت', 'error');
+        return;
+      }
 
-    const total = currentCart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      const total = currentCart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      if (!confirm(`✅ تأكيد الطلب بمبلغ ${total.toFixed(2)} درهم؟`)) return;
 
-    if (!confirm(`✅ تأكيد الطلب بمبلغ ${total.toFixed(0)} درهم؟`)) return;
+      const btn = document.getElementById('validateBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري المعالجة...';
 
-    cartItemsForReceipt = JSON.parse(JSON.stringify(currentCart));
-
-    const btn = document.getElementById('validateBtn');
-    btn.disabled = true;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري المعالجة...';
-
-    try {
-      const { data: order, error: orderError } = await sb
-        .from('orders')
-        .insert({
+      try {
+        const { data: order, error: orderError } = await sb.from('orders').insert({
           customer_name: 'كليان لاكيس',
           customer_phone: 'بدون رقم',
           customer_address: 'بدون عنوان',
           total: total,
           subtotal: total,
           status: 'completed'
-        })
-        .select()
-        .single();
+        }).select().single();
 
-      if (orderError) throw orderError;
+        if (orderError) throw orderError;
 
-      for (const item of currentCart) {
-        await sb.from('order_items').insert({
-          order_id: order.id,
-          product_id: item.id,
-          product_name: item.name,
-          product_price: item.price,
-          quantity: item.quantity,
-          subtotal: item.price * item.quantity
-        });
+        for (const item of currentCart) {
+          const { error: itemError } = await sb.from('order_items').insert({
+            order_id: order.id,
+            product_id: item.id,
+            product_name: item.name,
+            price: item.price,
+            quantity: item.quantity,
+            subtotal: item.price * item.quantity
+          });
 
-        const { data: product } = await sb
-          .from('products')
-          .select('stock')
-          .eq('id', item.id)
-          .single();
+          if (itemError) throw itemError;
 
-        const newStock = Math.max(0, (product?.stock || 0) - item.quantity);
-        
-        await sb
-          .from('products')
-          .update({ stock: newStock, updated_at: new Date() })
-          .eq('id', item.id);
+          const { data: product } = await sb.from('products').select('stock').eq('id', item.id).single();
+          const newStock = Math.max(0, (product?.stock || 0) - item.quantity);
+          await sb.from('products').update({
+            stock: newStock,
+            updated_at: new Date()
+          }).eq('id', item.id);
 
-        await sb.from('stock_movements').insert({
-          product_id: item.id,
-          change: -item.quantity,
-          reason: 'sale',
-          note: `بيع عبر لاكيس - طلب #${order.id.slice(0,8)}`
-        });
+          await sb.from('stock_movements').insert({
+            product_id: item.id,
+            change: -item.quantity,
+            reason: 'sale',
+            note: `بيع عبر لاكيس - طلب #${order.id.slice(0,8)}`
+          });
+        }
+
+        const balanceText = document.getElementById('walletBalance').textContent;
+        const currentBalance = parseFloat(balanceText) || 0;
+        const newBalance = currentBalance + total;
+        document.getElementById('walletBalance').innerHTML = newBalance.toFixed(2) + ' <span>درهم</span>';
+
+        if (walletId) {
+          await sb.from('wallet').update({
+            balance: newBalance,
+            total_earned: newBalance,
+            updated_at: new Date()
+          }).eq('id', walletId);
+        }
+
+        showToast('✅ تم تأكيد الدفع', 'success');
+        currentCart = [];
+        renderCart();
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-check-circle"></i> تم الدفع والاستلام (F3)';
+
+        updateStats();
+        loadWallet();
+
+      } catch (e) {
+        console.error(e);
+        showToast('❌ خطأ: ' + e.message, 'error');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-check-circle"></i> تم الدفع والاستلام (F3)';
       }
-
-      const balanceText = document.getElementById('walletBalance').textContent;
-      const currentBalance = parseFloat(balanceText) || 0;
-      const newBalance = currentBalance + total;
-      document.getElementById('walletBalance').innerHTML = newBalance.toFixed(2) + ' <span>درهم</span>';
-
-      if (walletId) {
-        await sb
-          .from('wallet')
-          .update({ balance: newBalance, total_earned: newBalance, updated_at: new Date() })
-          .eq('id', walletId);
-      }
-
-      showToast('✅ تم تأكيد الدفع', 'success');
-
-      currentCart = [];
-      currentCustomer = null;
-      cartItemsForReceipt = [];
-      renderCart();
-      btn.disabled = false;
-      btn.innerHTML = '<i class="fas fa-check-circle"></i> تم الدفع والاستلام (F3)';
-
-      loadPendingOrders();
-      updateStats();
-      loadTransactions();
-      loadWallet();
-
-    } catch(e) {
-      console.error(e);
-      showToast('❌ خطأ: ' + e.message, 'error');
-      btn.disabled = false;
-      btn.innerHTML = '<i class="fas fa-check-circle"></i> تم الدفع والاستلام (F3)';
-    }
-  };
-
-  // ==========================================
-  // STATS
-  // ==========================================
-  async function updateStats() {
-    if (!isOnline) return;
-    
-    try {
-      const today = new Date();
-      today.setHours(0,0,0,0);
-      const tomorrow = new Date(today);
-      tomorrow.setDate(tomorrow.getDate() + 1);
-
-      const { data, error } = await sb
-        .from('orders')
-        .select('total')
-        .gte('created_at', today.toISOString())
-        .lt('created_at', tomorrow.toISOString());
-
-      if (!error && data) {
-        document.getElementById('todayOrders').textContent = data.length;
-        const sales = data.reduce((sum, o) => sum + (o.total || 0), 0);
-        document.getElementById('todaySales').textContent = sales.toFixed(0);
-      }
-
-      const threshold = 5;
-      const { data: lowStock, error: stockError } = await sb
-        .from('products')
-        .select('id')
-        .lte('stock', threshold);
-
-      if (!stockError && lowStock) {
-        document.getElementById('lowStockCount').textContent = lowStock.length;
-      }
-
-    } catch(e) { console.error(e); }
-  }
-
-  // ==========================================
-  // ORDERS
-  // ==========================================
-  async function loadPendingOrders() {
-    const container = document.getElementById('ordersList');
-    const empty = document.getElementById('emptyState');
-    
-    if (!sb) {
-      showToast('❌ Supabase غير جاهز', 'error');
-      return;
     }
 
-    const result = await safeSupabaseRequest(async () => {
-      return await sb
-        .from('orders')
-        .select('*, items:order_items(*)')
-        .in('status', ['pending', 'confirmed'])
-        .order('created_at', { ascending: false });
-    }, { data: [] });
-
-    if (!result || result.error) {
-      empty.style.display = 'block';
-      container.innerHTML = '';
-      return;
+    // ========== STATS ==========
+    async function updateStats() {
+      if (!isOnline) return;
+      try {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const tomorrow = new Date(today);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        const { data, error } = await sb.from('orders').select('total').gte('created_at', today.toISOString()).lt(
+          'created_at', tomorrow.toISOString());
+        if (!error && data) {
+          document.getElementById('todayOrders').textContent = data.length;
+          document.getElementById('todaySales').textContent = data.reduce((sum, o) => sum + (o.total || 0), 0).toFixed(2);
+        }
+        const { data: lowStock } = await sb.from('products').select('id').lte('stock', 5);
+        if (lowStock) document.getElementById('lowStockCount').textContent = lowStock.length;
+      } catch (e) { console.error(e); }
     }
 
-    allOrders = result.data || [];
-    
-    if (allOrders.length === 0) {
-      empty.style.display = 'block';
-      container.innerHTML = '';
-      return;
+    // ========== STOCK ==========
+    async function loadAllStock() {
+      const grid = document.getElementById('productsGrid');
+      const empty = document.getElementById('stockEmptyState');
+      if (!sb) { showToast('❌ Supabase غير جاهز', 'error'); return; }
+      try {
+        const { data, error } = await sb.from('products').select(
+          'id, name, sku, price, stock, low_stock_threshold, images, is_available').order('name');
+        if (error) throw error;
+        allProducts = data || [];
+        if (allProducts.length === 0) { empty.style.display = 'block';
+          grid.innerHTML = ''; return; }
+        empty.style.display = 'none';
+        renderStockProducts(allProducts);
+      } catch (e) { console.error(e); }
     }
 
-    empty.style.display = 'none';
-    renderOrders(allOrders);
-  }
-
-  async function searchOrders() {
-    const searchTerm = document.getElementById('searchInput').value.trim().toLowerCase();
-    const container = document.getElementById('ordersList');
-    const empty = document.getElementById('emptyState');
-
-    if (!searchTerm) {
-      loadPendingOrders();
-      return;
+    async function searchStock() {
+      const searchTerm = document.getElementById('stockSearchInput').value.trim().toLowerCase();
+      const grid = document.getElementById('productsGrid');
+      const empty = document.getElementById('stockEmptyState');
+      if (!searchTerm) { loadAllStock(); return; }
+      if (!sb || !isOnline) { showToast('⚠️ لا يوجد اتصال', 'error'); return; }
+      try {
+        const { data, error } = await sb.from('products').select(
+          'id, name, sku, price, stock, low_stock_threshold, images, is_available').or(
+          `name.ilike.%${searchTerm}%,sku.ilike.%${searchTerm}%`).order('name');
+        if (error) throw error;
+        allProducts = data || [];
+        if (allProducts.length === 0) { empty.style.display = 'block';
+          empty.innerHTML =
+            `<i class="fas fa-search"></i><p style="font-size:0.8rem;">لا توجد منتجات لـ "${searchTerm}"</p>`;
+          grid.innerHTML = ''; return; }
+        empty.style.display = 'none';
+        renderStockProducts(allProducts);
+      } catch (e) { console.error(e);
+        showToast('❌ خطأ: ' + e.message, 'error'); }
     }
 
-    if (!sb || !isOnline) {
-      showToast('⚠️ لا يوجد اتصال', 'error');
-      return;
+    function renderStockProducts(products) {
+      const grid = document.getElementById('productsGrid');
+      grid.innerHTML = products.map(p => {
+        const stockStatus = p.stock <= 0 ? 'out' : (p.stock <= (p.low_stock_threshold || 5) ? 'low' : 'ok');
+        const stockLabels = { ok: '✅ متوفر', low: '⚠️ منخفض', out: '❌ نفذ' };
+        const stockClasses = { ok: 'stock-ok', low: 'stock-low', out: 'stock-out' };
+        const img = (p.images && p.images[0]) ? p.images[0] :
+        'https://placehold.co/40x40/0057b3/fff?text=M';
+        const inStock = p.stock > 0;
+        return `<div class="product-card"><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;"><img src="${img}" class="product-img" alt="${escapeHtml(p.name)}"><div><div class="p-name">${escapeHtml(p.name)}</div><div class="p-sku">${escapeHtml(p.sku || '—')}</div></div></div><div class="p-price">${p.price.toFixed(2)} درهم</div><div class="p-stock-info"><span class="${stockClasses[stockStatus]}">${stockLabels[stockStatus]}</span><span style="color:var(--text-dim);font-size:0.6rem;"> (${p.stock || 0} حبة)</span></div><button class="btn-add-stock" ${!inStock ? 'disabled' : ''} onclick="addFromStockSearch('${p.id}')"><i class="fas fa-cart-plus"></i> ${inStock ? 'إضافة للسلة' : 'غير متوفر'}</button></div>`;
+      }).join('');
     }
 
-    try {
-      const { data, error } = await sb
-        .from('orders')
-        .select('*, items:order_items(*)')
-        .in('status', ['pending', 'confirmed'])
-        .or(`customer_name.ilike.%${searchTerm}%,customer_phone.ilike.%${searchTerm}%`)
-        .order('created_at', { ascending: false });
+    function addFromStockSearch(productId) {
+      const product = allProducts.find(p => p.id === productId);
+      if (!product) { showToast('❌ المنتج غير موجود', 'error'); return; }
+      if (product.stock <= 0) { showToast('⚠️ ' + product.name + ' غير متوفر', 'warning'); return; }
+      addToCart({ id: product.id, name: product.name, price: product.price, stock: product.stock,
+        low_stock_threshold: product.low_stock_threshold || 5, sku: product.sku });
+      showToast('✅ تم إضافة ' + product.name, 'success');
+    }
 
-      if (error) throw error;
+    // ==========================================
+    // RETURN PRODUCT FUNCTIONALITY
+    // ==========================================
 
-      allOrders = data || [];
+    let selectedOrderForReturn = null;
+
+    function showReturnModal() {
+      const existing = document.querySelector('.return-modal-overlay');
+      if (existing) existing.remove();
+
+      const overlay = document.createElement('div');
+      overlay.className = 'return-modal-overlay';
+      overlay.id = 'returnModalOverlay';
+
+      overlay.innerHTML = `
+        <div class="return-modal">
+          <div class="modal-header">
+            <h2><i class="fas fa-undo" style="color:var(--danger);"></i> إرجاع منتج</h2>
+            <button class="modal-close" onclick="closeReturnModal()">×</button>
+          </div>
+          
+          <div style="margin-bottom:12px;">
+            <label style="color:var(--text-dim);font-size:0.8rem;">🔍 ابحث عن الطلب (رقم الطلب أو اسم الزبون)</label>
+            <input type="text" id="returnSearchInput" class="search-input" placeholder="رقم الطلب أو اسم الزبون..." onkeyup="if(event.key==='Enter') searchOrderForReturn()">
+          </div>
+          
+          <button class="btn-search-full" onclick="searchOrderForReturn()">
+            <i class="fas fa-search"></i> بحث
+          </button>
+          
+          <div id="returnResults" class="return-results">
+            <div class="empty-results">
+              <i class="fas fa-search"></i>
+              <p>ابحث عن طلب لإرجاع منتج منه</p>
+            </div>
+          </div>
+        </div>
+      `;
+
+      document.body.appendChild(overlay);
       
-      if (allOrders.length === 0) {
-        empty.style.display = 'block';
-        empty.innerHTML = `<i class="fas fa-search"></i><p style="font-size:0.85rem;">لا توجد طلبات لـ "${searchTerm}"</p>`;
-        container.innerHTML = '';
+      setTimeout(() => {
+        document.getElementById('returnSearchInput')?.focus();
+      }, 100);
+    }
+
+    function closeReturnModal() {
+      const overlay = document.getElementById('returnModalOverlay');
+      if (overlay) overlay.remove();
+      selectedOrderForReturn = null;
+    }
+
+    async function searchOrderForReturn() {
+      const searchTerm = document.getElementById('returnSearchInput').value.trim();
+      const resultsContainer = document.getElementById('returnResults');
+
+      if (!searchTerm) {
+        resultsContainer.innerHTML = `
+          <div class="empty-results">
+            <i class="fas fa-search"></i>
+            <p>ابحث عن طلب لإرجاع منتج منه</p>
+          </div>
+        `;
         return;
       }
 
-      empty.style.display = 'none';
-      renderOrders(allOrders);
-    } catch(e) {
-      console.error(e);
-      showToast('❌ خطأ: ' + e.message, 'error');
-    }
-  }
+      if (!isOnline) {
+        showToast('⚠️ لا يوجد اتصال بالإنترنت', 'error');
+        return;
+      }
 
-  function renderOrders(orders) {
-    const container = document.getElementById('ordersList');
-    
-    container.innerHTML = orders.map(order => {
-      const items = order.items || [];
-      const total = order.total || items.reduce((sum, item) => sum + (item.product_price * item.quantity), 0);
-      const statusLabels = { pending: '⏳ قيد المراجعة', confirmed: '✅ جاهز للاستلام', completed: '✔️ تم البيع', cancelled: '❌ ملغي' };
-      const statusClass = order.status === 'pending' ? 'pending' : (order.status === 'confirmed' ? 'confirmed' : 'completed');
+      try {
+        let data = [];
+        const searchLower = searchTerm.toLowerCase();
 
-      return `
-        <div class="order-card" data-order-id="${order.id}">
-          <div class="order-header">
-            <div>
-              <div class="customer-name">${escapeHtml(order.customer_name || 'كليان')}</div>
-              <div class="customer-phone"><i class="fas fa-phone"></i> ${escapeHtml(order.customer_phone || '—')}</div>
-              <div class="order-id">#${order.id.slice(0,8)} • ${new Date(order.created_at).toLocaleString('ar-MA')}</div>
+        const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(searchTerm);
+        const isShortUUID = /^[0-9a-f]{8,}$/i.test(searchTerm) && searchTerm.length >= 8;
+
+        if (isUUID || isShortUUID) {
+          let query = sb
+            .from('orders')
+            .select('*, items:order_items(*)')
+            .eq('status', 'completed')
+            .order('created_at', { ascending: false })
+            .limit(10);
+
+          if (isUUID) {
+            query = query.eq('id', searchTerm);
+          } else {
+            query = query.ilike('id', `${searchTerm}%`);
+          }
+
+          const { data: idData, error: idError } = await query;
+          
+          if (!idError && idData && idData.length > 0) {
+            data = idData;
+          }
+        }
+
+        if (data.length === 0) {
+          const { data: nameData, error: nameError } = await sb
+            .from('orders')
+            .select('*, items:order_items(*)')
+            .eq('status', 'completed')
+            .ilike('customer_name', `%${searchTerm}%`)
+            .order('created_at', { ascending: false })
+            .limit(10);
+          
+          if (!nameError && nameData && nameData.length > 0) {
+            data = nameData;
+          }
+        }
+
+        if (data.length === 0 && searchTerm.length >= 4) {
+          const { data: shortData, error: shortError } = await sb
+            .from('orders')
+            .select('*, items:order_items(*)')
+            .eq('status', 'completed')
+            .order('created_at', { ascending: false })
+            .limit(20);
+
+          if (!shortError && shortData && shortData.length > 0) {
+            data = shortData.filter(order => 
+              order.id.toLowerCase().startsWith(searchLower)
+            );
+          }
+        }
+
+        if (!data || data.length === 0) {
+          resultsContainer.innerHTML = `
+            <div class="empty-results">
+              <i class="fas fa-times-circle" style="color:var(--danger);"></i>
+              <p>لا توجد طلبات مطابقة لـ "${searchTerm}"</p>
+              <p style="font-size:0.7rem;margin-top:4px;color:var(--text-dim);">
+                تأكد من صحة رقم الطلب أو اسم الزبون
+              </p>
             </div>
-            <div>
-              <span class="order-status ${statusClass}">${statusLabels[order.status] || order.status}</span>
-              <span style="margin-right:6px;color:var(--blue-primary);font-weight:bold;font-size:0.8rem;">${total.toFixed(0)} درهم</span>
+          `;
+          return;
+        }
+
+        resultsContainer.innerHTML = data.map(order => {
+          const items = order.items || [];
+          const total = order.total || items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+          return `
+            <div class="return-result-item">
+              <div class="order-header">
+                <div>
+                  <div class="order-id">#${order.id.slice(0,8)}</div>
+                  <div class="order-customer">${escapeHtml(order.customer_name || 'كليان لاكيس')}</div>
+                  <div class="order-date">${new Date(order.created_at).toLocaleString('ar-MA')}</div>
+                </div>
+                <div style="text-align:left;">
+                  <div class="order-total">${total.toFixed(2)} درهم</div>
+                  <button class="btn-select-order" onclick="selectOrderForReturn('${order.id}')">
+                    <i class="fas fa-check"></i> اختيار
+                  </button>
+                </div>
+              </div>
+              <div class="order-products">
+                ${items.map(item => `${escapeHtml(item.product_name)} (×${item.quantity})`).join('، ')}
+              </div>
             </div>
+          `;
+        }).join('');
+
+      } catch (e) {
+        console.error(e);
+        showToast('❌ خطأ: ' + e.message, 'error');
+        resultsContainer.innerHTML = `
+          <div class="empty-results">
+            <i class="fas fa-exclamation-triangle" style="color:var(--danger);"></i>
+            <p>خطأ: ${e.message}</p>
           </div>
+        `;
+      }
+    }
 
-          <div style="margin:4px 0;">
-            ${items.map(item => `
-              <div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid var(--border);font-size:0.7rem;">
-                <span>${escapeHtml(item.product_name || 'منتج')}</span>
-                <span>× ${item.quantity}</span>
-                <span style="color:var(--blue-primary);">${(item.product_price * item.quantity).toFixed(0)} درهم</span>
+    async function selectOrderForReturn(orderId) {
+      try {
+        const { data: order, error } = await sb
+          .from('orders')
+          .select('*, items:order_items(*)')
+          .eq('id', orderId)
+          .single();
+
+        if (error) throw error;
+
+        const items = order.items || [];
+        if (items.length === 0) {
+          showToast('⚠️ هذا الطلب لا يحتوي على منتجات', 'warning');
+          return;
+        }
+
+        selectedOrderForReturn = order;
+        showReturnItemsSelection(order);
+
+      } catch (e) {
+        console.error(e);
+        showToast('❌ خطأ: ' + e.message, 'error');
+      }
+    }
+
+    function showReturnItemsSelection(order) {
+      const resultsContainer = document.getElementById('returnResults');
+      const items = order.items || [];
+      const total = order.total || items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+      resultsContainer.innerHTML = `
+        <div class="order-summary-box">
+          <div class="line">📋 الطلب: <span class="highlight">#${order.id.slice(0,8)}</span></div>
+          <div class="line">👤 الزبون: <span class="highlight">${escapeHtml(order.customer_name || 'كليان لاكيس')}</span></div>
+          <div class="line">💰 المجموع: <span class="highlight">${total.toFixed(2)} درهم</span></div>
+        </div>
+        
+        <div style="margin-bottom:12px;">
+          <label style="color:var(--text-dim);font-size:0.8rem;">اختر المنتجات للإرجاع:</label>
+          <div class="return-items-list">
+            ${items.map((item, index) => `
+              <div class="return-item-row">
+                <input type="checkbox" id="return_item_${index}" 
+                       data-item-id="${item.id}"
+                       data-product-id="${item.product_id}"
+                       data-price="${item.price}"
+                       data-max-qty="${item.quantity}"
+                       onchange="toggleReturnQty(${index})">
+                <div class="item-info">
+                  <div class="name">${escapeHtml(item.product_name)}</div>
+                  <div class="details">${item.price.toFixed(2)} درهم × ${item.quantity} = ${(item.price * item.quantity).toFixed(2)} درهم</div>
+                </div>
+                <input type="number" id="return_qty_${index}" 
+                       value="${item.quantity}" min="1" max="${item.quantity}"
+                       class="qty-input" disabled>
               </div>
             `).join('')}
           </div>
-
-          ${order.status === 'confirmed' ? `
-            <button class="btn-validate-order" onclick="validateOrder('${order.id}')">
-              <i class="fas fa-check-circle"></i> تم الدفع والاستلام
-            </button>
-          ` : `
-            <div style="text-align:center;padding:4px;color:var(--text-dim);font-size:0.7rem;">
-              <i class="fas fa-check-circle" style="color:var(--success);"></i> تمت المعالجة
-            </div>
-          `}
         </div>
-      `;
-    }).join('');
-  }
-
-  window.validateOrder = async function(orderId) {
-    if (!confirm('✅ تأكدت من استلام الفلوس؟')) return;
-
-    if (!isOnline) {
-      showToast('⚠️ لا يوجد اتصال', 'error');
-      return;
-    }
-
-    const btn = document.querySelector(`.order-card[data-order-id="${orderId}"] .btn-validate-order`);
-    if (btn) {
-      btn.disabled = true;
-      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري...';
-    }
-
-    try {
-      const { data: order, error: orderError } = await sb
-        .from('orders')
-        .select('*, items:order_items(*)')
-        .eq('id', orderId)
-        .single();
-
-      if (orderError) throw orderError;
-
-      await sb
-        .from('orders')
-        .update({ status: 'completed', updated_at: new Date() })
-        .eq('id', orderId);
-
-      const items = order.items || [];
-      let total = 0;
-      for (const item of items) {
-        total += (item.product_price || 0) * (item.quantity || 0);
-        if (item.product_id) {
-          const { data: product } = await sb
-            .from('products')
-            .select('stock')
-            .eq('id', item.product_id)
-            .single();
-
-          const newStock = Math.max(0, (product?.stock || 0) - (item.quantity || 0));
-          
-          await sb
-            .from('products')
-            .update({ stock: newStock, updated_at: new Date() })
-            .eq('id', item.product_id);
-
-          await sb.from('stock_movements').insert({
-            product_id: item.product_id,
-            change: -(item.quantity || 0),
-            reason: 'sale',
-            note: `بيع - طلب #${orderId.slice(0,8)}`
-          });
-        }
-      }
-
-      const balanceText = document.getElementById('walletBalance').textContent;
-      const currentBalance = parseFloat(balanceText) || 0;
-      const newBalance = currentBalance + total;
-      document.getElementById('walletBalance').innerHTML = newBalance.toFixed(2) + ' <span>درهم</span>';
-
-      if (walletId) {
-        await sb
-          .from('wallet')
-          .update({ balance: newBalance, total_earned: newBalance, updated_at: new Date() })
-          .eq('id', walletId);
-      }
-
-      showToast('✅ تم تأكيد الدفع', 'success');
-      
-      updateStats();
-      loadTransactions();
-      loadWallet();
-      setTimeout(() => loadPendingOrders(), 500);
-
-    } catch(e) {
-      console.error(e);
-      showToast('❌ خطأ: ' + e.message, 'error');
-      if (btn) {
-        btn.disabled = false;
-        btn.innerHTML = '<i class="fas fa-check-circle"></i> تم الدفع والاستلام';
-      }
-    }
-  };
-
-  // ==========================================
-  // TRANSACTIONS
-  // ==========================================
-  async function loadTransactions() {
-    const loading = document.getElementById('transLoading');
-    const table = document.getElementById('transTable');
-    const empty = document.getElementById('transEmpty');
-    const body = document.getElementById('transBody');
-    const countSpan = document.getElementById('transCount');
-    const totalSpan = document.getElementById('transTotal');
-
-    loading.style.display = 'block';
-    table.style.display = 'none';
-    empty.style.display = 'none';
-
-    if (!sb) {
-      showToast('❌ Supabase غير جاهز', 'error');
-      loading.style.display = 'none';
-      empty.style.display = 'block';
-      return;
-    }
-
-    try {
-      const { data, error } = await sb
-        .from('orders')
-        .select('id, customer_name, total, created_at')
-        .eq('status', 'completed')
-        .order('created_at', { ascending: false })
-        .limit(100);
-
-      loading.style.display = 'none';
-
-      if (error) {
-        console.error('❌ Error:', error);
-        empty.style.display = 'block';
-        empty.innerHTML = `<i class="fas fa-exclamation-triangle"></i><p>خطأ: ${error.message}</p>`;
-        countSpan.textContent = '0';
-        totalSpan.textContent = '0';
-        return;
-      }
-
-      if (!data || data.length === 0) {
-        empty.style.display = 'block';
-        countSpan.textContent = '0';
-        totalSpan.textContent = '0';
-        return;
-      }
-
-      table.style.display = 'table';
-      countSpan.textContent = data.length;
-      const total = data.reduce((s, o) => s + (parseFloat(o.total) || 0), 0);
-      totalSpan.textContent = total.toFixed(0);
-
-      body.innerHTML = data.map((order) => `
-        <tr>
-          <td>#${order.id ? order.id.slice(0,8) : '---'}</td>
-          <td>${escapeHtml(order.customer_name || 'كليان لاكيس')}</td>
-          <td class="amount">${parseFloat(order.total || 0).toFixed(0)} درهم</td>
-          <td style="font-size:0.55rem;color:var(--text-dim);">
-            ${order.created_at ? new Date(order.created_at).toLocaleString('ar-MA') : '—'}
-          </td>
-        </tr>
-      `).join('');
-
-    } catch(e) {
-      console.error('❌ Exception:', e);
-      loading.style.display = 'none';
-      empty.style.display = 'block';
-      empty.innerHTML = `<i class="fas fa-exclamation-triangle"></i><p>خطأ في التحميل</p>`;
-      countSpan.textContent = '0';
-      totalSpan.textContent = '0';
-    }
-  }
-
-  // ==========================================
-  // QUICK STOCK SEARCH
-  // ==========================================
-  async function loadAllStock() {
-    const grid = document.getElementById('productsGrid');
-    const empty = document.getElementById('stockEmptyState');
-
-    if (!sb) {
-      showToast('❌ Supabase غير جاهز', 'error');
-      return;
-    }
-
-    const result = await safeSupabaseRequest(async () => {
-      return await sb
-        .from('products')
-        .select('id, name, sku, price, stock, low_stock_threshold, images, is_available')
-        .order('name');
-    }, { data: [] });
-
-    if (!result || result.error) {
-      empty.style.display = 'block';
-      grid.innerHTML = '';
-      return;
-    }
-
-    allProducts = result.data || [];
-    
-    if (allProducts.length === 0) {
-      empty.style.display = 'block';
-      grid.innerHTML = '';
-      return;
-    }
-
-    empty.style.display = 'none';
-    renderStockProducts(allProducts);
-  }
-
-  async function searchStock() {
-    const searchTerm = document.getElementById('stockSearchInput').value.trim().toLowerCase();
-    const grid = document.getElementById('productsGrid');
-    const empty = document.getElementById('stockEmptyState');
-
-    if (!searchTerm) {
-      loadAllStock();
-      return;
-    }
-
-    if (!sb || !isOnline) {
-      showToast('⚠️ لا يوجد اتصال', 'error');
-      return;
-    }
-
-    try {
-      const { data, error } = await sb
-        .from('products')
-        .select('id, name, sku, price, stock, low_stock_threshold, images, is_available')
-        .or(`name.ilike.%${searchTerm}%,sku.ilike.%${searchTerm}%`)
-        .order('name');
-
-      if (error) throw error;
-
-      allProducts = data || [];
-      
-      if (allProducts.length === 0) {
-        empty.style.display = 'block';
-        empty.innerHTML = `<i class="fas fa-search"></i><p style="font-size:0.8rem;">لا توجد منتجات لـ "${searchTerm}"</p>`;
-        grid.innerHTML = '';
-        return;
-      }
-
-      empty.style.display = 'none';
-      renderStockProducts(allProducts);
-    } catch(e) {
-      console.error(e);
-      showToast('❌ خطأ: ' + e.message, 'error');
-    }
-  }
-
-  function renderStockProducts(products) {
-    const grid = document.getElementById('productsGrid');
-    
-    grid.innerHTML = products.map(p => {
-      const stockStatus = p.stock <= 0 ? 'out' : (p.stock <= (p.low_stock_threshold || 5) ? 'low' : 'ok');
-      const stockLabels = { ok: '✅ متوفر', low: '⚠️ منخفض', out: '❌ نفذ' };
-      const stockClasses = { ok: 'stock-ok', low: 'stock-low', out: 'stock-out' };
-      const img = (p.images && p.images[0]) ? p.images[0] : 'https://placehold.co/40x40/0057b3/fff?text=M';
-      const inStock = p.stock > 0;
-
-      return `
-        <div class="product-card">
-          <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
-            <img src="${img}" class="product-img" alt="${escapeHtml(p.name)}">
-            <div>
-              <div class="p-name">${escapeHtml(p.name)}</div>
-              <div class="p-sku">${escapeHtml(p.sku || '—')}</div>
-            </div>
-          </div>
-          <div class="p-price">${p.price} درهم</div>
-          <div class="p-stock-info">
-            <span class="${stockClasses[stockStatus]}">${stockLabels[stockStatus]}</span>
-            <span style="color:var(--text-dim);font-size:0.6rem;"> (${p.stock || 0} حبة)</span>
-          </div>
-          <button class="btn-add-stock" ${!inStock ? 'disabled' : ''} onclick="addFromStockSearch('${p.id}')">
-            <i class="fas fa-cart-plus"></i> ${inStock ? 'إضافة للسلة' : 'غير متوفر'}
+        
+        <div class="return-actions">
+          <button class="btn-return-confirm" onclick="processReturn()">
+            <i class="fas fa-undo"></i> تأكيد الإرجاع
+          </button>
+          <button class="btn-return-cancel" onclick="closeReturnModal()">
+            إلغاء
           </button>
         </div>
       `;
-    }).join('');
-  }
-
-  window.addFromStockSearch = async function(productId) {
-    const product = allProducts.find(p => p.id === productId);
-    if (!product) {
-      showToast('❌ المنتج غير موجود', 'error');
-      return;
     }
 
-    if (product.stock <= 0) {
-      showToast('⚠️ ' + product.name + ' غير متوفر', 'warning');
-      return;
+    function toggleReturnQty(index) {
+      const checkbox = document.getElementById(`return_item_${index}`);
+      const qtyInput = document.getElementById(`return_qty_${index}`);
+      if (checkbox && qtyInput) {
+        qtyInput.disabled = !checkbox.checked;
+        if (!checkbox.checked) {
+          qtyInput.value = 1;
+        }
+      }
     }
 
-    addToCart({
-      id: product.id,
-      name: product.name,
-      price: product.price,
-      stock: product.stock,
-      low_stock_threshold: product.low_stock_threshold || 5,
-      sku: product.sku
+    async function processReturn() {
+      if (!isOnline) {
+        showToast('⚠️ لا يوجد اتصال بالإنترنت', 'error');
+        return;
+      }
+
+      if (!selectedOrderForReturn) {
+        showToast('⚠️ الرجاء اختيار طلب أولاً', 'warning');
+        return;
+      }
+
+      const itemsToReturn = [];
+      const checkboxes = document.querySelectorAll('[id^="return_item_"]');
+
+      checkboxes.forEach((checkbox, index) => {
+        if (checkbox.checked) {
+          const qtyInput = document.getElementById(`return_qty_${index}`);
+          const qty = parseInt(qtyInput?.value) || 1;
+
+          itemsToReturn.push({
+            product_id: checkbox.dataset.productId,
+            item_id: checkbox.dataset.itemId,
+            price: parseFloat(checkbox.dataset.price),
+            quantity: qty,
+            max_qty: parseInt(checkbox.dataset.maxQty)
+          });
+        }
+      });
+
+      if (itemsToReturn.length === 0) {
+        showToast('⚠️ الرجاء اختيار منتج للإرجاع', 'warning');
+        return;
+      }
+
+      const totalRefund = itemsToReturn.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+      if (!confirm(`💰 هل تريد إرجاع ${itemsToReturn.length} منتج بقيمة ${totalRefund.toFixed(2)} درهم؟`)) {
+        return;
+      }
+
+      const btn = document.querySelector('.btn-return-confirm');
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري...';
+      }
+
+      try {
+        const { data: returnRecord, error: returnError } = await sb.from('returns').insert({
+          order_id: selectedOrderForReturn.id,
+          total_refund: totalRefund,
+          status: 'completed',
+          reason: 'إرجاع من قبل الزبون'
+        }).select().single();
+
+        if (returnError) throw returnError;
+
+        for (const item of itemsToReturn) {
+          await sb.from('return_items').insert({
+            return_id: returnRecord.id,
+            order_item_id: item.item_id,
+            product_id: item.product_id,
+            quantity: item.quantity,
+            price: item.price,
+            subtotal: item.price * item.quantity
+          });
+
+          const { data: product } = await sb.from('products').select('stock').eq('id', item.product_id).single();
+          const newStock = (product?.stock || 0) + item.quantity;
+          await sb.from('products').update({
+            stock: newStock,
+            updated_at: new Date()
+          }).eq('id', item.product_id);
+
+          await sb.from('stock_movements').insert({
+            product_id: item.product_id,
+            change: item.quantity,
+            reason: 'return',
+            note: `إرجاع - طلب #${selectedOrderForReturn.id.slice(0,8)}`
+          });
+        }
+
+        const { data: wallet } = await sb.from('wallet').select('balance').limit(1);
+        if (wallet && wallet.length > 0) {
+          const currentBalance = wallet[0].balance || 0;
+          const newBalance = Math.max(0, currentBalance - totalRefund);
+          await sb.from('wallet').update({
+            balance: newBalance,
+            updated_at: new Date()
+          }).eq('id', wallet[0].id);
+        }
+
+        const walletBalanceText = document.getElementById('walletBalance').textContent;
+        const currentWalletBalance = parseFloat(walletBalanceText) || 0;
+        const newWalletBalance = Math.max(0, currentWalletBalance - totalRefund);
+        document.getElementById('walletBalance').innerHTML = newWalletBalance.toFixed(2) + ' <span>درهم</span>';
+
+        showToast(`✅ تم إرجاع ${itemsToReturn.length} منتج بقيمة ${totalRefund.toFixed(2)} درهم`, 'success');
+
+        closeReturnModal();
+        updateStats();
+        loadWallet();
+        loadAllStock();
+
+      } catch (e) {
+        console.error(e);
+        showToast('❌ خطأ: ' + e.message, 'error');
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fas fa-undo"></i> تأكيد الإرجاع';
+        }
+      }
+    }
+
+    // ========== HELPERS ==========
+    function escapeHtml(s) { if (!s) return '';
+      return String(s).replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m])); }
+
+    // ========== INIT ==========
+    document.addEventListener('DOMContentLoaded', () => {
+      if (window.sb) sb = window.sb;
+      loadTheme();
+      updateOnlineStatus();
+      startNetworkMonitoring();
+      renderCart();
+      updateStats();
+      loadAllStock();
+      loadWallet();
+      setInterval(updateStats, 30000);
     });
-    
-    showToast('✅ تم إضافة ' + product.name, 'success');
-  };
-
-  // ==========================================
-  // HELPERS
-  // ==========================================
-  function escapeHtml(s) {
-    if (!s) return '';
-    return String(s).replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m]));
-  }
-
-  // ==========================================
-  // INIT
-  // ==========================================
-  document.addEventListener('DOMContentLoaded', () => {
-    if (window.sb) sb = window.sb;
-    updateOnlineStatus();
-    startNetworkMonitoring();
-    
-    loadPendingOrders();
-    renderCart();
-    updateStats();
-    loadAllStock();
-    loadTransactions();
-    loadWallet();
-    
-    setInterval(updateStats, 30000);
-    document.getElementById('searchInput').focus();
-  });
-</script>
+  </script>
 
 </body>
 </html>

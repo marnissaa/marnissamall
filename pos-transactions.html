@@ -1,0 +1,1182 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>مول لاكيس | المعاملات</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" href="images/logo.png" type="image/png">
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    /* ========== الألوان الأساسية ========== */
+    :root {
+      --blue-primary: #0057b3;
+      --blue-dark: #003d80;
+      --blue-light: #3a8fd4;
+      --black: #0a0a0a;
+      --black-light: #0d1117;
+      --gray: #161b22;
+      --text-light: #ffffff;
+      --text-muted: #c9d1d9;
+      --text-dim: #8b949e;
+      --gold: #C4A06A;
+      --success: #25D366;
+      --danger: #ff4757;
+      --warning: #ffa502;
+      --return-color: #ff6b6b;
+      --return-bg: rgba(255,107,107,0.08);
+    }
+
+    /* ========== الوضع الداكن (أسود + أزرق) ========== */
+    body {
+      --bg: #0a0a0a;
+      --bg2: #0d1117;
+      --bg3: #161b22;
+      --text: #ffffff;
+      --text-muted: #c9d1d9;
+      --text-dim: #8b949e;
+      --border: rgba(0,87,179,0.35);
+      --border2: rgba(0,87,179,0.5);
+      --card: rgba(13,17,23,0.85);
+      --card-hover: rgba(0,87,179,0.2);
+      --radius: 14px;
+      --shadow: 0 4px 24px rgba(0,0,0,0.4);
+      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      --sidebar-width: 240px;
+    }
+
+    /* ========== الوضع الفاتح (أزرق فاتح) ========== */
+    body.blue-theme {
+      --bg: #e8f0fe;
+      --bg2: #ffffff;
+      --bg3: #f0f5ff;
+      --text: #0a0a0a;
+      --text-muted: #1a3a5c;
+      --text-dim: #4a6a8c;
+      --border: rgba(0,87,179,0.2);
+      --border2: rgba(0,87,179,0.3);
+      --card: rgba(255,255,255,0.9);
+      --card-hover: rgba(0,87,179,0.1);
+    }
+
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: var(--bg2); border-radius: 6px; }
+    ::-webkit-scrollbar-thumb { background: var(--blue-primary); border-radius: 6px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--blue-dark); }
+
+    body {
+      background: var(--bg);
+      font-family: 'Tajawal', sans-serif;
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+      display: flex;
+      transition: var(--transition);
+    }
+
+    .sidebar {
+      width: var(--sidebar-width);
+      background: var(--bg3);
+      border-left: 2px solid var(--border);
+      min-height: 100vh;
+      padding: 16px 12px;
+      position: fixed;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      z-index: 100;
+      overflow-y: auto;
+      transition: var(--transition);
+    }
+    .sidebar .brand {
+      font-size: 1.3rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--text) 60%, var(--blue-light));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-align: center;
+      padding: 12px 0 20px 0;
+      border-bottom: 2px solid var(--border);
+      margin-bottom: 16px;
+    }
+    .sidebar .brand small {
+      font-size: 0.6rem;
+      display: block;
+      -webkit-text-fill-color: var(--text-dim);
+      background: none;
+    }
+    .sidebar .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      border-radius: 10px;
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 500;
+      transition: var(--transition);
+      margin-bottom: 4px;
+      cursor: pointer;
+    }
+    .sidebar .nav-item:hover {
+      background: var(--card-hover);
+      color: var(--text);
+    }
+    .sidebar .nav-item.active {
+      background: var(--blue-primary);
+      color: #fff;
+      box-shadow: 0 4px 16px rgba(0,87,179,0.2);
+    }
+    .sidebar .nav-item i {
+      width: 22px;
+      text-align: center;
+      font-size: 1rem;
+    }
+    .sidebar .nav-item .badge-nav {
+      margin-right: auto;
+      background: rgba(255,71,87,0.15);
+      color: var(--danger);
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 0.6rem;
+    }
+    .sidebar .nav-item.active .badge-nav {
+      background: rgba(255,255,255,0.15);
+      color: #fff;
+    }
+    .sidebar .sidebar-footer {
+      border-top: 1px solid var(--border);
+      margin-top: 20px;
+      padding-top: 16px;
+      text-align: center;
+      font-size: 0.6rem;
+      color: var(--text-dim);
+    }
+    .sidebar .sidebar-footer .online-status {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      font-size: 0.7rem;
+      padding: 4px 12px;
+      border-radius: 20px;
+      margin-bottom: 8px;
+    }
+    .sidebar .sidebar-footer .online-status.online {
+      color: var(--success);
+      border: 1px solid rgba(37,211,102,0.3);
+      background: rgba(37,211,102,0.08);
+    }
+    .sidebar .sidebar-footer .online-status.offline {
+      color: var(--danger);
+      border: 1px solid rgba(255,71,87,0.3);
+      background: rgba(255,71,87,0.08);
+    }
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+    .status-dot.online { background: var(--success); }
+    .status-dot.offline { background: var(--danger); }
+
+    /* ===== TOGGLE THEME ===== */
+    .theme-toggle {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: 6px 10px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 0.7rem;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .theme-toggle:hover {
+      background: var(--card-hover);
+      color: var(--text);
+      border-color: var(--blue-primary);
+    }
+
+    .main-content {
+      margin-right: var(--sidebar-width);
+      flex: 1;
+      padding: 12px 16px;
+      min-height: 100vh;
+      background: var(--bg);
+      transition: var(--transition);
+    }
+
+    .container {
+      max-width: 1600px;
+      margin: 0 auto;
+    }
+
+    .page-header {
+      padding: 10px 0;
+      border-bottom: 2px solid var(--border);
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .page-header h1 {
+      font-size: 1.5rem;
+      border-right: 4px solid var(--blue-primary);
+      padding-right: 12px;
+      background: linear-gradient(135deg, var(--text) 60%, var(--blue-light));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .page-header .badge {
+      background: var(--blue-primary);
+      padding: 4px 14px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      color: #fff;
+    }
+    .page-header .stats-summary {
+      display: flex;
+      gap: 16px;
+      font-size: 0.8rem;
+      flex-wrap: wrap;
+    }
+    .page-header .stats-summary .stat-item {
+      background: var(--bg3);
+      padding: 4px 12px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+    }
+    .page-header .stats-summary .stat-item .num {
+      color: var(--gold);
+      font-weight: bold;
+    }
+    .page-header .stats-summary .stat-item.return-stat {
+      border-color: var(--return-color);
+    }
+    .page-header .stats-summary .stat-item.return-stat .num {
+      color: var(--return-color);
+    }
+
+    .section-divider {
+      height: 1px;
+      background: linear-gradient(to left, transparent, var(--blue-primary), transparent);
+      margin: 3px 0 12px 0;
+      opacity: 0.25;
+    }
+
+    .filter-bar {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+    .filter-bar .filter-btn {
+      padding: 6px 16px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: var(--bg2);
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: var(--transition);
+      font-size: 0.75rem;
+    }
+    .filter-bar .filter-btn:hover {
+      background: var(--card-hover);
+    }
+    .filter-bar .filter-btn.active {
+      background: var(--blue-primary);
+      color: #fff;
+      border-color: var(--blue-primary);
+    }
+    .filter-bar .filter-btn.return-filter {
+      border-color: var(--return-color);
+    }
+    .filter-bar .filter-btn.return-filter.active {
+      background: var(--return-color);
+      color: #fff;
+      border-color: var(--return-color);
+    }
+
+    .search-box {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+    .search-box input {
+      flex: 1;
+      padding: 8px 14px;
+      border-radius: 30px;
+      border: 2px solid var(--border);
+      background: var(--bg2);
+      color: var(--text);
+      font-size: 0.85rem;
+      min-width: 100px;
+      transition: var(--transition);
+    }
+    .search-box input:focus {
+      outline: none;
+      border-color: var(--blue-primary);
+      box-shadow: 0 0 0 3px rgba(0,87,179,0.15);
+    }
+    .search-box input::placeholder {
+      color: var(--text-dim);
+    }
+    .search-box .btn-search {
+      padding: 8px 16px;
+      border-radius: 30px;
+      background: var(--blue-primary);
+      border: none;
+      color: white;
+      cursor: pointer;
+      font-size: 0.8rem;
+      transition: var(--transition);
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .search-box .btn-search:hover {
+      background: var(--blue-dark);
+      transform: translateY(-1px);
+    }
+    .search-box .btn-search.gray {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+    }
+    .search-box .btn-search.gray:hover {
+      background: var(--card-hover);
+    }
+
+    .trans-table-container {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      overflow-x: auto;
+    }
+    .trans-table-container table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+    .trans-table-container th {
+      text-align: right;
+      padding: 10px 12px;
+      background: rgba(0,87,179,0.08);
+      color: var(--text-muted);
+      border-bottom: 2px solid var(--border);
+      font-weight: 700;
+      position: sticky;
+      top: 0;
+      z-index: 5;
+    }
+    .trans-table-container td {
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    .trans-table-container tr:hover td {
+      background: rgba(0,87,179,0.03);
+    }
+    .trans-table-container .amount {
+      color: var(--gold);
+      font-weight: bold;
+    }
+    .trans-table-container .amount.return-amount {
+      color: var(--return-color);
+    }
+    .trans-table-container .status-badge {
+      padding: 2px 10px;
+      border-radius: 20px;
+      font-size: 0.65rem;
+      font-weight: bold;
+      display: inline-block;
+    }
+    .trans-table-container .status-badge.completed {
+      background: rgba(37,211,102,0.15);
+      color: var(--success);
+    }
+    .trans-table-container .status-badge.pending {
+      background: rgba(255,165,2,0.15);
+      color: var(--warning);
+    }
+    .trans-table-container .status-badge.confirmed {
+      background: rgba(0,87,179,0.15);
+      color: var(--blue-primary);
+    }
+    .trans-table-container .status-badge.cancelled {
+      background: rgba(255,71,87,0.15);
+      color: var(--danger);
+    }
+    .trans-table-container .status-badge.returned {
+      background: rgba(255,107,107,0.15);
+      color: var(--return-color);
+    }
+    .trans-table-container .return-row {
+      border-right: 3px solid var(--return-color);
+    }
+    .trans-table-container .return-row td {
+      background: var(--return-bg);
+    }
+    .trans-table-container .return-row:hover td {
+      background: rgba(255,107,107,0.15);
+    }
+    .trans-table-container .return-badge {
+      background: var(--return-color);
+      color: #fff;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 0.55rem;
+      font-weight: bold;
+      margin-right: 4px;
+    }
+
+    .pagination {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      padding: 16px 0;
+      flex-wrap: wrap;
+    }
+    .pagination button {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: 4px 14px;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: var(--transition);
+      font-size: 0.75rem;
+    }
+    .pagination button:hover:not(:disabled) {
+      background: var(--blue-primary);
+      color: #fff;
+      border-color: var(--blue-primary);
+    }
+    .pagination button:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+    .pagination .page-info {
+      color: var(--text-dim);
+      font-size: 0.75rem;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px 12px;
+      color: var(--text-dim);
+    }
+    .empty-state i {
+      font-size: 3rem;
+      margin-bottom: 12px;
+      opacity: 0.3;
+      display: block;
+    }
+    .empty-state p {
+      font-size: 1rem;
+    }
+
+    .toast-msg {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: var(--bg3);
+      border: 2px solid var(--border);
+      border-radius: 14px;
+      padding: 12px 28px;
+      z-index: 9999;
+      opacity: 0;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      font-size: 0.9rem;
+      box-shadow: var(--shadow);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 500;
+    }
+    .toast-msg.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+    .toast-msg.success {
+      border-color: var(--success);
+      color: var(--success);
+    }
+    .toast-msg.error {
+      border-color: var(--danger);
+      color: var(--danger);
+    }
+    .toast-msg.info {
+      border-color: var(--blue-primary);
+      color: var(--blue-primary);
+    }
+    .toast-msg.warning {
+      border-color: var(--warning);
+      color: var(--warning);
+    }
+
+    @media (max-width: 1100px) {
+      .sidebar { width: 60px; padding: 12px 6px; }
+      .sidebar .brand { font-size: 0.8rem; }
+      .sidebar .brand small { display: none; }
+      .sidebar .nav-item { padding: 10px 8px; font-size: 0.7rem; justify-content: center; }
+      .sidebar .nav-item span { display: none; }
+      .sidebar .nav-item .badge-nav { display: none; }
+      .sidebar .sidebar-footer .online-status span:last-child { display: none; }
+      .main-content { margin-right: 60px; }
+    }
+    @media (max-width: 850px) {
+      .sidebar { width: 50px; padding: 8px 4px; }
+      .sidebar .brand { font-size: 0.7rem; padding: 8px 0; }
+      .sidebar .nav-item { padding: 8px 6px; font-size: 0.6rem; }
+      .main-content { margin-right: 50px; padding: 8px 10px; }
+      .page-header h1 { font-size: 1.2rem; }
+      .page-header .stats-summary { font-size: 0.65rem; gap: 8px; }
+      .trans-table-container table { font-size: 0.75rem; }
+      .trans-table-container th,
+      .trans-table-container td { padding: 6px 8px; }
+    }
+    @media (max-width: 480px) {
+      .sidebar { width: 44px; padding: 6px 2px; }
+      .sidebar .brand { font-size: 0.6rem; padding: 6px 0; }
+      .sidebar .nav-item { padding: 6px 4px; font-size: 0.5rem; }
+      .sidebar .nav-item i { font-size: 0.8rem; width: 18px; }
+      .main-content { margin-right: 44px; padding: 6px 8px; }
+      .page-header h1 { font-size: 1rem; }
+      .trans-table-container table { font-size: 0.65rem; }
+      .trans-table-container th,
+      .trans-table-container td { padding: 4px 6px; }
+      .filter-bar .filter-btn { font-size: 0.65rem; padding: 4px 10px; }
+      .search-box input { font-size: 0.75rem; min-width: 60px; }
+      .search-box .btn-search { font-size: 0.7rem; padding: 6px 10px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ===== SIDEBAR ===== -->
+<aside class="sidebar">
+  <div class="brand">
+    🧾 مول لاكيس
+    <small>MarnissaMall</small>
+  </div>
+  
+  <nav>
+    <a href="pos.html" class="nav-item">
+      <i class="fas fa-cash-register"></i>
+      <span>نقطة البيع</span>
+    </a>
+    <a href="pos-orders.html" class="nav-item">
+      <i class="fas fa-clipboard-list"></i>
+      <span>الطلبات</span>
+      <span class="badge-nav" id="sidebarOrdersBadge">0</span>
+    </a>
+    <a href="pos-transactions.html" class="nav-item active">
+      <i class="fas fa-history"></i>
+      <span>المعاملات</span>
+    </a>
+    <a href="pos-wallet.html" class="nav-item">
+      <i class="fas fa-wallet"></i>
+      <span>المحفظة</span>
+    </a>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="online-status online" id="sidebarStatus">
+      <span class="status-dot online" id="sidebarDot"></span>
+      <span id="sidebarStatusText">متصل</span>
+    </div>
+    <div style="font-size:0.55rem;color:var(--text-dim);">
+      <i class="fas fa-store"></i> Marnissa v2.0
+    </div>
+  </div>
+</aside>
+
+<!-- ===== MAIN CONTENT ===== -->
+<div class="main-content">
+
+  <div class="container">
+
+    <!-- ===== PAGE HEADER ===== -->
+    <div class="page-header">
+      <div>
+        <h1>📊 سجل المعاملات</h1>
+        <p style="color: var(--text-dim); font-size: 0.7rem; margin-top: 2px;">جميع المعاملات المالية مع تفاصيل المنتجات والإرجاعات</p>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+        <div class="stats-summary">
+          <span class="stat-item">📦 <span class="num" id="totalTransactions">0</span></span>
+          <span class="stat-item">💰 <span class="num" id="totalAmount">0.00</span> درهم</span>
+          <span class="stat-item return-stat">🔄 <span class="num" id="totalReturns">0</span></span>
+        </div>
+        <span class="badge"><i class="fas fa-store"></i> Marnissa</span>
+        <button class="theme-toggle" onclick="toggleTheme()">
+          <i class="fas fa-moon"></i>
+          <span id="themeLabel">داكن</span>
+        </button>
+        <button onclick="location.reload()" style="background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:4px 12px;border-radius:20px;cursor:pointer;font-size:0.7rem;transition:var(--transition);"><i class="fas fa-sync-alt"></i></button>
+        <button onclick="exportTransactions()" style="background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:4px 12px;border-radius:20px;cursor:pointer;font-size:0.7rem;transition:var(--transition);" title="تصدير المعاملات"><i class="fas fa-file-export"></i></button>
+      </div>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <!-- ===== FILTERS ===== -->
+    <div class="filter-bar">
+      <button class="filter-btn active" data-filter="all" onclick="filterTransactions('all')">الكل</button>
+      <button class="filter-btn" data-filter="completed" onclick="filterTransactions('completed')">✔️ مكتملة</button>
+      <button class="filter-btn" data-filter="pending" onclick="filterTransactions('pending')">⏳ قيد المراجعة</button>
+      <button class="filter-btn" data-filter="confirmed" onclick="filterTransactions('confirmed')">✅ مؤكدة</button>
+      <button class="filter-btn" data-filter="cancelled" onclick="filterTransactions('cancelled')">❌ ملغية</button>
+      <button class="filter-btn return-filter" data-filter="returned" onclick="filterTransactions('returned')">🔄 مرتجعة</button>
+    </div>
+
+    <!-- ===== SEARCH ===== -->
+    <div class="search-box">
+      <input type="text" id="transSearchInput" placeholder="🔍 ابحث بالاسم أو رقم الطلب..." onkeyup="if(event.key==='Enter') searchTransactions()">
+      <button class="btn-search" onclick="searchTransactions()"><i class="fas fa-search"></i></button>
+      <button class="btn-search gray" onclick="loadAllTransactions()"><i class="fas fa-sync-alt"></i></button>
+    </div>
+
+    <!-- ===== TRANSACTIONS TABLE ===== -->
+    <div class="trans-table-container">
+      <div id="transLoading" style="text-align:center;padding:20px;">
+        <i class="fas fa-spinner fa-spin"></i> جاري التحميل...
+      </div>
+      
+      <table id="transTable" style="display:none;">
+        <thead>
+          <tr>
+            <th style="width:50px;">#</th>
+            <th style="width:130px;">رقم الطلب</th>
+            <th>الزبون</th>
+            <th>المنتجات</th>
+            <th style="width:100px;">المجموع</th>
+            <th style="width:100px;">الحالة</th>
+            <th style="width:150px;">التاريخ</th>
+            <th style="width:60px;"></th>
+          </tr>
+        </thead>
+        <tbody id="transBody"></tbody>
+      </table>
+      
+      <div id="transEmpty" class="empty-state" style="display:none;">
+        <i class="fas fa-receipt"></i>
+        <p>لا توجد معاملات</p>
+      </div>
+    </div>
+
+    <!-- ===== PAGINATION ===== -->
+    <div class="pagination" id="pagination" style="display:none;">
+      <button id="prevPage" onclick="changePage(-1)"><i class="fas fa-chevron-right"></i> السابق</button>
+      <span class="page-info" id="pageInfo">الصفحة 1 من 1</span>
+      <button id="nextPage" onclick="changePage(1)">التالي <i class="fas fa-chevron-left"></i></button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ===== TOAST ===== -->
+<div class="toast-msg" id="toastMsg"><i class="fas fa-info-circle"></i> <span id="toastText"></span></div>
+
+<script>
+  // ==========================================
+  // TRANSACTIONS PAGE
+  // ==========================================
+
+  let sb = window.sb;
+  let allTransactions = [];
+  let allReturns = [];
+  let filteredTransactions = [];
+  let currentFilter = 'all';
+  let currentPage = 1;
+  const itemsPerPage = 20;
+  let isOnline = navigator.onLine;
+
+  // ========== THEME TOGGLE ==========
+  function toggleTheme() {
+    document.body.classList.toggle('blue-theme');
+    const isBlue = document.body.classList.contains('blue-theme');
+    const icon = document.querySelector('.theme-toggle i');
+    const label = document.getElementById('themeLabel');
+    if (isBlue) {
+      icon.className = 'fas fa-sun';
+      label.textContent = 'فاتح';
+      localStorage.setItem('theme', 'blue');
+    } else {
+      icon.className = 'fas fa-moon';
+      label.textContent = 'داكن';
+      localStorage.setItem('theme', 'dark');
+    }
+  }
+
+  function loadTheme() {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'blue') {
+      document.body.classList.add('blue-theme');
+      document.querySelector('.theme-toggle i').className = 'fas fa-sun';
+      document.getElementById('themeLabel').textContent = 'فاتح';
+    }
+  }
+
+  // ========== TOAST ==========
+  function showToast(msg, type) {
+    const toast = document.getElementById('toastMsg');
+    const icon = document.querySelector('#toastMsg i');
+    const text = document.getElementById('toastText');
+    const icons = {
+      success: 'fa-check-circle',
+      error: 'fa-times-circle',
+      warning: 'fa-exclamation-triangle',
+      info: 'fa-info-circle'
+    };
+    icon.className = 'fas ' + (icons[type] || icons.info);
+    text.textContent = msg;
+    toast.className = `toast-msg ${type} show`;
+    clearTimeout(window._toastTimer);
+    window._toastTimer = setTimeout(() => toast.classList.remove('show'), 3500);
+  }
+
+  // ========== NETWORK ==========
+  function updateOnlineStatus() {
+    const statusEl = document.getElementById('sidebarStatus');
+    const dot = document.getElementById('sidebarDot');
+    const text = document.getElementById('sidebarStatusText');
+    if (isOnline) {
+      statusEl.className = 'online-status online';
+      dot.className = 'status-dot online';
+      text.textContent = 'متصل';
+    } else {
+      statusEl.className = 'online-status offline';
+      dot.className = 'status-dot offline';
+      text.textContent = 'غير متصل';
+    }
+  }
+
+  window.addEventListener('online', () => {
+    isOnline = true;
+    updateOnlineStatus();
+    showToast('🌐 تم استعادة الاتصال بالإنترنت', 'success');
+    setTimeout(() => loadAllTransactions(), 1000);
+  });
+
+  window.addEventListener('offline', () => {
+    isOnline = false;
+    updateOnlineStatus();
+    showToast('⚠️ انقطع الاتصال بالإنترنت', 'error');
+  });
+
+  // ========== LOAD TRANSACTIONS ==========
+  async function loadAllTransactions() {
+    const loading = document.getElementById('transLoading');
+    const table = document.getElementById('transTable');
+    const empty = document.getElementById('transEmpty');
+    const body = document.getElementById('transBody');
+
+    loading.style.display = 'block';
+    table.style.display = 'none';
+    empty.style.display = 'none';
+
+    if (!sb) {
+      loading.style.display = 'none';
+      empty.style.display = 'block';
+      showToast('❌ Supabase غير جاهز', 'error');
+      return;
+    }
+
+    if (!isOnline) {
+      loading.style.display = 'none';
+      empty.style.display = 'block';
+      empty.innerHTML = `<i class="fas fa-wifi"></i><p>لا يوجد اتصال بالإنترنت</p>`;
+      return;
+    }
+
+    try {
+      const { data: ordersData, error: ordersError } = await sb
+        .from('orders')
+        .select(`
+          *,
+          items:order_items(
+            id,
+            product_id,
+            product_name,
+            price,
+            quantity,
+            subtotal
+          )
+        `)
+        .order('created_at', { ascending: false });
+
+      if (ordersError) throw ordersError;
+
+      const { data: returnsData, error: returnsError } = await sb
+        .from('returns')
+        .select(`
+          *,
+          return_items(
+            id,
+            order_item_id,
+            product_id,
+            quantity,
+            price,
+            subtotal
+          )
+        `)
+        .order('created_at', { ascending: false });
+
+      if (returnsError) throw returnsError;
+
+      let transactions = [];
+      
+      if (ordersData && ordersData.length > 0) {
+        transactions = ordersData.map(order => {
+          if (!order.items) order.items = [];
+          if (!order.total || order.total === 0) {
+            order.total = order.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+          }
+          return {
+            ...order,
+            type: 'order',
+            is_return: false
+          };
+        });
+      }
+
+      if (returnsData && returnsData.length > 0) {
+        const returnTransactions = returnsData.map(ret => {
+          const items = ret.return_items || [];
+          const total = ret.total_refund || items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+          
+          const originalOrder = ordersData?.find(o => o.id === ret.order_id);
+          const originalItems = originalOrder?.items || [];
+          
+          return {
+            id: ret.id,
+            order_id: ret.order_id,
+            customer_name: originalOrder?.customer_name || 'إرجاع',
+            customer_phone: originalOrder?.customer_phone || '—',
+            total: -total,
+            status: 'returned',
+            created_at: ret.created_at,
+            items: items.map(item => {
+              const originalItem = originalItems.find(oi => oi.id === item.order_item_id);
+              const productName = originalItem?.product_name || 'منتج غير معروف';
+              
+              return {
+                product_name: `🔄 ${productName}`,
+                price: item.price,
+                quantity: item.quantity,
+                subtotal: item.subtotal,
+                original_name: productName
+              };
+            }),
+            type: 'return',
+            is_return: true,
+            return_id: ret.id,
+            original_total: originalOrder?.total || 0
+          };
+        });
+        
+        transactions = [...transactions, ...returnTransactions];
+      }
+
+      transactions.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+      loading.style.display = 'none';
+
+      if (!transactions || transactions.length === 0) {
+        empty.style.display = 'block';
+        document.getElementById('totalTransactions').textContent = '0';
+        document.getElementById('totalAmount').textContent = '0.00';
+        document.getElementById('totalReturns').textContent = '0';
+        document.getElementById('pagination').style.display = 'none';
+        return;
+      }
+
+      allTransactions = transactions;
+      allReturns = transactions.filter(t => t.is_return);
+      
+      filteredTransactions = [...allTransactions];
+      updateStats();
+      applyFilter(currentFilter);
+      renderPage();
+
+    } catch(e) {
+      console.error('Exception:', e);
+      loading.style.display = 'none';
+      empty.style.display = 'block';
+      empty.innerHTML = `<i class="fas fa-exclamation-triangle"></i><p>خطأ في التحميل: ${e.message}</p>`;
+    }
+  }
+
+  // ========== FILTERS ==========
+  function filterTransactions(filter) {
+    currentFilter = filter;
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.filter === filter);
+    });
+    applyFilter(filter);
+  }
+
+  function applyFilter(filter) {
+    if (filter === 'all') {
+      filteredTransactions = [...allTransactions];
+    } else if (filter === 'returned') {
+      filteredTransactions = allTransactions.filter(t => t.is_return === true);
+    } else {
+      filteredTransactions = allTransactions.filter(t => t.status === filter && !t.is_return);
+    }
+    currentPage = 1;
+    renderPage();
+    updateStats();
+  }
+
+  // ========== SEARCH ==========
+  function searchTransactions() {
+    const searchTerm = document.getElementById('transSearchInput').value.trim().toLowerCase();
+    if (!searchTerm) {
+      applyFilter(currentFilter);
+      return;
+    }
+    filteredTransactions = allTransactions.filter(t => {
+      const name = (t.customer_name || '').toLowerCase();
+      const id = (t.id || '').toLowerCase();
+      const orderId = (t.order_id || '').toLowerCase();
+      return name.includes(searchTerm) || id.includes(searchTerm) || orderId.includes(searchTerm);
+    });
+    currentPage = 1;
+    renderPage();
+    updateStats();
+  }
+
+  // ========== PAGINATION ==========
+  function renderPage() {
+    const body = document.getElementById('transBody');
+    const table = document.getElementById('transTable');
+    const empty = document.getElementById('transEmpty');
+    const pagination = document.getElementById('pagination');
+
+    if (filteredTransactions.length === 0) {
+      table.style.display = 'none';
+      empty.style.display = 'block';
+      pagination.style.display = 'none';
+      return;
+    }
+
+    table.style.display = 'table';
+    empty.style.display = 'none';
+
+    const totalPages = Math.ceil(filteredTransactions.length / itemsPerPage);
+    const start = (currentPage - 1) * itemsPerPage;
+    const end = Math.min(start + itemsPerPage, filteredTransactions.length);
+    const pageData = filteredTransactions.slice(start, end);
+
+    pagination.style.display = 'flex';
+    document.getElementById('pageInfo').textContent = `الصفحة ${currentPage} من ${totalPages}`;
+    document.getElementById('prevPage').disabled = currentPage <= 1;
+    document.getElementById('nextPage').disabled = currentPage >= totalPages;
+
+    const statusLabels = {
+      pending: '⏳ قيد المراجعة',
+      confirmed: '✅ مؤكدة',
+      completed: '✔️ مكتملة',
+      cancelled: '❌ ملغية',
+      returned: '🔄 مرتجعة'
+    };
+    const statusClasses = {
+      pending: 'pending',
+      confirmed: 'confirmed',
+      completed: 'completed',
+      cancelled: 'cancelled',
+      returned: 'returned'
+    };
+
+    body.innerHTML = pageData.map((transaction) => {
+      const items = transaction.items || [];
+      const total = transaction.total || items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      const itemCount = items.length;
+      const rowId = `row-${transaction.id}`;
+      const detailId = `detail-${transaction.id}`;
+      const isReturn = transaction.is_return;
+      const rowClass = isReturn ? 'return-row' : '';
+      const amountClass = isReturn ? 'amount return-amount' : 'amount';
+      const displayTotal = isReturn ? Math.abs(total) : total;
+
+      let itemsPreview = '';
+      if (items.length > 0) {
+        const previewItems = items.slice(0, 3);
+        itemsPreview = previewItems.map(item => 
+          `${escapeHtml(item.product_name || 'منتج')} (×${item.quantity})`
+        ).join('، ');
+        if (items.length > 3) {
+          itemsPreview += ` +${items.length - 3} أخرى`;
+        }
+      } else {
+        itemsPreview = 'لا توجد منتجات';
+      }
+
+      const displayId = isReturn ? `RET-${transaction.id.slice(0,6)}` : `#${transaction.id.slice(0,8)}`;
+      const orderIdDisplay = transaction.order_id ? `#${transaction.order_id.slice(0,8)}` : '—';
+      const returnBadge = isReturn ? `<span class="return-badge">🔄 مرتجع</span>` : '';
+
+      return `
+        <tr id="${rowId}" onclick="toggleDetails('${transaction.id}')" style="cursor:pointer;" class="${rowClass}">
+          <td>${isReturn ? '🔄' : '#'}${transaction.id ? transaction.id.slice(0,4) : '---'}</td>
+          <td style="font-size:0.7rem;color:var(--text-dim);">
+            ${displayId}
+            ${isReturn ? `<div style="font-size:0.55rem;">الطلب: ${orderIdDisplay}</div>` : ''}
+          </td>
+          <td>
+            <strong>${escapeHtml(transaction.customer_name || 'كليان لاكيس')}</strong>
+            <div style="font-size:0.6rem;color:var(--text-dim);">
+              <i class="fas fa-phone"></i> ${escapeHtml(transaction.customer_phone || '—')}
+            </div>
+            ${returnBadge}
+          </td>
+          <td>
+            <span style="font-size:0.75rem;color:var(--text-muted);">${itemsPreview}</span>
+            <span style="font-size:0.6rem;color:var(--text-dim);display:block;">${itemCount} منتج</span>
+          </td>
+          <td class="${amountClass}">${isReturn ? '-' : ''}${displayTotal.toFixed(2)} درهم</td>
+          <td><span class="status-badge ${statusClasses[transaction.status] || 'pending'}">${statusLabels[transaction.status] || transaction.status}</span></td>
+          <td style="font-size:0.7rem;color:var(--text-dim);">
+            ${transaction.created_at ? new Date(transaction.created_at).toLocaleString('ar-MA') : '—'}
+          </td>
+          <td>
+            <button class="expand-btn" onclick="event.stopPropagation();toggleDetails('${transaction.id}')">
+              <i class="fas fa-chevron-down"></i>
+            </button>
+          </td>
+        </tr>
+        <tr id="${detailId}" style="display:none;background:var(--bg2);">
+          <td colspan="8" style="padding:8px 12px;">
+            <div style="font-size:0.7rem;">
+              <strong style="color:${isReturn ? 'var(--return-color)' : 'var(--blue-primary)'};">
+                ${isReturn ? '🔄 تفاصيل الإرجاع:' : '📦 تفاصيل المنتجات:'}
+              </strong>
+              <div style="margin-top:4px;">
+                ${isReturn ? `
+                  <div style="color:var(--text-dim);margin-bottom:4px;">
+                    <i class="fas fa-undo"></i> إرجاع من الطلب: <strong style="color:var(--blue-primary);">${orderIdDisplay}</strong>
+                  </div>
+                  <div style="color:var(--text-dim);margin-bottom:4px;">
+                    المبلغ المسترد: <strong style="color:var(--return-color);">${displayTotal.toFixed(2)} درهم</strong>
+                  </div>
+                ` : ''}
+                ${items.length > 0 ? items.map(item => `
+                  <div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid var(--border);">
+                    <span>${escapeHtml(item.product_name || 'منتج')}</span>
+                    <span>الكمية: ${item.quantity}</span>
+                    <span style="color:${isReturn ? 'var(--return-color)' : 'var(--gold)'};">${(item.price * item.quantity).toFixed(2)} درهم</span>
+                  </div>
+                `).join('') : '<div style="color:var(--text-dim);">لا توجد منتجات مسجلة</div>'}
+                <div style="display:flex;justify-content:space-between;padding-top:6px;margin-top:4px;border-top:2px solid var(--border);font-weight:bold;">
+                  <span>${isReturn ? 'المبلغ المسترد' : 'المجموع الكلي'}</span>
+                  <span style="color:${isReturn ? 'var(--return-color)' : 'var(--gold)'};">${isReturn ? '-' : ''}${displayTotal.toFixed(2)} درهم</span>
+                </div>
+              </div>
+            </div>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  function changePage(delta) {
+    const totalPages = Math.ceil(filteredTransactions.length / itemsPerPage);
+    const newPage = currentPage + delta;
+    if (newPage < 1 || newPage > totalPages) return;
+    currentPage = newPage;
+    renderPage();
+    document.querySelector('.trans-table-container').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function toggleDetails(transactionId) {
+    const detailRow = document.getElementById(`detail-${transactionId}`);
+    const mainRow = document.getElementById(`row-${transactionId}`);
+    if (!detailRow) return;
+    
+    const isHidden = detailRow.style.display === 'none';
+    detailRow.style.display = isHidden ? 'table-row' : 'none';
+    
+    const icon = mainRow.querySelector('.expand-btn i');
+    if (icon) {
+      icon.className = isHidden ? 'fas fa-chevron-up' : 'fas fa-chevron-down';
+    }
+    mainRow.classList.toggle('expanded-row', isHidden);
+  }
+
+  // ========== UPDATE STATS ==========
+  function updateStats() {
+    const total = filteredTransactions.reduce((s, o) => s + (parseFloat(o.total) || 0), 0);
+    const returnsCount = filteredTransactions.filter(t => t.is_return).length;
+    document.getElementById('totalTransactions').textContent = filteredTransactions.length;
+    document.getElementById('totalAmount').textContent = total.toFixed(2);
+    document.getElementById('totalReturns').textContent = returnsCount;
+    document.getElementById('sidebarOrdersBadge').textContent = allTransactions.filter(t => !t.is_return).length;
+  }
+
+  // ========== EXPORT FUNCTIONS ==========
+  function exportTransactions() {
+    if (filteredTransactions.length === 0) {
+      showToast('⚠️ لا توجد معاملات للتصدير', 'warning');
+      return;
+    }
+
+    let csv = 'رقم الطلب,الزبون,الهاتف,المجموع,الحالة,التاريخ,المنتجات,نوع المعاملة\n';
+    filteredTransactions.forEach(transaction => {
+      const items = transaction.items || [];
+      const total = transaction.total || items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      const itemsList = items.map(item => 
+        `${item.product_name || 'منتج'} (${item.quantity})`
+      ).join('; ');
+      const type = transaction.is_return ? 'مرتجع' : 'بيع';
+      const displayTotal = transaction.is_return ? `-${Math.abs(total).toFixed(2)}` : total.toFixed(2);
+      csv += `#${transaction.id.slice(0,8)},${transaction.customer_name || 'كليان'},${transaction.customer_phone || '—'},${displayTotal},${transaction.status},${new Date(transaction.created_at).toLocaleString('ar-MA')},"${itemsList}",${type}\n`;
+    });
+
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `المعاملات_${new Date().toLocaleDateString('ar-MA')}.csv`;
+    link.click();
+    URL.revokeObjectURL(link.href);
+    showToast('✅ تم تصدير المعاملات', 'success');
+  }
+
+  // ========== HELPERS ==========
+  function escapeHtml(s) {
+    if (!s) return '';
+    return String(s).replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m]));
+  }
+
+  // ========== INIT ==========
+  document.addEventListener('DOMContentLoaded', () => {
+    if (window.sb) sb = window.sb;
+    loadTheme();
+    updateOnlineStatus();
+    loadAllTransactions();
+
+    document.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'r') {
+        e.preventDefault();
+        loadAllTransactions();
+        showToast('🔄 تم تحديث البيانات', 'info');
+      }
+    });
+  });
+</script>
+
+</body>
+</html>

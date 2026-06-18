@@ -1,0 +1,730 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>مول لاكيس | المحفظة</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" href="images/logo.png" type="image/png">
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    /* ========== الألوان الأساسية ========== */
+    :root {
+      --blue-primary: #0057b3;
+      --blue-dark: #003d80;
+      --blue-light: #3a8fd4;
+      --black: #0a0a0a;
+      --black-light: #0d1117;
+      --gray: #161b22;
+      --text-light: #ffffff;
+      --text-muted: #c9d1d9;
+      --text-dim: #8b949e;
+      --gold: #C4A06A;
+      --success: #25D366;
+      --danger: #ff4757;
+      --warning: #ffa502;
+    }
+
+    /* ========== الوضع الداكن (أسود + أزرق) ========== */
+    body {
+      --bg: #0a0a0a;
+      --bg2: #0d1117;
+      --bg3: #161b22;
+      --text: #ffffff;
+      --text-muted: #c9d1d9;
+      --text-dim: #8b949e;
+      --border: rgba(0,87,179,0.35);
+      --border2: rgba(0,87,179,0.5);
+      --card: rgba(13,17,23,0.85);
+      --card-hover: rgba(0,87,179,0.2);
+      --radius: 14px;
+      --shadow: 0 4px 24px rgba(0,0,0,0.4);
+      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      --sidebar-width: 240px;
+    }
+
+    /* ========== الوضع الفاتح (أزرق فاتح) ========== */
+    body.blue-theme {
+      --bg: #e8f0fe;
+      --bg2: #ffffff;
+      --bg3: #f0f5ff;
+      --text: #0a0a0a;
+      --text-muted: #1a3a5c;
+      --text-dim: #4a6a8c;
+      --border: rgba(0,87,179,0.2);
+      --border2: rgba(0,87,179,0.3);
+      --card: rgba(255,255,255,0.9);
+      --card-hover: rgba(0,87,179,0.1);
+    }
+
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: var(--bg2); border-radius: 6px; }
+    ::-webkit-scrollbar-thumb { background: var(--blue-primary); border-radius: 6px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--blue-dark); }
+
+    body {
+      background: var(--bg);
+      font-family: 'Tajawal', sans-serif;
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+      display: flex;
+      transition: var(--transition);
+    }
+
+    .sidebar {
+      width: var(--sidebar-width);
+      background: var(--bg3);
+      border-left: 2px solid var(--border);
+      min-height: 100vh;
+      padding: 16px 12px;
+      position: fixed;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      z-index: 100;
+      overflow-y: auto;
+      transition: var(--transition);
+    }
+    .sidebar .brand {
+      font-size: 1.3rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--text) 60%, var(--blue-light));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-align: center;
+      padding: 12px 0 20px 0;
+      border-bottom: 2px solid var(--border);
+      margin-bottom: 16px;
+    }
+    .sidebar .brand small {
+      font-size: 0.6rem;
+      display: block;
+      -webkit-text-fill-color: var(--text-dim);
+      background: none;
+    }
+    .sidebar .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      border-radius: 10px;
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 500;
+      transition: var(--transition);
+      margin-bottom: 4px;
+      cursor: pointer;
+    }
+    .sidebar .nav-item:hover {
+      background: var(--card-hover);
+      color: var(--text);
+    }
+    .sidebar .nav-item.active {
+      background: var(--blue-primary);
+      color: #fff;
+      box-shadow: 0 4px 16px rgba(0,87,179,0.2);
+    }
+    .sidebar .nav-item i {
+      width: 22px;
+      text-align: center;
+      font-size: 1rem;
+    }
+    .sidebar .sidebar-footer {
+      border-top: 1px solid var(--border);
+      margin-top: 20px;
+      padding-top: 16px;
+      text-align: center;
+      font-size: 0.6rem;
+      color: var(--text-dim);
+    }
+    .sidebar .sidebar-footer .online-status {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      font-size: 0.7rem;
+      padding: 4px 12px;
+      border-radius: 20px;
+      margin-bottom: 8px;
+    }
+    .sidebar .sidebar-footer .online-status.online {
+      color: var(--success);
+      border: 1px solid rgba(37,211,102,0.3);
+      background: rgba(37,211,102,0.08);
+    }
+    .sidebar .sidebar-footer .online-status.offline {
+      color: var(--danger);
+      border: 1px solid rgba(255,71,87,0.3);
+      background: rgba(255,71,87,0.08);
+    }
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+    .status-dot.online { background: var(--success); }
+    .status-dot.offline { background: var(--danger); }
+
+    /* ===== TOGGLE THEME ===== */
+    .theme-toggle {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: 6px 10px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 0.7rem;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .theme-toggle:hover {
+      background: var(--card-hover);
+      color: var(--text);
+      border-color: var(--blue-primary);
+    }
+
+    .main-content {
+      margin-right: var(--sidebar-width);
+      flex: 1;
+      padding: 12px 16px;
+      min-height: 100vh;
+      background: var(--bg);
+      transition: var(--transition);
+    }
+
+    .container {
+      max-width: 1600px;
+      margin: 0 auto;
+    }
+
+    .page-header {
+      padding: 10px 0;
+      border-bottom: 2px solid var(--border);
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .page-header h1 {
+      font-size: 1.5rem;
+      border-right: 4px solid var(--blue-primary);
+      padding-right: 12px;
+      background: linear-gradient(135deg, var(--text) 60%, var(--blue-light));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .page-header .badge {
+      background: var(--blue-primary);
+      padding: 4px 14px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      color: #fff;
+    }
+
+    .section-divider {
+      height: 1px; background: linear-gradient(to left, transparent, var(--blue-primary), transparent);
+      margin: 3px 0 12px 0; opacity: 0.25;
+    }
+
+    .wallet-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    .wallet-card {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      text-align: center;
+      transition: var(--transition);
+    }
+    .wallet-card:hover { border-color: var(--blue-primary); }
+    .wallet-card .card-icon {
+      font-size: 2rem;
+      color: var(--blue-primary);
+      margin-bottom: 8px;
+    }
+    .wallet-card .card-value {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--gold);
+    }
+    .wallet-card .card-label {
+      color: var(--text-dim);
+      font-size: 0.75rem;
+      margin-top: 4px;
+    }
+    .wallet-card .card-sub {
+      color: var(--text-dim);
+      font-size: 0.6rem;
+      margin-top: 2px;
+    }
+
+    .transfer-section {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .transfer-section .transfer-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .transfer-section .transfer-info .label {
+      color: var(--text-dim);
+      font-size: 0.75rem;
+    }
+    .transfer-section .transfer-info .amount {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--gold);
+    }
+    .transfer-section .btn-transfer {
+      padding: 10px 30px;
+      border-radius: 30px;
+      background: var(--gold);
+      border: none;
+      color: #0a0a0a;
+      font-weight: bold;
+      cursor: pointer;
+      transition: var(--transition);
+      font-size: 1rem;
+    }
+    .transfer-section .btn-transfer:hover {
+      background: #b8925a;
+      transform: scale(1.04);
+      box-shadow: 0 4px 16px rgba(196, 160, 106, 0.3);
+    }
+    .transfer-section .btn-transfer:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+    .transfer-history {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      margin-top: 16px;
+    }
+    .transfer-history .history-title {
+      color: var(--blue-primary);
+      font-size: 0.9rem;
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+    .transfer-history .history-item {
+      display: flex; justify-content: space-between;
+      padding: 6px 0; border-bottom: 1px solid var(--border);
+      font-size: 0.75rem;
+    }
+    .transfer-history .history-item .h-amount { color: var(--gold); font-weight: bold; }
+    .transfer-history .history-item .h-status { color: var(--success); }
+    .transfer-history .history-empty {
+      text-align: center; padding: 20px; color: var(--text-dim); font-size: 0.8rem;
+    }
+
+    .toast-msg {
+      position: fixed; bottom: 30px; left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: var(--bg3); border: 2px solid var(--border);
+      border-radius: 14px; padding: 12px 28px; z-index: 9999;
+      opacity: 0; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      font-size: 0.9rem; box-shadow: var(--shadow);
+      display: flex; align-items: center; gap: 10px; font-weight: 500;
+    }
+    .toast-msg.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+    .toast-msg.success { border-color: var(--success); color: var(--success); }
+    .toast-msg.error { border-color: var(--danger); color: var(--danger); }
+    .toast-msg.info { border-color: var(--blue-primary); color: var(--blue-primary); }
+    .toast-msg.warning { border-color: var(--warning); color: var(--warning); }
+
+    @media (max-width: 1100px) {
+      .sidebar { width: 60px; padding: 12px 6px; }
+      .sidebar .brand { font-size: 0.8rem; }
+      .sidebar .brand small { display: none; }
+      .sidebar .nav-item { padding: 10px 8px; font-size: 0.7rem; justify-content: center; }
+      .sidebar .nav-item span { display: none; }
+      .sidebar .sidebar-footer .online-status span:last-child { display: none; }
+      .main-content { margin-right: 60px; }
+    }
+    @media (max-width: 850px) {
+      .sidebar { width: 50px; padding: 8px 4px; }
+      .sidebar .brand { font-size: 0.7rem; padding: 8px 0; }
+      .sidebar .nav-item { padding: 8px 6px; font-size: 0.6rem; }
+      .main-content { margin-right: 50px; padding: 8px 10px; }
+      .page-header h1 { font-size: 1.2rem; }
+      .wallet-cards { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+      .wallet-card .card-value { font-size: 1.5rem; }
+      .transfer-section { flex-direction: column; text-align: center; }
+      .transfer-section .btn-transfer { width: 100%; }
+    }
+    @media (max-width: 480px) {
+      .sidebar { width: 44px; padding: 6px 2px; }
+      .sidebar .brand { font-size: 0.6rem; padding: 6px 0; }
+      .sidebar .nav-item { padding: 6px 4px; font-size: 0.5rem; }
+      .sidebar .nav-item i { font-size: 0.8rem; width: 18px; }
+      .main-content { margin-right: 44px; padding: 6px 8px; }
+      .page-header h1 { font-size: 1rem; }
+      .wallet-cards { grid-template-columns: 1fr 1fr; gap: 8px; }
+      .wallet-card { padding: 12px; }
+      .wallet-card .card-value { font-size: 1.2rem; }
+      .transfer-section .transfer-info .amount { font-size: 1.4rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ===== SIDEBAR ===== -->
+<aside class="sidebar">
+  <div class="brand">
+    🧾 مول لاكيس
+    <small>MarnissaMall</small>
+  </div>
+  
+  <nav>
+    <a href="pos.html" class="nav-item">
+      <i class="fas fa-cash-register"></i>
+      <span>نقطة البيع</span>
+    </a>
+    <a href="pos-orders.html" class="nav-item">
+      <i class="fas fa-clipboard-list"></i>
+      <span>الطلبات</span>
+      <span class="badge-nav" id="sidebarOrdersBadge">0</span>
+    </a>
+    <a href="pos-transactions.html" class="nav-item">
+      <i class="fas fa-history"></i>
+      <span>المعاملات</span>
+    </a>
+    <a href="pos-wallet.html" class="nav-item active">
+      <i class="fas fa-wallet"></i>
+      <span>المحفظة</span>
+    </a>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="online-status online" id="sidebarStatus">
+      <span class="status-dot online" id="sidebarDot"></span>
+      <span id="sidebarStatusText">متصل</span>
+    </div>
+    <div style="font-size:0.55rem;color:var(--text-dim);">
+      <i class="fas fa-store"></i> Marnissa v2.0
+    </div>
+  </div>
+</aside>
+
+<!-- ===== MAIN CONTENT ===== -->
+<div class="main-content">
+
+  <div class="container">
+
+    <!-- ===== PAGE HEADER ===== -->
+    <div class="page-header">
+      <div>
+        <h1>💰 المحفظة المالية</h1>
+        <p style="color: var(--text-dim); font-size: 0.7rem; margin-top: 2px;">إدارة الأرباح والتحويلات</p>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+        <span class="badge"><i class="fas fa-store"></i> Marnissa</span>
+        <button class="theme-toggle" onclick="toggleTheme()">
+          <i class="fas fa-moon"></i>
+          <span id="themeLabel">داكن</span>
+        </button>
+        <button onclick="location.reload()" style="background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:4px 12px;border-radius:20px;cursor:pointer;font-size:0.7rem;transition:var(--transition);"><i class="fas fa-sync-alt"></i></button>
+      </div>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <!-- ===== WALLET CARDS ===== -->
+    <div class="wallet-cards">
+      <div class="wallet-card">
+        <div class="card-icon"><i class="fas fa-coins"></i></div>
+        <div class="card-value" id="walletBalance">0.00</div>
+        <div class="card-label">الرصيد الحالي</div>
+        <div class="card-sub">درهم</div>
+      </div>
+      <div class="wallet-card">
+        <div class="card-icon"><i class="fas fa-calendar-day"></i></div>
+        <div class="card-value" id="walletToday">0.00</div>
+        <div class="card-label">أرباح اليوم</div>
+        <div class="card-sub">درهم</div>
+      </div>
+      <div class="wallet-card">
+        <div class="card-icon"><i class="fas fa-calendar-alt"></i></div>
+        <div class="card-value" id="walletMonth">0.00</div>
+        <div class="card-label">أرباح الشهر</div>
+        <div class="card-sub">درهم</div>
+      </div>
+      <div class="wallet-card">
+        <div class="card-icon"><i class="fas fa-trophy"></i></div>
+        <div class="card-value" id="walletTotal">0.00</div>
+        <div class="card-label">إجمالي الأرباح</div>
+        <div class="card-sub">درهم</div>
+      </div>
+    </div>
+
+    <!-- ===== TRANSFER SECTION ===== -->
+    <div class="transfer-section">
+      <div class="transfer-info">
+        <div class="label">💰 المبلغ القابل للتحويل</div>
+        <div class="amount" id="transferAmount">0.00 درهم</div>
+      </div>
+      <button class="btn-transfer" id="transferBtn" onclick="transferToProject()">
+        <i class="fas fa-arrow-up"></i> تحويل للمشروع
+      </button>
+    </div>
+
+    <!-- ===== TRANSFER HISTORY ===== -->
+    <div class="transfer-history">
+      <div class="history-title"><i class="fas fa-history"></i> سجل التحويلات</div>
+      <div id="historyContainer">
+        <div class="history-empty">لا توجد تحويلات</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ===== TOAST ===== -->
+<div class="toast-msg" id="toastMsg"><i class="fas fa-info-circle"></i> <span id="toastText"></span></div>
+
+<script>
+  // ==========================================
+  // WALLET PAGE
+  // ==========================================
+
+  let sb = window.sb;
+  let walletId = null;
+  let isOnline = navigator.onLine;
+  let networkCheckInterval = null;
+
+  // ========== THEME TOGGLE ==========
+  function toggleTheme() {
+    document.body.classList.toggle('blue-theme');
+    const isBlue = document.body.classList.contains('blue-theme');
+    const icon = document.querySelector('.theme-toggle i');
+    const label = document.getElementById('themeLabel');
+    if (isBlue) {
+      icon.className = 'fas fa-sun';
+      label.textContent = 'فاتح';
+      localStorage.setItem('theme', 'blue');
+    } else {
+      icon.className = 'fas fa-moon';
+      label.textContent = 'داكن';
+      localStorage.setItem('theme', 'dark');
+    }
+  }
+
+  function loadTheme() {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'blue') {
+      document.body.classList.add('blue-theme');
+      document.querySelector('.theme-toggle i').className = 'fas fa-sun';
+      document.getElementById('themeLabel').textContent = 'فاتح';
+    }
+  }
+
+  // ========== TOAST ==========
+  function showToast(msg, type) {
+    const toast = document.getElementById('toastMsg');
+    const icon = document.querySelector('#toastMsg i');
+    const text = document.getElementById('toastText');
+    const icons = { success: 'fa-check-circle', error: 'fa-times-circle', warning: 'fa-exclamation-triangle', info: 'fa-info-circle' };
+    icon.className = 'fas ' + (icons[type] || icons.info);
+    text.textContent = msg;
+    toast.className = `toast-msg ${type} show`;
+    clearTimeout(window._toastTimer);
+    window._toastTimer = setTimeout(() => toast.classList.remove('show'), 3500);
+  }
+
+  // ========== NETWORK ==========
+  function updateOnlineStatus() {
+    const statusEl = document.getElementById('sidebarStatus');
+    const dot = document.getElementById('sidebarDot');
+    const text = document.getElementById('sidebarStatusText');
+    if (isOnline) {
+      statusEl.className = 'online-status online';
+      dot.className = 'status-dot online';
+      text.textContent = 'متصل';
+    } else {
+      statusEl.className = 'online-status offline';
+      dot.className = 'status-dot offline';
+      text.textContent = 'غير متصل';
+    }
+  }
+
+  window.addEventListener('online', () => {
+    isOnline = true;
+    updateOnlineStatus();
+    showToast('🌐 تم استعادة الاتصال بالإنترنت', 'success');
+    setTimeout(() => loadWalletFull(), 1000);
+  });
+
+  window.addEventListener('offline', () => {
+    isOnline = false;
+    updateOnlineStatus();
+    showToast('⚠️ انقطع الاتصال بالإنترنت', 'error');
+  });
+
+  function startNetworkMonitoring() {
+    if (networkCheckInterval) clearInterval(networkCheckInterval);
+    networkCheckInterval = setInterval(() => {
+      const currentStatus = navigator.onLine;
+      if (currentStatus !== isOnline) {
+        isOnline = currentStatus;
+        updateOnlineStatus();
+        if (isOnline) { showToast('🌐 تم استعادة الاتصال', 'success'); loadWalletFull(); }
+        else { showToast('⚠️ انقطع الاتصال بالإنترنت', 'error'); }
+      }
+    }, 5000);
+  }
+
+  async function safeSupabaseRequest(requestFn, fallbackData = null) {
+    if (!isOnline) { showToast('⚠️ لا يوجد اتصال بالإنترنت', 'error'); return fallbackData; }
+    try { return await requestFn(); }
+    catch (error) {
+      if (error.message?.includes('Failed to fetch') || error.message?.includes('NetworkError')) {
+        isOnline = false; updateOnlineStatus(); showToast('❌ فشل الاتصال بالخادم', 'error');
+      } else { console.error('Supabase error:', error); showToast('❌ خطأ: ' + (error.message || 'حدث خطأ'), 'error'); }
+      return fallbackData;
+    }
+  }
+
+  // ========== LOAD WALLET ==========
+  async function loadWalletFull() {
+    try {
+      // Load wallet
+      const result = await safeSupabaseRequest(async () => {
+        return await sb.from('wallet').select('*').limit(1);
+      }, { data: [] });
+
+      let balance = 0;
+      if (result && result.data && result.data.length > 0) {
+        walletId = result.data[0].id;
+        balance = result.data[0].balance || 0;
+        document.getElementById('walletBalance').textContent = balance.toFixed(2);
+        document.getElementById('transferAmount').textContent = balance.toFixed(2) + ' درهم';
+      }
+
+      // Load transfer history
+      const historyResult = await safeSupabaseRequest(async () => {
+        return await sb.from('wallet_transfers').select('*').order('created_at', { ascending: false }).limit(20);
+      }, { data: [] });
+      
+      const historyContainer = document.getElementById('historyContainer');
+      if (historyResult && historyResult.data && historyResult.data.length > 0) {
+        historyContainer.innerHTML = historyResult.data.map(t => `
+          <div class="history-item">
+            <span>${new Date(t.created_at).toLocaleString('ar-MA')}</span>
+            <span class="h-amount">${t.amount.toFixed(2)} درهم</span>
+            <span class="h-status">${t.status === 'completed' ? '✅ مكتمل' : '⏳ قيد الانتظار'}</span>
+          </div>
+        `).join('');
+      } else {
+        historyContainer.innerHTML = '<div class="history-empty">لا توجد تحويلات</div>';
+      }
+
+      // Load stats
+      const today = new Date(); today.setHours(0,0,0,0);
+      const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+
+      const todayResult = await safeSupabaseRequest(async () => {
+        return await sb.from('orders').select('total').eq('status', 'completed').gte('created_at', today.toISOString());
+      }, { data: [] });
+      const todayProfit = todayResult?.data ? todayResult.data.reduce((s, o) => s + (o.total || 0), 0) : 0;
+
+      const monthResult = await safeSupabaseRequest(async () => {
+        return await sb.from('orders').select('total').eq('status', 'completed').gte('created_at', monthStart.toISOString());
+      }, { data: [] });
+      const monthProfit = monthResult?.data ? monthResult.data.reduce((s, o) => s + (o.total || 0), 0) : 0;
+
+      const totalResult = await safeSupabaseRequest(async () => {
+        return await sb.from('orders').select('total').eq('status', 'completed');
+      }, { data: [] });
+      const totalProfit = totalResult?.data ? totalResult.data.reduce((s, o) => s + (o.total || 0), 0) : 0;
+
+      document.getElementById('walletToday').textContent = todayProfit.toFixed(2);
+      document.getElementById('walletMonth').textContent = monthProfit.toFixed(2);
+      document.getElementById('walletTotal').textContent = totalProfit.toFixed(2);
+
+    } catch(e) { console.error('Error loading wallet:', e); }
+  }
+
+  // ========== TRANSFER ==========
+  window.transferToProject = async function() {
+    const balanceText = document.getElementById('walletBalance').textContent;
+    const currentBalance = parseFloat(balanceText) || 0;
+    
+    if (currentBalance <= 0) {
+      showToast('⚠️ لا يوجد رصيد للتحويل', 'warning');
+      return;
+    }
+
+    if (!isOnline) {
+      showToast('⚠️ لا يوجد اتصال بالإنترنت', 'error');
+      return;
+    }
+
+    if (!confirm(`💰 هل تريد تحويل ${currentBalance.toFixed(2)} درهم إلى المشروع؟`)) return;
+
+    const btn = document.getElementById('transferBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري...';
+
+    try {
+      await sb.from('wallet_transfers').insert({
+        amount: currentBalance,
+        status: 'completed',
+        note: 'تحويل من لاكيس إلى المشروع'
+      });
+
+      await sb
+        .from('wallet')
+        .update({ balance: 0, total_transferred: currentBalance, updated_at: new Date() })
+        .eq('id', walletId);
+
+      document.getElementById('walletBalance').textContent = '0.00';
+      document.getElementById('transferAmount').textContent = '0.00 درهم';
+      showToast(`✅ تم تحويل ${currentBalance.toFixed(2)} درهم`, 'success');
+      
+      loadWalletFull();
+
+    } catch(e) {
+      console.error(e);
+      showToast('❌ خطأ: ' + e.message, 'error');
+    }
+
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-arrow-up"></i> تحويل للمشروع';
+  };
+
+  // ========== HELPERS ==========
+  function escapeHtml(s) { if (!s) return ''; return String(s).replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); }
+
+  // ========== INIT ==========
+  document.addEventListener('DOMContentLoaded', () => {
+    if (window.sb) sb = window.sb;
+    loadTheme();
+    updateOnlineStatus();
+    startNetworkMonitoring();
+    loadWalletFull();
+  });
+</script>
+
+</body>
+</html>
