@@ -1,0 +1,1060 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>إدارة المحفظة | MarnissaMall</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" href="images/logo.png" type="image/png">
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&family=Cairo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --blue-primary: #0057b3;
+      --blue-dark: #003d80;
+      --blue-light: #3a8fd4;
+      --success: #25D366;
+      --danger: #ff4757;
+      --warning: #ffa502;
+      --info: #00bcd4;
+      --purple: #6c5ce7;
+      --gold: #f9a825;
+    }
+
+    body {
+      --bg: #0a0a0a;
+      --bg2: #0d1117;
+      --text: #ffffff;
+      --text-muted: #c9d1d9;
+      --text-dim: #8b949e;
+      --border: rgba(0,87,179,0.35);
+      --border2: rgba(0,87,179,0.5);
+      --card: rgba(13,17,23,0.85);
+      --card-hover: rgba(0,87,179,0.2);
+      background: var(--bg);
+      font-family: 'Tajawal', 'Cairo', sans-serif;
+      color: var(--text);
+      min-height: 100vh;
+      transition: background-color 0.5s ease, color 0.5s ease;
+    }
+
+    body.blue-theme {
+      --bg: #e8f0fe;
+      --bg2: #ffffff;
+      --text: #0a0a0a;
+      --text-muted: #1a3a5c;
+      --text-dim: #4a6a8c;
+      --border: rgba(0,87,179,0.2);
+      --border2: rgba(0,87,179,0.3);
+      --card: rgba(255,255,255,0.9);
+      --card-hover: rgba(0,87,179,0.1);
+    }
+
+    .darija-text { font-family: 'Tajawal', 'Cairo', sans-serif; }
+
+    .page-header {
+      padding: clamp(40px, 6vh, 70px) 1.5rem 1.5rem;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .section-title {
+      position: relative;
+      display: inline-block;
+      font-size: clamp(1.5rem, 5vw, 2rem);
+    }
+    .section-title::after {
+      content: '';
+      position: absolute;
+      bottom: -12px;
+      right: 0;
+      width: 50px;
+      height: 2px;
+      background: var(--blue-primary);
+    }
+
+    .container-wrap {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 1.5rem clamp(60px, 8vh, 100px);
+    }
+
+    /* ===== KPI Cards ===== */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1rem;
+      margin: 2rem 0;
+    }
+    .kpi-card {
+      background: var(--card);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      transition: all 0.3s;
+    }
+    .kpi-card:hover { border-color: var(--blue-primary); transform: translateY(-3px); }
+    .kpi-icon {
+      width: 48px; height: 48px;
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem;
+      flex-shrink: 0;
+    }
+    .kpi-icon.blue { background: rgba(0,87,179,0.15); color: var(--blue-primary); }
+    .kpi-icon.success { background: rgba(37,211,102,0.15); color: var(--success); }
+    .kpi-icon.warning { background: rgba(255,165,2,0.15); color: var(--warning); }
+    .kpi-icon.danger { background: rgba(255,71,87,0.15); color: var(--danger); }
+    .kpi-icon.info { background: rgba(0,188,212,0.15); color: var(--info); }
+    .kpi-icon.purple { background: rgba(108,92,231,0.15); color: var(--purple); }
+    .kpi-value { font-size: 1.5rem; font-weight: 800; line-height: 1.2; }
+    .kpi-label { font-size: 0.75rem; color: var(--text-dim); margin-top: 2px; }
+
+    /* ===== Wallet Card ===== */
+    .wallet-card {
+      background: var(--card);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      transition: all 0.3s;
+    }
+    .wallet-card:hover { border-color: var(--blue-primary); }
+
+    .wallet-balance {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem;
+      margin-top: 1rem;
+    }
+    .balance-item {
+      text-align: center;
+      padding: 1.5rem;
+      background: rgba(0,87,179,0.05);
+      border-radius: 16px;
+      border: 1px solid var(--border2);
+    }
+    .balance-item .amount {
+      font-size: 2rem;
+      font-weight: 800;
+      margin: 0.5rem 0;
+    }
+    .balance-item .label {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+    }
+    .balance-item .icon {
+      font-size: 1.5rem;
+      opacity: 0.6;
+    }
+    .balance-item.primary .amount { color: var(--blue-primary); }
+    .balance-item.success .amount { color: var(--success); }
+    .balance-item.warning .amount { color: var(--warning); }
+    .balance-item.danger .amount { color: var(--danger); }
+
+    /* ===== Buttons ===== */
+    .gold-btn {
+      background: transparent;
+      border: 1.5px solid var(--blue-primary);
+      color: var(--text);
+      letter-spacing: 1px;
+      font-weight: 500;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.4s;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.65rem 1.5rem;
+      border-radius: 50px;
+      font-size: 0.85rem;
+      white-space: nowrap;
+      font-family: 'Tajawal', 'Cairo', sans-serif;
+    }
+    .gold-btn::before {
+      content: '';
+      position: absolute;
+      top: 0; left: -100%; width: 100%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(0,87,179,0.2), transparent);
+      transition: left 0.5s;
+    }
+    .gold-btn:hover::before { left: 100%; }
+    .gold-btn:hover { transform: translateY(-2px); border-color: var(--blue-light); color: var(--blue-light); }
+    .gold-btn.success { border-color: var(--success); color: var(--success); }
+    .gold-btn.success:hover { background: rgba(37,211,102,0.1); }
+    .gold-btn.danger { border-color: var(--danger); color: var(--danger); }
+    .gold-btn.danger:hover { background: rgba(255,71,87,0.1); }
+    .gold-btn.purple { border-color: var(--purple); color: var(--purple); }
+    .gold-btn.purple:hover { background: rgba(108,92,231,0.1); }
+
+    /* ===== Table ===== */
+    .table-wrap {
+      background: var(--card);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      overflow: hidden;
+    }
+    .wallet-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+    .wallet-table th {
+      text-align: right;
+      padding: 1rem;
+      background: rgba(0,87,179,0.08);
+      color: var(--blue-primary);
+      font-weight: 700;
+      font-size: 0.7rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      white-space: nowrap;
+      font-family: 'Tajawal', 'Cairo', sans-serif;
+    }
+    .wallet-table td {
+      padding: 0.9rem 1rem;
+      border-top: 1px solid var(--border);
+      vertical-align: middle;
+      font-family: 'Tajawal', 'Cairo', sans-serif;
+    }
+    .wallet-table tr:hover td { background: var(--card-hover); }
+
+    /* ===== Status Badges ===== */
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      font-family: 'Tajawal', 'Cairo', sans-serif;
+    }
+    .status-badge.pending { background: rgba(255,165,2,0.12); color: var(--warning); }
+    .status-badge.completed { background: rgba(37,211,102,0.12); color: var(--success); }
+    .status-badge.failed { background: rgba(255,71,87,0.12); color: var(--danger); }
+
+    /* ===== Icons ===== */
+    .icon-btn {
+      width: 34px; height: 34px;
+      border-radius: 8px;
+      border: 1px solid var(--border2);
+      background: rgba(0,87,179,0.05);
+      color: var(--text-muted);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.25s;
+      font-size: 0.85rem;
+    }
+    .icon-btn:hover { border-color: var(--blue-primary); color: var(--blue-primary); background: rgba(0,87,179,0.12); }
+    .icon-btn.success:hover { border-color: var(--success); color: var(--success); background: rgba(37,211,102,0.12); }
+    .icon-btn.danger:hover { border-color: var(--danger); color: var(--danger); background: rgba(255,71,87,0.12); }
+
+    .actions-cell { display: flex; gap: 0.4rem; justify-content: flex-end; }
+
+    /* ===== Toolbar ===== */
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
+    }
+    .search-input {
+      background: var(--card);
+      border: 1px solid var(--border2);
+      border-radius: 12px;
+      padding: 0.65rem 1rem;
+      color: var(--text);
+      font-family: 'Tajawal', 'Cairo', sans-serif;
+      min-width: 220px;
+      flex: 1;
+    }
+    .search-input:focus { outline: none; border-color: var(--blue-primary); }
+    .search-input::placeholder { color: var(--text-dim); }
+
+    .filter-select {
+      background: var(--card);
+      border: 1px solid var(--border2);
+      border-radius: 12px;
+      padding: 0.65rem 1rem;
+      color: var(--text);
+      font-family: 'Tajawal', 'Cairo', sans-serif;
+      cursor: pointer;
+    }
+    .filter-select:focus { outline: none; border-color: var(--blue-primary); }
+
+    /* ===== Modal ===== */
+    .modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      padding: 1rem;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal-box {
+      background: var(--bg2);
+      border: 1px solid var(--border2);
+      border-radius: 20px;
+      padding: 1.75rem;
+      max-width: 500px;
+      width: 100%;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+    }
+    .modal-box h3 { font-size: 1.2rem; margin-bottom: 0.3rem; color: var(--text); font-family: 'Tajawal', 'Cairo', sans-serif; }
+    .modal-box p { font-size: 0.85rem; color: var(--text-dim); margin-bottom: 1.25rem; font-family: 'Tajawal', 'Cairo', sans-serif; }
+
+    .modal-input-group { margin-bottom: 1rem; }
+    .modal-input-group label { font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 0.3rem; font-family: 'Tajawal', 'Cairo', sans-serif; }
+    .modal-input {
+      background: rgba(0,0,0,0.05);
+      border: 1px solid var(--border2);
+      border-radius: 12px;
+      padding: 0.7rem 1rem;
+      color: var(--text);
+      width: 100%;
+      font-family: 'Tajawal', 'Cairo', sans-serif;
+    }
+    .modal-input:focus { outline: none; border-color: var(--blue-primary); }
+    .modal-input::placeholder { color: var(--text-dim); }
+
+    .modal-actions { display: flex; gap: 0.75rem; margin-top: 1.5rem; }
+    .modal-actions .gold-btn { flex: 1; justify-content: center; }
+    .btn-cancel {
+      flex: 1;
+      justify-content: center;
+      background: rgba(255,71,87,0.08);
+      border: 1.5px solid rgba(255,71,87,0.3);
+      color: var(--danger);
+      border-radius: 50px;
+      padding: 0.65rem 1.5rem;
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: 'Tajawal', 'Cairo', sans-serif;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.3s;
+    }
+    .btn-cancel:hover { background: rgba(255,71,87,0.15); }
+
+    /* ===== States ===== */
+    .empty-state, .loading-state {
+      text-align: center;
+      padding: 4rem 1rem;
+      color: var(--text-dim);
+      font-family: 'Tajawal', 'Cairo', sans-serif;
+    }
+    .loader-spinner {
+      width: 36px; height: 36px;
+      border: 3px solid rgba(0,87,179,0.3);
+      border-radius: 50%;
+      border-top-color: var(--blue-primary);
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 1rem;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ===== Toast ===== */
+    .toast-msg {
+      position: fixed;
+      bottom: 30px; left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: var(--bg2);
+      border: 1px solid var(--blue-primary);
+      border-radius: 12px;
+      padding: 0.8rem 1.5rem;
+      font-size: 0.85rem;
+      display: flex; align-items: center; gap: 0.6rem;
+      z-index: 4000;
+      opacity: 0;
+      transition: all 0.35s;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+      font-family: 'Tajawal', 'Cairo', sans-serif;
+    }
+    .toast-msg.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+    .toast-msg.success { border-color: var(--success); color: var(--success); }
+    .toast-msg.error { border-color: var(--danger); color: var(--danger); }
+    .toast-msg.info { border-color: var(--info); color: var(--info); }
+
+    .quick-actions {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      margin: 1rem 0;
+    }
+
+    .pending-count-badge {
+      background: rgba(255,165,2,0.2);
+      color: var(--warning);
+      border: 1px solid rgba(255,165,2,0.3);
+      border-radius: 50px;
+      padding: 0.15rem 0.65rem;
+      font-size: 0.7rem;
+      font-weight: 700;
+      margin-right: 0.3rem;
+    }
+
+    @media (max-width: 768px) {
+      .table-wrap { overflow-x: auto; }
+      .wallet-table { min-width: 650px; }
+      .wallet-balance { grid-template-columns: 1fr; }
+      .kpi-grid { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ===== Header و Navbar ===== -->
+  <div id="header-placeholder"></div>
+  <div id="admin-navbar-placeholder"></div>
+
+  <!-- ===== المحتوى الرئيسي ===== -->
+  <div class="page-header">
+    <span class="text-xs tracking-[0.3em] darija-text" style="color:var(--blue-primary);">✦ إدارة المحفظة ✦</span>
+    <h1 class="section-title font-bold darija-text mt-2" style="color:var(--text);">المحفظة المالية</h1>
+    <p class="text-sm mt-4 darija-text" style="color:var(--text-dim);">إدارة الرصيد، سجل التحويلات، وإضافة/سحب الأموال</p>
+  </div>
+
+  <div class="container-wrap">
+
+    <!-- ===== KPI Cards ===== -->
+    <div class="kpi-grid" data-aos="fade-up">
+      <div class="kpi-card">
+        <div class="kpi-icon blue"><i class="fas fa-wallet"></i></div>
+        <div>
+          <div class="kpi-value" id="kpiBalance">0.00</div>
+          <div class="kpi-label darija-text">الرصيد الحالي</div>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon success"><i class="fas fa-arrow-up"></i></div>
+        <div>
+          <div class="kpi-value" id="kpiEarned">0.00</div>
+          <div class="kpi-label darija-text">إجمالي المكاسب</div>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon warning"><i class="fas fa-arrow-down"></i></div>
+        <div>
+          <div class="kpi-value" id="kpiTransferred">0.00</div>
+          <div class="kpi-label darija-text">إجمالي المحول</div>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon danger"><i class="fas fa-clock"></i></div>
+        <div>
+          <div class="kpi-value" id="kpiPending">0</div>
+          <div class="kpi-label darija-text">العمليات المعلقة</div>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon info"><i class="fas fa-exchange-alt"></i></div>
+        <div>
+          <div class="kpi-value" id="kpiTotalTransfers">0</div>
+          <div class="kpi-label darija-text">إجمالي التحويلات</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== بطاقة المحفظة ===== -->
+    <div class="wallet-card" data-aos="fade-up">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+        <div>
+          <h2 class="text-lg font-bold darija-text" style="color:var(--text);">💰 تفاصيل المحفظة</h2>
+          <p class="text-sm darija-text" style="color:var(--text-dim);">
+            آخر تحديث: <span id="lastUpdated">—</span>
+            <span id="pendingBadge" style="display:none;" class="pending-count-badge">
+              <i class="fas fa-clock"></i> <span id="pendingCountBadge">0</span> معلق
+            </span>
+          </p>
+        </div>
+        <div class="quick-actions">
+          <button class="gold-btn success darija-text" onclick="openAddFundsModal()">
+            <i class="fas fa-plus"></i> إيداع
+          </button>
+          <button class="gold-btn danger darija-text" onclick="openWithdrawModal()">
+            <i class="fas fa-minus"></i> سحب
+          </button>
+          <button class="gold-btn purple darija-text" onclick="openTransferModal()">
+            <i class="fas fa-exchange-alt"></i> تحويل
+          </button>
+        </div>
+      </div>
+
+      <div class="wallet-balance">
+        <div class="balance-item primary">
+          <div class="icon"><i class="fas fa-wallet"></i></div>
+          <div class="label darija-text">الرصيد الحالي</div>
+          <div class="amount" id="currentBalance">0.00 درهم</div>
+        </div>
+        <div class="balance-item success">
+          <div class="icon"><i class="fas fa-arrow-up"></i></div>
+          <div class="label darija-text">إجمالي المكاسب</div>
+          <div class="amount" id="totalEarned">0.00 درهم</div>
+        </div>
+        <div class="balance-item warning">
+          <div class="icon"><i class="fas fa-arrow-down"></i></div>
+          <div class="label darija-text">إجمالي المحول</div>
+          <div class="amount" id="totalTransferred">0.00 درهم</div>
+        </div>
+        <div class="balance-item danger">
+          <div class="icon"><i class="fas fa-clock"></i></div>
+          <div class="label darija-text">العمليات المعلقة</div>
+          <div class="amount" id="pendingTransfers">0</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== شريط الأدوات ===== -->
+    <div class="toolbar">
+      <input type="text" id="searchInput" class="search-input darija-text" placeholder="🔍 بحث عن تحويل (مبلغ، ملاحظة)...">
+      <select id="statusFilter" class="filter-select darija-text">
+        <option value="all">📊 كل الحالات</option>
+        <option value="pending">⏳ معلق</option>
+        <option value="completed">✅ مكتمل</option>
+        <option value="failed">❌ فشل</option>
+      </select>
+      <button class="gold-btn darija-text" onclick="loadWalletData()">
+        <i class="fas fa-sync-alt"></i> تحديث
+      </button>
+    </div>
+
+    <!-- ===== جدول التحويلات ===== -->
+    <div class="table-wrap">
+      <div id="loadingState" class="loading-state darija-text">
+        <div class="loader-spinner"></div>
+        <p>جاري تحميل البيانات...</p>
+      </div>
+      <div id="tableContainer" style="display:none;">
+        <table class="wallet-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>المبلغ</th>
+              <th>الحالة</th>
+              <th>الملاحظة</th>
+              <th>تاريخ الإنشاء</th>
+              <th>الإجراءات</th>
+            </tr>
+          </thead>
+          <tbody id="transfersTableBody"></tbody>
+        </table>
+      </div>
+      <div id="emptyState" class="empty-state darija-text" style="display:none;">
+        <i class="fas fa-exchange-alt text-3xl mb-3 block opacity-40"></i>
+        لا توجد تحويلات مسجلة
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ===== مودال الإيداع/السحب/التحويل ===== -->
+  <div class="modal-overlay" id="walletModal">
+    <div class="modal-box">
+      <h3 id="modalTitle" class="darija-text">💰 إيداع</h3>
+      <p id="modalSubtitle" class="darija-text" style="color:var(--text-dim);">أدخل المبلغ واختر العملية</p>
+
+      <div class="modal-input-group">
+        <label class="darija-text">المبلغ (درهم)</label>
+        <input type="number" id="modalAmount" class="modal-input" placeholder="0.00" step="0.01" min="0.01">
+      </div>
+
+      <div class="modal-input-group">
+        <label class="darija-text">الملاحظة (اختياري)</label>
+        <input type="text" id="modalNote" class="modal-input" placeholder="سبب العملية...">
+      </div>
+
+      <input type="hidden" id="modalType" value="deposit">
+
+      <div class="modal-actions">
+        <button class="btn-cancel darija-text" onclick="closeWalletModal()">
+          <i class="fas fa-times"></i> إلغاء
+        </button>
+        <button class="gold-btn darija-text" id="modalConfirmBtn" onclick="confirmWalletAction()">
+          <i class="fas fa-check"></i> تأكيد
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== توست ===== -->
+  <div class="toast-msg" id="toastMsg"></div>
+
+  <!-- ===== ملفات JavaScript ===== -->
+  <script src="admin.js"></script>
+  <script src="header.js"></script>
+  <script src="footer.js"></script>
+
+  <script>
+    AOS.init({ duration: 700, once: true, offset: 60 });
+
+    let sb = null;
+    let walletData = null;
+    let transfers = [];
+    let isProcessing = false;
+
+    function initSupabase() {
+      try {
+        if (typeof MARNISSA_CONFIG !== 'undefined' && MARNISSA_CONFIG.SUPABASE_URL && MARNISSA_CONFIG.SUPABASE_ANON_KEY) {
+          sb = supabase.createClient(MARNISSA_CONFIG.SUPABASE_URL, MARNISSA_CONFIG.SUPABASE_ANON_KEY);
+          console.log('✅ Supabase client initialized');
+        } else {
+          console.error('❌ Supabase config manquante');
+          showToast('❌ خطأ: تأكد من إعدادات Supabase في config.js', 'error');
+        }
+      } catch(e) {
+        console.error('❌ Supabase init error:', e);
+      }
+    }
+
+    // ========== تحميل البيانات ==========
+    async function loadWalletData() {
+      if (!sb) return;
+
+      document.getElementById('loadingState').style.display = 'block';
+      document.getElementById('tableContainer').style.display = 'none';
+      document.getElementById('emptyState').style.display = 'none';
+
+      try {
+        // 1. تحميل بيانات المحفظة
+        const { data: wallet, error: walletError } = await sb
+          .from('wallet')
+          .select('*')
+          .limit(1)
+          .maybeSingle();
+
+        if (walletError && walletError.code !== 'PGRST116') {
+          throw walletError;
+        }
+
+        if (!wallet) {
+          // إنشاء محفظة افتراضية إذا لم تكن موجودة
+          const { data: newWallet, error: createError } = await sb
+            .from('wallet')
+            .insert({
+              balance: 0,
+              total_earned: 0,
+              total_transferred: 0,
+              name: 'المحفظة الرئيسية'
+            })
+            .select()
+            .single();
+
+          if (createError) throw createError;
+          walletData = newWallet;
+        } else {
+          walletData = wallet;
+        }
+
+        // 2. تحميل التحويلات
+        const { data: transfersData, error: transfersError } = await sb
+          .from('wallet_transfers')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        if (transfersError) throw transfersError;
+        transfers = transfersData || [];
+
+        // 3. تحديث الواجهة
+        updateWalletUI();
+        renderTransfersTable(filterTransfers());
+        updateKPIs();
+        document.getElementById('loadingState').style.display = 'none';
+        document.getElementById('tableContainer').style.display = 'block';
+
+      } catch(e) {
+        console.error('❌ Error loading wallet data:', e);
+        showToast('❌ خطأ في تحميل البيانات: ' + e.message, 'error');
+        document.getElementById('loadingState').style.display = 'none';
+        document.getElementById('emptyState').style.display = 'block';
+      }
+    }
+
+    function updateWalletUI() {
+      if (!walletData) return;
+
+      const balance = walletData.balance || 0;
+      const earned = walletData.total_earned || 0;
+      const transferred = walletData.total_transferred || 0;
+      const pendingCount = transfers.filter(t => t.status === 'pending').length;
+
+      document.getElementById('currentBalance').textContent = balance.toFixed(2) + ' درهم';
+      document.getElementById('totalEarned').textContent = earned.toFixed(2) + ' درهم';
+      document.getElementById('totalTransferred').textContent = transferred.toFixed(2) + ' درهم';
+      document.getElementById('pendingTransfers').textContent = pendingCount;
+      
+      const updated = walletData.updated_at ? new Date(walletData.updated_at).toLocaleString('ar-MA') : '—';
+      document.getElementById('lastUpdated').textContent = updated;
+
+      // Badge للعمليات المعلقة
+      const badge = document.getElementById('pendingBadge');
+      const badgeCount = document.getElementById('pendingCountBadge');
+      if (pendingCount > 0) {
+        badge.style.display = 'inline';
+        badgeCount.textContent = pendingCount;
+      } else {
+        badge.style.display = 'none';
+      }
+    }
+
+    function updateKPIs() {
+      const balance = walletData?.balance || 0;
+      const earned = walletData?.total_earned || 0;
+      const transferred = walletData?.total_transferred || 0;
+      const pendingCount = transfers.filter(t => t.status === 'pending').length;
+      const totalTransfers = transfers.length;
+
+      document.getElementById('kpiBalance').textContent = balance.toFixed(2) + ' درهم';
+      document.getElementById('kpiEarned').textContent = earned.toFixed(2) + ' درهم';
+      document.getElementById('kpiTransferred').textContent = transferred.toFixed(2) + ' درهم';
+      document.getElementById('kpiPending').textContent = pendingCount;
+      document.getElementById('kpiTotalTransfers').textContent = totalTransfers;
+    }
+
+    function renderTransfersTable(filteredTransfers) {
+      const tbody = document.getElementById('transfersTableBody');
+
+      if (!filteredTransfers || filteredTransfers.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="text-center py-8 darija-text" style="color:var(--text-dim);">لا توجد تحويلات مطابقة</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filteredTransfers.map((t, index) => {
+        const statusClass = t.status === 'completed' ? 'completed' : t.status === 'failed' ? 'failed' : 'pending';
+        const statusIcon = t.status === 'completed' ? 'fa-check-circle' : t.status === 'failed' ? 'fa-times-circle' : 'fa-clock';
+        const amountColor = t.status === 'completed' ? 'var(--success)' : t.status === 'failed' ? 'var(--danger)' : 'var(--warning)';
+        const sign = t.amount > 0 ? '+' : '';
+        const formattedAmount = `${sign}${t.amount.toFixed(2)}`;
+
+        return `
+          <tr>
+            <td>${index + 1}</td>
+            <td style="color: ${amountColor}; font-weight: 700;">${formattedAmount} درهم</td>
+            <td>
+              <span class="status-badge ${statusClass} darija-text">
+                <i class="fas ${statusIcon}"></i>
+                ${t.status === 'completed' ? 'مكتمل' : t.status === 'failed' ? 'فشل' : 'معلق'}
+              </span>
+            </td>
+            <td class="darija-text" style="font-size:0.8rem;">${escapeHtml(t.note || '—')}</td>
+            <td style="font-size:0.7rem;">${new Date(t.created_at).toLocaleString('ar-MA')}</td>
+            <td>
+              <div class="actions-cell">
+                ${t.status === 'pending' ? `
+                  <button class="icon-btn success" onclick="updateTransferStatus('${t.id}', 'completed')" title="تأكيد">
+                    <i class="fas fa-check"></i>
+                  </button>
+                  <button class="icon-btn danger" onclick="updateTransferStatus('${t.id}', 'failed')" title="رفض">
+                    <i class="fas fa-times"></i>
+                  </button>
+                ` : `
+                  <button class="icon-btn" onclick="deleteTransfer('${t.id}')" title="حذف">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                `}
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function filterTransfers() {
+      const search = document.getElementById('searchInput').value.trim().toLowerCase();
+      const status = document.getElementById('statusFilter').value;
+
+      return transfers.filter(t => {
+        const matchesSearch = !search || 
+          (t.note && t.note.toLowerCase().includes(search)) ||
+          t.amount.toString().includes(search);
+        
+        const matchesStatus = status === 'all' || t.status === status;
+        
+        return matchesSearch && matchesStatus;
+      });
+    }
+
+    // ========== عمليات المحفظة ==========
+    async function updateWalletBalance(amount, type, note = '') {
+      if (!walletData) return false;
+
+      const newBalance = type === 'deposit' 
+        ? walletData.balance + amount 
+        : walletData.balance - amount;
+
+      if (newBalance < 0) {
+        showToast('⚠️ الرصيد غير كافي', 'error');
+        return false;
+      }
+
+      // تحديث المحفظة
+      const updates = {
+        balance: newBalance,
+        updated_at: new Date().toISOString()
+      };
+
+      if (type === 'deposit') {
+        updates.total_earned = (walletData.total_earned || 0) + amount;
+      } else {
+        updates.total_transferred = (walletData.total_transferred || 0) + amount;
+      }
+
+      const { error: updateError } = await sb
+        .from('wallet')
+        .update(updates)
+        .eq('id', walletData.id);
+
+      if (updateError) {
+        console.error('❌ Update error:', updateError);
+        showToast('❌ فشل تحديث المحفظة: ' + updateError.message, 'error');
+        return false;
+      }
+
+      // تحديث البيانات المحلية
+      walletData.balance = newBalance;
+      if (type === 'deposit') {
+        walletData.total_earned = (walletData.total_earned || 0) + amount;
+      } else {
+        walletData.total_transferred = (walletData.total_transferred || 0) + amount;
+      }
+
+      // تسجيل التحويل
+      const { error: insertError } = await sb
+        .from('wallet_transfers')
+        .insert({
+          amount: type === 'deposit' ? amount : -amount,
+          status: 'completed',
+          note: note || (type === 'deposit' ? 'إيداع' : 'سحب')
+        });
+
+      if (insertError) {
+        console.warn('⚠️ Transfer record failed:', insertError.message);
+      }
+
+      return true;
+    }
+
+    // ========== إدارة التحويلات ==========
+    async function updateTransferStatus(transferId, status) {
+      if (isProcessing) return;
+      isProcessing = true;
+
+      try {
+        // جلب بيانات التحويل
+        const { data: transfer, error: fetchError } = await sb
+          .from('wallet_transfers')
+          .select('*')
+          .eq('id', transferId)
+          .single();
+
+        if (fetchError) throw fetchError;
+        if (!transfer || transfer.status !== 'pending') {
+          showToast('⚠️ هذه العملية ليست معلقة', 'warning');
+          return;
+        }
+
+        // تحديث حالة التحويل
+        const { error: updateError } = await sb
+          .from('wallet_transfers')
+          .update({ status })
+          .eq('id', transferId);
+
+        if (updateError) throw updateError;
+
+        // إذا كانت مكتملة، تحديث المحفظة
+        if (status === 'completed') {
+          const isDeposit = transfer.amount > 0;
+          const amount = Math.abs(transfer.amount);
+          const success = await updateWalletBalance(amount, isDeposit ? 'deposit' : 'withdraw', transfer.note);
+          
+          if (!success) {
+            // إعادة الحالة إذا فشل التحديث
+            await sb.from('wallet_transfers').update({ status: 'pending' }).eq('id', transferId);
+            return;
+          }
+        }
+
+        showToast(`✅ تم ${status === 'completed' ? 'تأكيد' : 'رفض'} العملية`, 'success');
+        await loadWalletData();
+
+      } catch(e) {
+        console.error('❌ Status update error:', e);
+        showToast('❌ خطأ: ' + e.message, 'error');
+      } finally {
+        isProcessing = false;
+      }
+    }
+
+    async function deleteTransfer(transferId) {
+      if (!confirm('⚠️ هل أنت متأكد من حذف هذه العملية؟')) return;
+
+      try {
+        const { error } = await sb
+          .from('wallet_transfers')
+          .delete()
+          .eq('id', transferId);
+
+        if (error) throw error;
+        showToast('✅ تم حذف العملية', 'success');
+        await loadWalletData();
+      } catch(e) {
+        console.error('❌ Delete error:', e);
+        showToast('❌ خطأ في الحذف: ' + e.message, 'error');
+      }
+    }
+
+    // ========== المودالات ==========
+    function openAddFundsModal() {
+      document.getElementById('modalTitle').textContent = '💰 إيداع في المحفظة';
+      document.getElementById('modalSubtitle').textContent = 'أدخل المبلغ الذي تريد إضافته للمحفظة';
+      document.getElementById('modalType').value = 'deposit';
+      document.getElementById('modalAmount').value = '';
+      document.getElementById('modalNote').value = '';
+      document.getElementById('modalConfirmBtn').innerHTML = '<i class="fas fa-plus"></i> إيداع';
+      document.getElementById('walletModal').classList.add('open');
+    }
+
+    function openWithdrawModal() {
+      document.getElementById('modalTitle').textContent = '💸 سحب من المحفظة';
+      document.getElementById('modalSubtitle').textContent = 'أدخل المبلغ الذي تريد سحبه من المحفظة';
+      document.getElementById('modalType').value = 'withdraw';
+      document.getElementById('modalAmount').value = '';
+      document.getElementById('modalNote').value = '';
+      document.getElementById('modalConfirmBtn').innerHTML = '<i class="fas fa-minus"></i> سحب';
+      document.getElementById('walletModal').classList.add('open');
+    }
+
+    function openTransferModal() {
+      document.getElementById('modalTitle').textContent = '🔄 تحويل مالي';
+      document.getElementById('modalSubtitle').textContent = 'أدخل المبلغ المراد تحويله (سيتم تسجيله كتحويل معلق)';
+      document.getElementById('modalType').value = 'transfer';
+      document.getElementById('modalAmount').value = '';
+      document.getElementById('modalNote').value = '';
+      document.getElementById('modalConfirmBtn').innerHTML = '<i class="fas fa-exchange-alt"></i> تحويل';
+      document.getElementById('walletModal').classList.add('open');
+    }
+
+    function closeWalletModal() {
+      document.getElementById('walletModal').classList.remove('open');
+    }
+
+    async function confirmWalletAction() {
+      const amount = parseFloat(document.getElementById('modalAmount').value);
+      const note = document.getElementById('modalNote').value.trim();
+      const type = document.getElementById('modalType').value;
+
+      if (!amount || amount <= 0) {
+        showToast('⚠️ أدخل مبلغ صحيح', 'error');
+        return;
+      }
+
+      if (isProcessing) return;
+      isProcessing = true;
+
+      try {
+        if (type === 'deposit') {
+          // إيداع مباشر
+          const success = await updateWalletBalance(amount, 'deposit', note || 'إيداع يدوي');
+          if (success) {
+            showToast(`✅ تم إيداع ${amount.toFixed(2)} درهم بنجاح`, 'success');
+            closeWalletModal();
+            await loadWalletData();
+          }
+        } else if (type === 'withdraw') {
+          // سحب مباشر
+          if (amount > walletData.balance) {
+            showToast(`⚠️ الرصيد غير كافي. الرصيد الحالي: ${walletData.balance.toFixed(2)} درهم`, 'error');
+            return;
+          }
+          const success = await updateWalletBalance(amount, 'withdraw', note || 'سحب يدوي');
+          if (success) {
+            showToast(`✅ تم سحب ${amount.toFixed(2)} درهم بنجاح`, 'success');
+            closeWalletModal();
+            await loadWalletData();
+          }
+        } else if (type === 'transfer') {
+          // تحويل معلق
+          const { error: insertError } = await sb
+            .from('wallet_transfers')
+            .insert({
+              amount: -amount,
+              status: 'pending',
+              note: note || 'تحويل مالي'
+            });
+
+          if (insertError) throw insertError;
+          showToast(`⏳ تم تسجيل تحويل بقيمة ${amount.toFixed(2)} درهم (معلق)`, 'info');
+          closeWalletModal();
+          await loadWalletData();
+        }
+      } catch(e) {
+        console.error('❌ Action error:', e);
+        showToast('❌ فشلت العملية: ' + e.message, 'error');
+      } finally {
+        isProcessing = false;
+      }
+    }
+
+    // ========== أدوات مساعدة ==========
+    function showToast(text, type) {
+      const toast = document.getElementById('toastMsg');
+      toast.textContent = text;
+      toast.className = `toast-msg ${type} show`;
+      clearTimeout(window._toastTimer);
+      window._toastTimer = setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    function escapeHtml(s) {
+      if (!s) return '';
+      return String(s).replace(/[&<>"']/g, m => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]));
+    }
+
+    // ========== Event Listeners ==========
+    document.addEventListener('DOMContentLoaded', async () => {
+      initSupabase();
+      if (!sb) {
+        showToast('❌ خطأ في الاتصال بـ Supabase', 'error');
+        return;
+      }
+      await loadWalletData();
+
+      document.getElementById('searchInput').addEventListener('input', () => renderTransfersTable(filterTransfers()));
+      document.getElementById('statusFilter').addEventListener('change', () => renderTransfersTable(filterTransfers()));
+
+      // إغلاق المودال بالضغط خارجها
+      document.getElementById('walletModal').addEventListener('click', (e) => {
+        if (e.target.id === 'walletModal') closeWalletModal();
+      });
+
+      // إغلاق المودال بزر ESC
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeWalletModal();
+      });
+    });
+  </script>
+</body>
+</html>
