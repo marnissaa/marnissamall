@@ -436,7 +436,8 @@
 <body>
 
   <div id="header-placeholder"></div>
-<div id="admin-navbar-placeholder"></div>
+  <div id="admin-navbar-placeholder"></div>
+  
   <!-- ماسح الباركود -->
   <div class="scanner-overlay" id="scannerOverlay">
     <button class="close-scanner" onclick="stopSkuScanner()"><i class="fas fa-times"></i></button>
@@ -624,7 +625,7 @@
         </div>
 
         <div class="form-actions">
-          <a href="admin-stock.html" class="btn-outline-cancel darija-text"><i class="fas fa-arrow-right"></i> إلغاء</a>
+          <a href="admin-products.html" class="btn-outline-cancel darija-text"><i class="fas fa-arrow-right"></i> إلغاء</a>
           <button type="submit" class="gold-btn darija-text" id="submitBtn">
             <i class="fas fa-check"></i> <span id="submitBtnText">حفظ المنتج</span>
           </button>
@@ -636,7 +637,7 @@
 
   <div class="toast-msg" id="toastMsg"></div>
 
-<script src="admin.js"></script>
+  <script src="admin.js"></script>
   <script src="header.js"></script>
   <script src="footer.js"></script>
 
@@ -820,6 +821,81 @@
       });
     }
 
+    // ========== LOAD PRODUCT FOR EDIT ==========
+    async function loadProductForEdit(productId) {
+      try {
+        const { data: product, error } = await sb
+          .from('products')
+          .select('*')
+          .eq('id', productId)
+          .single();
+
+        if (error || !product) {
+          showToast('❌ المنتج غير موجود', 'error');
+          return;
+        }
+
+        // تغيير عنوان الصفحة
+        document.getElementById('pageTitle').textContent = 'تعديل المنتج';
+        document.getElementById('submitBtnText').textContent = 'حفظ التعديلات';
+
+        // ملء الحقول
+        document.getElementById('productSku').value = product.sku || '';
+        document.getElementById('productName').value = product.name || '';
+        document.getElementById('productDescription').value = product.description || '';
+        document.getElementById('productPrice').value = product.price || '';
+        document.getElementById('productOldPrice').value = product.old_price || '';
+        document.getElementById('productCostPrice').value = product.cost_price || '';
+        document.getElementById('productStock').value = product.stock || 0;
+        document.getElementById('productLowStock').value = product.low_stock_threshold || 5;
+        document.getElementById('productBrand').value = product.brand || '';
+        document.getElementById('productWeight').value = product.weight || '';
+        document.getElementById('productDimensions').value = product.dimensions || '';
+        document.getElementById('productOrigin').value = product.origin || '';
+        document.getElementById('productTags').value = (product.tags || []).join(', ');
+        document.getElementById('productSlug').value = product.slug || '';
+        document.getElementById('productAvailable').checked = product.is_available !== false;
+        document.getElementById('productFeatured').checked = product.is_featured || false;
+
+        // تحديد الفئة
+        if (product.category_id) {
+          document.getElementById('productCategory').value = product.category_id;
+        }
+
+        // تحميل الصور
+        if (product.images && product.images.length > 0) {
+          uploadedImages = product.images.map(url => ({ url, public_id: url.split('/').pop() || '' }));
+          renderImageGrid();
+        }
+
+        // تحميل الفيديو
+        if (product.video_url) {
+          uploadedVideo = { url: product.video_url, public_id: product.video_url.split('/').pop() || '' };
+          renderVideoGrid();
+        }
+
+        // تحميل المتغيرات
+        if (product.variants && product.variants.length > 0) {
+          variants = product.variants.map(v => ({
+            type: v.type,
+            options: (v.options || []).map(opt => ({
+              value: opt.value || '',
+              price_extra: opt.price_extra || 0,
+              stock: opt.stock || 0,
+              sku: opt.sku || ''
+            }))
+          }));
+          renderVariants();
+        }
+
+        showToast('✅ تم تحميل بيانات المنتج', 'success');
+
+      } catch (error) {
+        console.error('❌ Error loading product:', error);
+        showToast('❌ خطأ في تحميل المنتج', 'error');
+      }
+    }
+
     // Images
     const imageDropzone = document.getElementById('imageDropzone');
     const imageInput = document.getElementById('imageInput');
@@ -848,15 +924,30 @@
     }
 
     function renderImageGrid() {
+      // حذف العناصر القديمة (غير الـ uploading)
       imageGrid.querySelectorAll('.media-item.ready').forEach(el => el.remove());
+      
+      if (uploadedImages.length === 0) {
+        imageGrid.innerHTML = '';
+        return;
+      }
+
       uploadedImages.forEach((img, i) => {
         const item = document.createElement('div');
         item.className = 'media-item ready';
-        item.innerHTML = `<img src="${img.url}" alt="صورة"><button class="remove-btn" onclick="removeImage(${i})"><i class="fas fa-times"></i></button><span class="badge-type">${i===0?'⭐ الرئيسية':'صورة'}</span>`;
+        const isFirst = i === 0;
+        item.innerHTML = `
+          <img src="${img.url}" alt="صورة" loading="lazy">
+          <button class="remove-btn" onclick="removeImage(${i})"><i class="fas fa-times"></i></button>
+          <span class="badge-type">${isFirst ? '⭐ الرئيسية' : 'صورة'}</span>
+        `;
         imageGrid.appendChild(item);
       });
     }
-    window.removeImage = function(i) { uploadedImages.splice(i, 1); renderImageGrid(); };
+    window.removeImage = function(i) { 
+      uploadedImages.splice(i, 1); 
+      renderImageGrid(); 
+    };
 
     // Video
     const videoDropzone = document.getElementById('videoDropzone');
@@ -889,16 +980,27 @@
       if (uploadedVideo) {
         const item = document.createElement('div');
         item.className = 'media-item ready';
-        item.innerHTML = `<video src="${uploadedVideo.url}" muted></video><button class="remove-btn" onclick="removeVideo()"><i class="fas fa-times"></i></button><span class="badge-type">🎬 فيديو</span>`;
+        item.innerHTML = `
+          <video src="${uploadedVideo.url}" muted></video>
+          <button class="remove-btn" onclick="removeVideo()"><i class="fas fa-times"></i></button>
+          <span class="badge-type">🎬 فيديو</span>
+        `;
         videoGrid.appendChild(item);
       }
     }
-    window.removeVideo = function() { uploadedVideo = null; renderVideoGrid(); };
+    window.removeVideo = function() { 
+      uploadedVideo = null; 
+      renderVideoGrid(); 
+    };
 
     function createUploadItem() {
       const div = document.createElement('div');
       div.className = 'media-item uploading';
-      div.innerHTML = '<div class="mini-spinner"></div><div class="upload-progress">0%</div><div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:0%"></div></div>';
+      div.innerHTML = `
+        <div class="mini-spinner"></div>
+        <div class="upload-progress">0%</div>
+        <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:0%"></div></div>
+      `;
       return div;
     }
 
@@ -990,6 +1092,7 @@
 
       let result;
       if (editingProductId) {
+        // تعديل: لا نعدل المخزون من هنا
         delete productData.stock;
         result = await sb.from('products').update(productData).eq('id', editingProductId);
       } else {
@@ -1006,20 +1109,24 @@
       }
 
       showToast('✅ تم حفظ المنتج بنجاح', 'success');
-      setTimeout(() => window.location.href = 'admin-stock.html', 1500);
+      setTimeout(() => window.location.href = 'admin-products.html', 1500);
     });
 
-    // Init
+    // ========== INIT ==========
     const urlParams = new URLSearchParams(window.location.search);
     editingProductId = urlParams.get('id');
 
     document.addEventListener('DOMContentLoaded', async () => {
       initSupabase();
       if (!sb) { showToast('❌ خطأ في الاتصال', 'error'); return; }
+      
       await loadCategories();
+      
       if (editingProductId) {
-        document.getElementById('pageTitle').textContent = 'تعديل المنتج';
-        document.getElementById('submitBtnText').textContent = 'حفظ التعديلات';
+        await loadProductForEdit(editingProductId);
+      } else {
+        document.getElementById('pageTitle').textContent = 'إضافة منتج جديد';
+        document.getElementById('submitBtnText').textContent = 'حفظ المنتج';
       }
     });
 

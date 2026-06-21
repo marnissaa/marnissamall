@@ -549,7 +549,7 @@
             <h4 class="marnissa-footer__col-title">التصفح</h4>
             <ul class="marnissa-footer__list">
               <li><a href="index.html">🏠 الرئيسية</a></li>
-              <li><a href="products.html">✨ جميع المنتجات</a></li>
+              <li><a href="product.html">✨ جميع المنتجات</a></li>
               <li><a href="offers.html">🔥 العروض الخاصة</a></li>
               <li><a href="sellers.html">👨‍🌾 الباعة المحليين</a></li>
               <li><a href="contact.html">📞 اتصل بنا</a></li>

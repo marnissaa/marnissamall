@@ -437,6 +437,7 @@
   <div class="toast-msg" id="toastMsg"></div>
 
   <script src="admin.js"></script>
+  <script src="header.js"></script>
   <script src="footer.js"></script>
 
   <script>
@@ -641,7 +642,7 @@
             <td class="darija-text" style="font-size:0.7rem;">${updatedAt}</td>
             <td>
               <div class="actions-cell">
-                <a href="product.html?id=${p.id}" target="_blank" class="icon-btn" title="معاينة"><i class="fas fa-eye"></i></a>
+                <a href="product-detail.html?id=${p.id}" target="_blank" class="icon-btn" title="معاينة"><i class="fas fa-eye"></i></a>
                 <a href="admin-product-form.html?id=${p.id}" class="icon-btn" title="تعديل"><i class="fas fa-pen"></i></a>
                 <button class="icon-btn danger" title="حذف" onclick="openDeleteModal('${p.id}', '${escapeHtml(p.name)}')"><i class="fas fa-trash"></i></button>
               </div>

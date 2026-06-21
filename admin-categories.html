@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>إدارة الفئات | MarnissaMall Admin</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" href="images/logo.png" type="image/png">
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&family=Cairo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    /* ========== الألوان الأساسية ========== */
+    :root {
+      --blue-primary: #0057b3;
+      --blue-dark: #003d80;
+      --blue-light: #3a8fd4;
+      --black: #0a0a0a;
+      --black-light: #0d1117;
+      --gray: #161b22;
+      --text-light: #ffffff;
+      --text-muted: #c9d1d9;
+      --text-dim: #8b949e;
+      --gold: #C4A06A;
+      --success: #25D366;
+      --danger: #ff4757;
+      --warning: #ffa502;
+    }
+
+    /* ========== الوضع الداكن (أسود + أزرق) ========== */
+    body {
+      --bg: #0a0a0a;
+      --bg2: #0d1117;
+      --text: #ffffff;
+      --text-muted: #c9d1d9;
+      --text-dim: #8b949e;
+      --border: rgba(0,87,179,0.35);
+      --border2: rgba(0,87,179,0.5);
+      --card: rgba(13,17,23,0.85);
+      --card-hover: rgba(0,87,179,0.2);
+    }
+
+    /* ========== الوضع الفاتح (أزرق فاتح) ========== */
+    body.blue-theme {
+      --bg: #e8f0fe;
+      --bg2: #ffffff;
+      --text: #0a0a0a;
+      --text-muted: #1a3a5c;
+      --text-dim: #4a6a8c;
+      --border: rgba(0,87,179,0.2);
+      --border2: rgba(0,87,179,0.3);
+      --card: rgba(255,255,255,0.9);
+      --card-hover: rgba(0,87,179,0.1);
+    }
+
+    body {
+      background: var(--bg);
+      font-family: 'Tajawal', 'Cairo', sans-serif;
+      color: var(--text);
+      min-height: 100vh;
+      transition: background-color 0.5s ease, color 0.5s ease;
+    }
+
+    .darija-text { font-family: 'Tajawal', 'Cairo', sans-serif; }
+
+    .page-header {
+      padding: clamp(20px, 4vh, 40px) 1.5rem 1rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .section-title {
+      font-size: clamp(1.5rem, 4vw, 2rem);
+      font-weight: 800;
+      position: relative;
+      display: inline-block;
+    }
+    .section-title::after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      right: 0;
+      width: 50px;
+      height: 2px;
+      background: var(--blue-primary);
+    }
+
+    .container-wrap {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1.5rem clamp(60px, 8vh, 100px);
+    }
+
+    /* KPI */
+    .kpi-mini-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 0.75rem;
+      margin: 1.5rem 0;
+    }
+    .kpi-mini {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1rem;
+      text-align: center;
+    }
+    .kpi-mini .val { font-size: 1.3rem; font-weight: 800; color: var(--blue-primary); }
+    .kpi-mini .lbl { font-size: 0.7rem; color: var(--text-dim); margin-top: 2px; }
+
+    /* Toolbar */
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
+    }
+    .search-input {
+      background: var(--card);
+      border: 1px solid var(--border2);
+      border-radius: 12px;
+      padding: 0.65rem 1rem;
+      color: var(--text);
+      font-family: inherit;
+      min-width: 220px;
+      flex: 1;
+    }
+    .search-input:focus { outline: none; border-color: var(--blue-primary); }
+    .search-input::placeholder { color: var(--text-dim); }
+
+    .gold-btn {
+      background: transparent;
+      border: 1.5px solid var(--blue-primary);
+      color: var(--text);
+      font-weight: 600;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.4s;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.6rem 1.3rem;
+      border-radius: 50px;
+      font-size: 0.85rem;
+      white-space: nowrap;
+      text-decoration: none;
+      font-family: inherit;
+    }
+    .gold-btn::before {
+      content: '';
+      position: absolute;
+      top: 0; left: -100%; width: 100%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(0,87,179,0.2), transparent);
+      transition: left 0.5s;
+    }
+    .gold-btn:hover::before { left: 100%; }
+    .gold-btn:hover { transform: translateY(-2px); border-color: var(--blue-light); color: var(--blue-light); }
+    .gold-btn.danger { border-color: var(--danger); color: var(--danger); }
+    .gold-btn.danger:hover { background: rgba(255,71,87,0.1); }
+    .gold-btn.success { border-color: var(--success); color: var(--success); }
+    .gold-btn.success:hover { background: rgba(37,211,102,0.1); }
+
+    /* Table */
+    .table-wrap {
+      background: var(--card);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      overflow: hidden;
+    }
+    .categories-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+    .categories-table th {
+      text-align: right;
+      padding: 1rem;
+      background: rgba(0,87,179,0.08);
+      color: var(--blue-primary);
+      font-weight: 700;
+      font-size: 0.7rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+    .categories-table td {
+      padding: 0.9rem 1rem;
+      border-top: 1px solid var(--border);
+      vertical-align: middle;
+    }
+    .categories-table tr:hover td { background: var(--card-hover); }
+
+    .category-cell { display: flex; align-items: center; gap: 0.75rem; }
+    .category-cell img {
+      width: 48px; height: 48px;
+      border-radius: 12px;
+      object-fit: cover;
+      flex-shrink: 0;
+      background: #1a1a2e;
+    }
+    .category-cell .cname { font-weight: 600; color: var(--text); font-size: 0.9rem; }
+    .category-cell .cslug { font-size: 0.7rem; color: var(--text-dim); }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.7rem;
+      font-weight: 700;
+    }
+    .status-badge.active { background: rgba(37,211,102,0.12); color: var(--success); }
+    .status-badge.inactive { background: rgba(255,71,87,0.12); color: var(--danger); }
+
+    .actions-cell { display: flex; gap: 0.4rem; justify-content: flex-end; }
+    .icon-btn {
+      width: 34px; height: 34px;
+      border-radius: 8px;
+      border: 1px solid var(--border2);
+      background: rgba(0,87,179,0.05);
+      color: var(--text-muted);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.25s;
+      font-size: 0.85rem;
+      text-decoration: none;
+    }
+    .icon-btn:hover { border-color: var(--blue-primary); color: var(--blue-primary); background: rgba(0,87,179,0.12); }
+    .icon-btn.danger:hover { border-color: var(--danger); color: var(--danger); background: rgba(255,71,87,0.12); }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.75);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      padding: 1rem;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal-box {
+      background: var(--bg2);
+      border: 1px solid var(--border2);
+      border-radius: 20px;
+      padding: 2rem;
+      max-width: 450px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+    }
+    .modal-box h3 { font-size: 1.2rem; margin-bottom: 0.5rem; color: var(--text); }
+    .modal-box p { font-size: 0.85rem; color: var(--text-dim); margin-bottom: 1.5rem; }
+    .modal-actions { display: flex; gap: 0.75rem; justify-content: center; }
+
+    /* Form inside modal */
+    .modal-form .form-group { margin-bottom: 1rem; text-align: right; }
+    .modal-form label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 0.3rem;
+    }
+    .modal-form .form-input {
+      background: rgba(0,0,0,0.05);
+      border: 1px solid var(--border2);
+      border-radius: 10px;
+      padding: 0.7rem 1rem;
+      color: var(--text);
+      width: 100%;
+      font-family: inherit;
+      transition: all 0.3s;
+      font-size: 0.9rem;
+    }
+    .modal-form .form-input:focus { outline: none; border-color: var(--blue-primary); }
+    .modal-form .form-input::placeholder { color: var(--text-dim); }
+    .modal-form .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+    @media (max-width: 480px) { .modal-form .form-row { grid-template-columns: 1fr; } }
+
+    .empty-state, .loading-state {
+      text-align: center;
+      padding: 4rem 1rem;
+      color: var(--text-dim);
+    }
+    .loader-spinner {
+      width: 40px; height: 40px;
+      border: 3px solid rgba(0,87,179,0.2);
+      border-radius: 50%;
+      border-top-color: var(--blue-primary);
+      animation: spin 0.8s linear infinite;
+      margin: 2rem auto;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .toast-msg {
+      position: fixed;
+      bottom: 30px; left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: var(--bg2);
+      border: 1px solid var(--blue-primary);
+      border-radius: 12px;
+      padding: 0.8rem 1.5rem;
+      font-size: 0.85rem;
+      display: flex; align-items: center; gap: 0.6rem;
+      z-index: 3000;
+      opacity: 0;
+      transition: all 0.35s;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+      max-width: 90vw;
+    }
+    .toast-msg.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+    .toast-msg.success { border-color: var(--success); color: var(--success); }
+    .toast-msg.error { border-color: var(--danger); color: var(--danger); }
+
+    @media (max-width: 768px) {
+      .table-wrap { overflow-x: auto; }
+      .categories-table { min-width: 700px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="admin-navbar-placeholder"></div>
+
+  <div class="page-header">
+    <span class="text-xs tracking-[0.3em] darija-text" style="color:var(--blue-primary);">✦ إدارة الفئات ✦</span>
+    <h1 class="section-title darija-text mt-2" style="color:var(--text);">📂 الفئات</h1>
+    <p class="text-sm mt-4 darija-text" style="color:var(--text-dim);">إدارة، تعديل، وحذف الفئات - تنظيم منتجاتك</p>
+  </div>
+
+  <div class="container-wrap">
+
+    <!-- Mini KPIs -->
+    <div class="kpi-mini-grid" data-aos="fade-up">
+      <div class="kpi-mini"><div class="val" id="kpiTotal">—</div><div class="lbl darija-text">إجمالي الفئات</div></div>
+      <div class="kpi-mini"><div class="val" id="kpiMain">—</div><div class="lbl darija-text">فئات رئيسية</div></div>
+      <div class="kpi-mini"><div class="val" id="kpiSub">—</div><div class="lbl darija-text">فئات فرعية</div></div>
+      <div class="kpi-mini"><div class="val" id="kpiActive">—</div><div class="lbl darija-text">فئات نشطة</div></div>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="toolbar" data-aos="fade-up">
+      <input type="text" id="searchInput" class="search-input darija-text" placeholder="🔍 بحث عن فئة...">
+      <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+        <select id="statusFilter" class="search-input darija-text" style="min-width:120px;flex:0;">
+          <option value="all">📌 الكل</option>
+          <option value="active">✅ نشطة</option>
+          <option value="inactive">❌ غير نشطة</option>
+        </select>
+        <button class="gold-btn darija-text" onclick="openAddModal()" style="background:var(--blue-primary);color:white;border-color:var(--blue-primary);">
+          <i class="fas fa-plus"></i> فئة جديدة
+        </button>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="table-wrap" data-aos="fade-up">
+      <div id="loadingState" class="loading-state">
+        <div class="loader-spinner"></div>
+        <p class="darija-text">جاري تحميل الفئات...</p>
+      </div>
+      <div id="tableContainer" style="display:none;">
+        <table class="categories-table">
+          <thead>
+            <tr>
+              <th>الفئة</th>
+              <th>الرابط (Slug)</th>
+              <th>النوع</th>
+              <th>الفئة الأم</th>
+              <th>الترتيب</th>
+              <th>الحالة</th>
+              <th>المنتجات</th>
+              <th>إجراءات</th>
+            </tr>
+          </thead>
+          <tbody id="categoriesTableBody"></tbody>
+        </table>
+      </div>
+      <div id="emptyState" class="empty-state darija-text" style="display:none;">
+        <i class="fas fa-folder-open text-4xl mb-3 block opacity-40"></i>
+        لا توجد فئات
+        <div class="mt-4"><button class="gold-btn" onclick="openAddModal()">➕ أضف أول فئة</button></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Add/Edit Modal -->
+  <div class="modal-overlay" id="categoryModal">
+    <div class="modal-box modal-form">
+      <h3 class="darija-text" id="modalTitle"><i class="fas fa-folder" style="color:var(--blue-primary);"></i> إضافة فئة جديدة</h3>
+      <form id="categoryForm">
+        <div class="form-group">
+          <label class="darija-text">اسم الفئة <span style="color:var(--danger);">*</span></label>
+          <input type="text" id="categoryName" class="form-input darija-text" placeholder="مثال: منتجات غذائية" required>
+        </div>
+        <div class="form-group">
+          <label class="darija-text">الرابط (Slug)</label>
+          <input type="text" id="categorySlug" class="form-input darija-text" placeholder="منتجات-غذائية">
+          <p style="font-size:0.65rem;color:var(--text-dim);margin-top:0.2rem;">يترك فارغاً للتوليد التلقائي</p>
+        </div>
+        <div class="form-group">
+          <label class="darija-text">الوصف</label>
+          <input type="text" id="categoryDescription" class="form-input darija-text" placeholder="وصف مختصر للفئة">
+        </div>
+        <div class="form-group">
+          <label class="darija-text">الفئة الأم</label>
+          <select id="categoryParent" class="form-input darija-text">
+            <option value="">— لا يوجد (فئة رئيسية) —</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="darija-text">ترتيب العرض</label>
+            <input type="number" id="categoryOrder" class="form-input" value="0" min="0">
+          </div>
+          <div class="form-group">
+            <label class="darija-text">صورة الفئة</label>
+            <input type="text" id="categoryImage" class="form-input darija-text" placeholder="رابط الصورة">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="darija-text">الحالة</label>
+          <select id="categoryStatus" class="form-input darija-text">
+            <option value="true">✅ نشطة</option>
+            <option value="false">❌ غير نشطة</option>
+          </select>
+        </div>
+        <div class="modal-actions" style="margin-top:1.5rem;">
+          <button type="button" class="gold-btn darija-text" onclick="closeCategoryModal()">إلغاء</button>
+          <button type="submit" class="gold-btn darija-text" id="saveCategoryBtn" style="background:var(--blue-primary);color:white;border-color:var(--blue-primary);">
+            <i class="fas fa-save"></i> <span id="saveBtnText">حفظ</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div class="modal-overlay" id="deleteModal">
+    <div class="modal-box">
+      <h3 class="darija-text"><i class="fas fa-trash-alt" style="color:var(--danger);"></i> تأكيد الحذف</h3>
+      <p class="darija-text" id="deleteCategoryName">هل أنت متأكد من حذف هذه الفئة؟</p>
+      <p class="darija-text text-xs" style="color:var(--danger);">⚠️ هذا الإجراء لا يمكن التراجع عنه</p>
+      <div class="modal-actions">
+        <button class="gold-btn darija-text" onclick="closeDeleteModal()">إلغاء</button>
+        <button class="gold-btn danger darija-text" id="confirmDeleteBtn">
+          <i class="fas fa-trash"></i> حذف
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-msg" id="toastMsg"></div>
+
+  <script src="admin.js"></script>
+  <script src="header.js"></script>
+  <script src="footer.js"></script>
+
+  <script>
+    AOS.init({ duration: 700, once: true, offset: 60 });
+
+    // ========== Supabase Client ==========
+    let sb = null;
+
+    function initSupabase() {
+      try {
+        if (typeof MARNISSA_CONFIG !== 'undefined' && MARNISSA_CONFIG.SUPABASE_URL && MARNISSA_CONFIG.SUPABASE_ANON_KEY) {
+          sb = supabase.createClient(MARNISSA_CONFIG.SUPABASE_URL, MARNISSA_CONFIG.SUPABASE_ANON_KEY);
+          console.log('✅ Supabase ready');
+        } else {
+          sb = supabase.createClient(
+            'https://mbzrhdszwfutwlfmldyv.supabase.co',
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1ienJoZHN6d2Z1dHdsZm1sZHl2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0MjUzNjAsImV4cCI6MjA5NzAwMTM2MH0.0XtnF-ZrhczJyUEHBpsCpsPriCrxxQyMg2d2u75XGXs'
+          );
+        }
+      } catch(e) { console.error('❌ Supabase init error:', e); }
+    }
+
+    // ========== Variables ==========
+    let allCategories = [];
+    let editingCategoryId = null;
+
+    // ========== Load Data ==========
+    async function loadCategories() {
+      const loadingState = document.getElementById('loadingState');
+      const tableContainer = document.getElementById('tableContainer');
+      const emptyState = document.getElementById('emptyState');
+      
+      loadingState.style.display = 'block';
+      tableContainer.style.display = 'none';
+      emptyState.style.display = 'none';
+
+      try {
+        const { data, error } = await sb
+          .from('categories')
+          .select('*')
+          .order('display_order', { ascending: true });
+
+        if (error) throw error;
+
+        allCategories = data || [];
+
+        console.log('📂 Categories:', allCategories.length);
+
+        loadingState.style.display = 'none';
+
+        if (allCategories.length === 0) {
+          emptyState.style.display = 'block';
+          return;
+        }
+
+        tableContainer.style.display = 'block';
+        
+        updateKPIs();
+        renderTable(filterCategories());
+        populateParentSelect();
+
+      } catch(err) {
+        console.error('❌ Load error:', err);
+        loadingState.style.display = 'none';
+        emptyState.style.display = 'block';
+        emptyState.innerHTML = `
+          <i class="fas fa-exclamation-triangle text-4xl mb-3 block" style="color:var(--danger);"></i>
+          <p class="darija-text">خطأ في تحميل الفئات: ${err.message}</p>
+          <button onclick="loadCategories()" class="gold-btn mt-3">🔄 إعادة المحاولة</button>
+        `;
+      }
+    }
+
+    // ========== KPI ==========
+    function updateKPIs() {
+      const total = allCategories.length;
+      const main = allCategories.filter(c => !c.parent_id).length;
+      const sub = allCategories.filter(c => c.parent_id).length;
+      const active = allCategories.filter(c => c.is_active !== false).length;
+
+      document.getElementById('kpiTotal').textContent = total;
+      document.getElementById('kpiMain').textContent = main;
+      document.getElementById('kpiSub').textContent = sub;
+      document.getElementById('kpiActive').textContent = active;
+    }
+
+    // ========== Get Category Name by ID ==========
+    function getCategoryName(id) {
+      if (!id) return '—';
+      const cat = allCategories.find(c => c.id === id);
+      return cat ? cat.name : '—';
+    }
+
+    // ========== Get Subcategories Count ==========
+    function getSubCount(id) {
+      return allCategories.filter(c => c.parent_id === id).length;
+    }
+
+    // ========== Filter ==========
+    function filterCategories() {
+      const search = document.getElementById('searchInput').value.trim().toLowerCase();
+      const status = document.getElementById('statusFilter').value;
+
+      return allCategories.filter(c => {
+        const matchesSearch = !search || 
+          (c.name && c.name.toLowerCase().includes(search)) ||
+          (c.slug && c.slug.toLowerCase().includes(search)) ||
+          (c.description && c.description.toLowerCase().includes(search));
+        
+        let matchesStatus = true;
+        if (status === 'active') matchesStatus = c.is_active !== false;
+        else if (status === 'inactive') matchesStatus = c.is_active === false;
+
+        return matchesSearch && matchesStatus;
+      });
+    }
+
+    // ========== Render Table ==========
+    function renderTable(categories) {
+      const tbody = document.getElementById('categoriesTableBody');
+
+      if (categories.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" class="text-center py-8 darija-text" style="color:var(--text-dim);">لا توجد نتائج مطابقة</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = categories.map(c => {
+        const img = c.image || 'https://placehold.co/48x48/1a1a2e/0057b3?text=C';
+        const isMain = !c.parent_id;
+        const subCount = getSubCount(c.id);
+        const status = c.is_active !== false;
+
+        return `
+          <tr>
+            <td>
+              <div class="category-cell">
+                <img src="${img}" alt="" onerror="this.src='https://placehold.co/48x48/1a1a2e/0057b3?text=C'">
+                <div>
+                  <div class="cname darija-text">${escapeHtml(c.name)}</div>
+                  <div class="cslug">/${escapeHtml(c.slug || '')}</div>
+                </div>
+              </div>
+            </td>
+            <td class="darija-text"><code style="font-size:0.7rem;">${escapeHtml(c.slug || '—')}</code></td>
+            <td class="darija-text">
+              <span style="font-size:0.7rem;padding:0.2rem 0.6rem;border-radius:10px;background:${isMain ? 'rgba(0,87,179,0.1)' : 'rgba(255,165,2,0.1)'};color:${isMain ? 'var(--blue-primary)' : 'var(--warning)'};">
+                ${isMain ? '📁 رئيسية' : '📂 فرعية'}
+              </span>
+            </td>
+            <td class="darija-text">${isMain ? '—' : escapeHtml(getCategoryName(c.parent_id))}</td>
+            <td class="darija-text" style="text-align:center;">${c.display_order || 0}</td>
+            <td>
+              <span class="status-badge ${status ? 'active' : 'inactive'} darija-text">
+                <i class="fas ${status ? 'fa-check-circle' : 'fa-times-circle'}"></i>
+                ${status ? 'نشطة' : 'غير نشطة'}
+              </span>
+            </td>
+            <td class="darija-text" style="text-align:center;font-weight:700;">${subCount}</td>
+            <td>
+              <div class="actions-cell">
+                <button class="icon-btn" title="تعديل" onclick="openEditModal('${c.id}')"><i class="fas fa-pen"></i></button>
+                <button class="icon-btn danger" title="حذف" onclick="openDeleteModal('${c.id}', '${escapeHtml(c.name)}')"><i class="fas fa-trash"></i></button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // ========== Populate Parent Select ==========
+    function populateParentSelect() {
+      const select = document.getElementById('categoryParent');
+      const currentId = editingCategoryId;
+      
+      select.innerHTML = '<option value="">— لا يوجد (فئة رئيسية) —</option>';
+      
+      allCategories
+        .filter(c => c.id !== currentId)
+        .forEach(c => {
+          const option = document.createElement('option');
+          option.value = c.id;
+          option.textContent = c.name + (c.parent_id ? ' (فرعية)' : '');
+          select.appendChild(option);
+        });
+    }
+
+    // ========== Add/Edit Modal ==========
+    function openAddModal() {
+      editingCategoryId = null;
+      document.getElementById('modalTitle').innerHTML = '<i class="fas fa-folder" style="color:var(--blue-primary);"></i> إضافة فئة جديدة';
+      document.getElementById('saveBtnText').textContent = 'حفظ';
+      document.getElementById('categoryForm').reset();
+      document.getElementById('categoryOrder').value = allCategories.length;
+      document.getElementById('categoryStatus').value = 'true';
+      document.getElementById('categorySlug').value = '';
+      populateParentSelect();
+      document.getElementById('categoryModal').classList.add('open');
+    }
+
+    function openEditModal(categoryId) {
+      const category = allCategories.find(c => c.id === categoryId);
+      if (!category) return;
+
+      editingCategoryId = categoryId;
+      document.getElementById('modalTitle').innerHTML = '<i class="fas fa-edit" style="color:var(--blue-primary);"></i> تعديل الفئة';
+      document.getElementById('saveBtnText').textContent = 'تحديث';
+      
+      document.getElementById('categoryName').value = category.name || '';
+      document.getElementById('categorySlug').value = category.slug || '';
+      document.getElementById('categoryDescription').value = category.description || '';
+      document.getElementById('categoryOrder').value = category.display_order || 0;
+      document.getElementById('categoryImage').value = category.image || '';
+      document.getElementById('categoryStatus').value = category.is_active !== false ? 'true' : 'false';
+      
+      populateParentSelect();
+      if (category.parent_id) {
+        document.getElementById('categoryParent').value = category.parent_id;
+      }
+      
+      document.getElementById('categoryModal').classList.add('open');
+    }
+
+    function closeCategoryModal() {
+      document.getElementById('categoryModal').classList.remove('open');
+      editingCategoryId = null;
+    }
+
+    // ========== Save Category ==========
+    document.getElementById('categoryForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const name = document.getElementById('categoryName').value.trim();
+      let slug = document.getElementById('categorySlug').value.trim();
+      const description = document.getElementById('categoryDescription').value.trim();
+      const parentId = document.getElementById('categoryParent').value || null;
+      const displayOrder = parseInt(document.getElementById('categoryOrder').value) || 0;
+      const image = document.getElementById('categoryImage').value.trim();
+      const isActive = document.getElementById('categoryStatus').value === 'true';
+
+      if (!name) {
+        showToast('⚠️ المرجو إدخال اسم الفئة', 'error');
+        return;
+      }
+
+      if (!slug) {
+        slug = generateSlug(name);
+      }
+
+      const btn = document.getElementById('saveCategoryBtn');
+      const orig = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الحفظ...';
+
+      // بناء البيانات بدون updated_at (لأن العمود غير موجود)
+      const data = {
+        name: name,
+        slug: slug,
+        description: description || null,
+        parent_id: parentId,
+        display_order: displayOrder,
+        image: image || null,
+        is_active: isActive
+      };
+
+      // إضافة created_at فقط إذا كانت إضافة جديدة
+      if (!editingCategoryId) {
+        data.created_at = new Date().toISOString();
+      }
+
+      let result;
+      if (editingCategoryId) {
+        result = await sb.from('categories').update(data).eq('id', editingCategoryId);
+      } else {
+        result = await sb.from('categories').insert(data);
+      }
+
+      btn.disabled = false;
+      btn.innerHTML = orig;
+
+      if (result.error) {
+        console.error('❌ Error:', result.error);
+        showToast('❌ خطأ: ' + result.error.message, 'error');
+        return;
+      }
+
+      closeCategoryModal();
+      showToast('✅ تم حفظ الفئة بنجاح', 'success');
+      loadCategories();
+    });
+
+    // ========== Delete ==========
+    function openDeleteModal(categoryId, categoryName) {
+      document.getElementById('deleteCategoryName').textContent = `هل أنت متأكد من حذف: "${categoryName}"؟`;
+      document.getElementById('deleteModal').classList.add('open');
+      document.getElementById('confirmDeleteBtn').dataset.id = categoryId;
+    }
+
+    function closeDeleteModal() {
+      document.getElementById('deleteModal').classList.remove('open');
+    }
+
+    document.getElementById('confirmDeleteBtn').addEventListener('click', async () => {
+      const categoryId = document.getElementById('confirmDeleteBtn').dataset.id;
+      if (!categoryId) return;
+
+      const btn = document.getElementById('confirmDeleteBtn');
+      const orig = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الحذف...';
+
+      const { count, error: countError } = await sb
+        .from('products')
+        .select('*', { count: 'exact', head: true })
+        .eq('category_id', categoryId);
+
+      if (countError) {
+        showToast('❌ فشل التحقق: ' + countError.message, 'error');
+        btn.disabled = false;
+        btn.innerHTML = orig;
+        return;
+      }
+
+      if (count > 0) {
+        showToast(`⚠️ لا يمكن حذف الفئة، هناك ${count} منتج(ة) تابعة لها`, 'error');
+        btn.disabled = false;
+        btn.innerHTML = orig;
+        return;
+      }
+
+      const { error } = await sb.from('categories').delete().eq('id', categoryId);
+
+      btn.disabled = false;
+      btn.innerHTML = orig;
+      closeDeleteModal();
+
+      if (error) {
+        showToast('❌ فشل الحذف: ' + error.message, 'error');
+        return;
+      }
+
+      showToast('✅ تم حذف الفئة بنجاح', 'success');
+      loadCategories();
+    });
+
+    // ========== Helpers ==========
+    function generateSlug(text) {
+      return text
+        .toLowerCase()
+        .replace(/[^\u0621-\u064Aa-z0-9\s]/g, '')
+        .replace(/\s+/g, '-')
+        .replace(/-+/g, '-')
+        .trim();
+    }
+
+    document.getElementById('categoryName').addEventListener('input', function() {
+      const slugInput = document.getElementById('categorySlug');
+      if (!slugInput.value || slugInput.dataset.auto === 'true') {
+        slugInput.value = generateSlug(this.value);
+        slugInput.dataset.auto = 'true';
+      }
+    });
+
+    function escapeHtml(s) {
+      if (!s) return '';
+      return String(s).replace(/[&<>"']/g, m => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]));
+    }
+
+    function showToast(text, type) {
+      const toast = document.getElementById('toastMsg');
+      toast.textContent = text;
+      toast.className = `toast-msg ${type} show`;
+      clearTimeout(window._toastTimer);
+      window._toastTimer = setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    // ========== Events ==========
+    function setupEvents() {
+      document.getElementById('searchInput').addEventListener('input', () => {
+        renderTable(filterCategories());
+      });
+
+      document.getElementById('statusFilter').addEventListener('change', () => {
+        renderTable(filterCategories());
+      });
+
+      document.getElementById('categoryModal').addEventListener('click', (e) => {
+        if (e.target.id === 'categoryModal') closeCategoryModal();
+      });
+
+      document.getElementById('deleteModal').addEventListener('click', (e) => {
+        if (e.target.id === 'deleteModal') closeDeleteModal();
+      });
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          closeCategoryModal();
+          closeDeleteModal();
+        }
+      });
+    }
+
+    // ========== Init ==========
+    document.addEventListener('DOMContentLoaded', () => {
+      initSupabase();
+      if (!sb) {
+        showToast('❌ خطأ في الاتصال بقاعدة البيانات', 'error');
+        return;
+      }
+      loadCategories();
+      setupEvents();
+    });
+  </script>
+</body>
+</html>

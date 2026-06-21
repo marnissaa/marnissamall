@@ -596,7 +596,7 @@
           </a>
           <ul class="marnissa-nav__links" id="marnissaNavLinks">
             <li><a href="index.html" data-page="index"> الرئيسية</a></li>
-            <li><a href="products.html" data-page="products"> المنتجات</a></li>
+            <li><a href="product.html" data-page="product"> المنتجات</a></li>
             <li><a href="offers.html" data-page="offers"> العروض</a></li>
             <li><a href="sellers.html" data-page="sellers"> الباعة</a></li>
             ${desktopLinks}
@@ -612,7 +612,7 @@
         <div class="marnissa-nav__mobile" id="marnissaMobile">
           <ul>
             <li><a href="index.html" data-page="index"> الرئيسية</a></li>
-            <li><a href="products.html" data-page="products"> المنتجات</a></li>
+            <li><a href="product.html" data-page="product"> المنتجات</a></li>
             <li><a href="offers.html" data-page="offers"> العروض</a></li>
             <li><a href="sellers.html" data-page="sellers"> الباعة</a></li>
             ${mobileLinks}
