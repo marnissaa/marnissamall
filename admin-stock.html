@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>إدارة المخزون | MarnissaMall</title>
+  <title>إدارة المخزون والمنتجات | MarnissaMall</title>
   <meta name="robots" content="noindex, nofollow">
   <link rel="icon" href="images/logo.png" type="image/png">
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&family=Cairo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -12,7 +12,6 @@
   <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
   <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <!-- مكتبة html5-qrcode لقراءة الباركود و QR -->
   <script src="https://unpkg.com/html5-qrcode"></script>
   <script src="config.js"></script>
 
@@ -27,6 +26,8 @@
       --danger: #ff4757;
       --warning: #ffa502;
       --info: #00bcd4;
+      --purple: #6c5ce7;
+      --gold: #f9a825;
     }
 
     body {
@@ -90,9 +91,10 @@
       padding: 0 1.5rem clamp(60px, 8vh, 100px);
     }
 
+    /* KPI Grid */
     .kpi-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
       gap: 1rem;
       margin: 2rem 0;
     }
@@ -120,9 +122,11 @@
     .kpi-icon.warning { background: rgba(255,165,2,0.15); color: var(--warning); }
     .kpi-icon.danger { background: rgba(255,71,87,0.15); color: var(--danger); }
     .kpi-icon.info { background: rgba(0,188,212,0.15); color: var(--info); }
+    .kpi-icon.gold { background: rgba(249,168,37,0.15); color: var(--gold); }
     .kpi-value { font-size: 1.5rem; font-weight: 800; line-height: 1.2; }
-    .kpi-label { font-size: 0.75rem; color: var(--text-dim); margin-top: 2px; }
+    .kpi-label { font-size: 0.7rem; color: var(--text-dim); margin-top: 2px; }
 
+    /* Toolbar */
     .toolbar {
       display: flex;
       flex-wrap: wrap;
@@ -154,7 +158,9 @@
       cursor: pointer;
     }
     .filter-select:focus { outline: none; border-color: var(--blue-primary); }
+    .filter-select option { background: var(--bg2); color: var(--text); }
 
+    /* Buttons */
     .gold-btn {
       background: transparent;
       border: 1.5px solid var(--blue-primary);
@@ -172,6 +178,8 @@
       border-radius: 50px;
       font-size: 0.85rem;
       white-space: nowrap;
+      font-family: 'Tajawal', 'Cairo', sans-serif;
+      text-decoration: none;
     }
     .gold-btn::before {
       content: '';
@@ -182,8 +190,13 @@
     }
     .gold-btn:hover::before { left: 100%; }
     .gold-btn:hover { transform: translateY(-2px); border-color: var(--blue-light); color: var(--blue-light); }
+    .gold-btn.success { border-color: var(--success); color: var(--success); }
+    .gold-btn.success:hover { background: rgba(37,211,102,0.1); }
+    .gold-btn.danger { border-color: var(--danger); color: var(--danger); }
+    .gold-btn.danger:hover { background: rgba(255,71,87,0.1); }
+    .gold-btn.gold { border-color: var(--gold); color: var(--gold); }
+    .gold-btn.gold:hover { background: rgba(249,168,37,0.1); }
 
-    /* Scanner button */
     .scan-btn {
       background: linear-gradient(135deg, #0057b3, #003d80);
       border: none;
@@ -211,6 +224,7 @@
       100% { box-shadow: 0 0 0 0 rgba(0,87,179,0); }
     }
 
+    /* Table */
     .table-wrap {
       background: var(--card);
       backdrop-filter: blur(8px);
@@ -292,14 +306,25 @@
       cursor: pointer;
       transition: all 0.25s;
       font-size: 0.85rem;
+      text-decoration: none;
     }
     .icon-btn:hover { border-color: var(--blue-primary); color: var(--blue-primary); background: rgba(0,87,179,0.12); }
     .icon-btn.danger:hover { border-color: var(--danger); color: var(--danger); background: rgba(255,71,87,0.12); }
     .icon-btn.success:hover { border-color: var(--success); color: var(--success); background: rgba(37,211,102,0.12); }
+    .icon-btn.info:hover { border-color: var(--info); color: var(--info); background: rgba(0,188,212,0.12); }
 
     .actions-cell { display: flex; gap: 0.4rem; justify-content: flex-end; }
 
-    /* Scanner Modal */
+    .rating-stars { color: #ffa502; font-size: 0.8rem; }
+    .seller-tag {
+      font-size: 0.65rem;
+      padding: 0.15rem 0.5rem;
+      border-radius: 10px;
+      background: rgba(0,87,179,0.1);
+      color: var(--blue-light);
+    }
+
+    /* Scanner */
     .scanner-overlay {
       position: fixed; inset: 0;
       background: rgba(0,0,0,0.95);
@@ -347,11 +372,6 @@
       justify-content: center;
     }
 
-    .scan-region-highlight {
-      border: 2px solid var(--blue-primary) !important;
-      border-radius: 12px;
-    }
-
     .close-scanner {
       position: absolute;
       top: 20px;
@@ -395,6 +415,7 @@
     }
     .scanner-flash:hover { background: rgba(255,255,255,0.2); }
 
+    /* Modal */
     .modal-overlay {
       position: fixed; inset: 0;
       background: rgba(0,0,0,0.7);
@@ -411,8 +432,10 @@
       border: 1px solid var(--border2);
       border-radius: 20px;
       padding: 1.75rem;
-      max-width: 450px;
+      max-width: 500px;
       width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
       box-shadow: 0 20px 60px rgba(0,0,0,0.4);
     }
     .modal-box h3 { font-size: 1.2rem; margin-bottom: 0.3rem; color: var(--text); }
@@ -433,7 +456,7 @@
 
     .modal-radio-row {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(4, 1fr);
       gap: 0.5rem;
       margin-bottom: 1rem;
     }
@@ -442,7 +465,7 @@
       padding: 0.6rem;
       border: 1px solid var(--border2);
       border-radius: 12px;
-      font-size: 0.75rem;
+      font-size: 0.7rem;
       cursor: pointer;
       transition: all 0.2s;
       display: flex;
@@ -542,26 +565,85 @@
     }
     .history-table th { color: var(--text-muted); font-weight: 600; }
 
-    .seller-tag {
-      font-size: 0.65rem;
-      padding: 0.15rem 0.5rem;
-      border-radius: 10px;
-      background: rgba(0,87,179,0.1);
-      color: var(--blue-light);
+    .wallet-info {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 0.75rem 1rem;
+      margin-bottom: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
     }
+    .wallet-info .label { color: var(--text-dim); font-size: 0.8rem; }
+    .wallet-info .value { font-weight: 700; font-size: 1.1rem; color: var(--blue-primary); }
+
+    .pagination-btn {
+      background: var(--card);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      width: 36px; height: 36px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: inherit;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+    .pagination-btn:hover, .pagination-btn.active {
+      background: var(--blue-primary);
+      border-color: var(--blue-primary);
+      color: white;
+    }
+
+    /* Tabs */
+    .tabs-container {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.5rem;
+      flex-wrap: wrap;
+    }
+    .tab-btn {
+      padding: 0.6rem 1.2rem;
+      border-radius: 12px;
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--text-dim);
+      cursor: pointer;
+      transition: all 0.3s;
+      font-family: 'Tajawal', 'Cairo', sans-serif;
+      font-size: 0.85rem;
+    }
+    .tab-btn:hover { background: var(--card-hover); color: var(--text); }
+    .tab-btn.active {
+      border-color: var(--blue-primary);
+      color: var(--blue-primary);
+      background: rgba(0,87,179,0.08);
+    }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
 
     @media (max-width: 768px) {
       .table-wrap { overflow-x: auto; }
       .stock-table { min-width: 850px; }
       .scanner-container { max-width: 100%; }
+      .modal-radio-row { grid-template-columns: repeat(2, 1fr); }
+      .kpi-grid { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); }
     }
   </style>
 </head>
 <body>
 
   <div id="header-placeholder"></div>
-<div id="admin-navbar-placeholder"></div>
-  <!-- ماسح الباركود -->
+  <div id="admin-navbar-placeholder"></div>
+
+  <!-- Scanner Overlay -->
   <div class="scanner-overlay" id="scannerOverlay">
     <button class="close-scanner" onclick="stopScanner()" title="إغلاق">
       <i class="fas fa-times"></i>
@@ -581,11 +663,14 @@
         <div id="scannedProductInfo" class="darija-text" style="color: var(--text-dim);"></div>
         
         <div class="scanner-actions">
-          <button class="gold-btn darija-text" onclick="addStockScanned()">
+          <button class="gold-btn success darija-text" onclick="addStockScanned()">
             <i class="fas fa-plus"></i> +1 للمخزون
           </button>
-          <button class="gold-btn darija-text" onclick="removeStockScanned()">
+          <button class="gold-btn danger darija-text" onclick="removeStockScanned()">
             <i class="fas fa-minus"></i> -1 من المخزون
+          </button>
+          <button class="gold-btn gold darija-text" onclick="openAddStockForScanned()">
+            <i class="fas fa-boxes"></i> إضافة كمية
           </button>
         </div>
       </div>
@@ -593,13 +678,30 @@
   </div>
 
   <div class="page-header">
-    <span class="text-xs tracking-[0.3em] darija-text" style="color:var(--blue-primary);">✦ إدارة المخزون ✦</span>
-    <h1 class="section-title font-bold darija-text mt-2" style="color:var(--text);">تتبع وتحكم المخزون</h1>
-    <p class="text-sm mt-4 darija-text" style="color:var(--text-dim);">تحديث الكميات، مراقبة المنتجات المنخفضة، وسجل الحركات - مسح QR/Barcode</p>
+    <span class="text-xs tracking-[0.3em] darija-text" style="color:var(--blue-primary);">✦ إدارة المخزون والمنتجات ✦</span>
+    <h1 class="section-title font-bold darija-text mt-2" style="color:var(--text);">📦 المخزون والمنتجات</h1>
+    <p class="text-sm mt-4 darija-text" style="color:var(--text-dim);">إدارة المنتجات، تتبع المخزون، مراقبة الكميات، وسجل الحركات</p>
   </div>
 
   <div class="container-wrap">
 
+    <!-- Wallet Balance Info -->
+    <div class="wallet-info" id="walletInfo">
+      <div>
+        <span class="label darija-text">💰 الرصيد الحالي:</span>
+        <span class="value" id="currentBalanceDisplay">0.00 درهم</span>
+      </div>
+      <div>
+        <span class="label darija-text" style="font-size:0.7rem;">⚠️ عند إضافة مخزون، سيتم خصم التكلفة من الرصيد</span>
+      </div>
+      <div>
+        <a href="admin-wallet.html" class="gold-btn" style="font-size:0.7rem;padding:0.3rem 0.8rem;">
+          <i class="fas fa-wallet"></i> المحفظة
+        </a>
+      </div>
+    </div>
+
+    <!-- KPI Cards -->
     <div class="kpi-grid" data-aos="fade-up">
       <div class="kpi-card">
         <div class="kpi-icon blue"><i class="fas fa-boxes-stacked"></i></div>
@@ -630,89 +732,204 @@
         </div>
       </div>
       <div class="kpi-card">
-        <div class="kpi-icon info"><i class="fas fa-chart-line"></i></div>
+        <div class="kpi-icon gold"><i class="fas fa-chart-line"></i></div>
         <div>
           <div class="kpi-value" id="kpiTotalValue">—</div>
           <div class="kpi-label darija-text">قيمة المخزون (درهم)</div>
         </div>
       </div>
+      <div class="kpi-card">
+        <div class="kpi-icon info"><i class="fas fa-star"></i></div>
+        <div>
+          <div class="kpi-value" id="kpiFeatured">—</div>
+          <div class="kpi-label darija-text">منتجات مميزة</div>
+        </div>
+      </div>
     </div>
 
-    <div class="toolbar">
-      <input type="text" id="searchInput" class="search-input darija-text" placeholder="🔍 بحث عن منتج (اسم، SKU، باركود)...">
-      <select id="filterSelect" class="filter-select darija-text">
-        <option value="all">📦 كل المنتجات</option>
-        <option value="low">⚠️ مخزون منخفض</option>
-        <option value="out">❌ نفذ من المخزون</option>
-        <option value="available">✅ متوفر</option>
-      </select>
-      <select id="categoryFilter" class="filter-select darija-text">
-        <option value="all">📂 كل الفئات</option>
-      </select>
-      <button class="scan-btn darija-text" onclick="startScanner()">
-        <i class="fas fa-qrcode"></i> مسح باركود
+    <!-- Tabs -->
+    <div class="tabs-container">
+      <button class="tab-btn active" data-tab="products" onclick="switchTab('products')">
+        <i class="fas fa-box"></i> المنتجات
       </button>
-      <button class="gold-btn darija-text" onclick="window.location.href='admin-product-form.html'">
-        <i class="fas fa-plus"></i> منتج جديد
+      <button class="tab-btn" data-tab="stock" onclick="switchTab('stock')">
+        <i class="fas fa-boxes"></i> المخزون
+      </button>
+      <button class="tab-btn" data-tab="history" onclick="switchTab('history')">
+        <i class="fas fa-history"></i> سجل الحركات
       </button>
     </div>
 
-    <div class="table-wrap">
-      <div id="loadingState" class="loading-state">
-        <div class="loader-spinner"></div>
-        <p class="darija-text">جاري تحميل المخزون...</p>
+    <!-- ===== Tab: Products ===== -->
+    <div class="tab-content active" id="tab-products">
+      <div class="toolbar">
+        <input type="text" id="searchInput" class="search-input darija-text" placeholder="🔍 بحث عن منتج (اسم، SKU، باركود)...">
+        <select id="categoryFilter" class="filter-select darija-text">
+          <option value="all">📂 كل الفئات</option>
+        </select>
+        <select id="stockFilter" class="filter-select darija-text">
+          <option value="all">📦 كل المنتجات</option>
+          <option value="available">✅ متوفر</option>
+          <option value="low">⚠️ مخزون منخفض</option>
+          <option value="out">❌ نفذ من المخزون</option>
+          <option value="featured">⭐ مميز</option>
+        </select>
+        <button class="scan-btn darija-text" onclick="startScanner()">
+          <i class="fas fa-qrcode"></i> مسح باركود
+        </button>
+        <a href="admin-product-form.html" class="gold-btn success darija-text">
+          <i class="fas fa-plus"></i> منتج جديد
+        </a>
       </div>
-      <div id="tableContainer" style="display:none;">
-        <table class="stock-table">
-          <thead>
-            <tr>
-              <th>المنتج</th>
-              <th>SKU / باركود</th>
-              <th>البائع</th>
-              <th>السعر</th>
-              <th>الكمية</th>
-              <th>الحالة</th>
-              <th>الحد الأدنى</th>
-              <th>آخر تحديث</th>
-              <th>إجراءات</th>
-            </tr>
-          </thead>
-          <tbody id="stockTableBody"></tbody>
-        </table>
+
+      <div class="table-wrap">
+        <div id="loadingState" class="loading-state">
+          <div class="loader-spinner"></div>
+          <p class="darija-text">جاري تحميل المنتجات...</p>
+        </div>
+        <div id="tableContainer" style="display:none;">
+          <table class="stock-table">
+            <thead>
+              <tr>
+                <th>المنتج</th>
+                <th>SKU</th>
+                <th>الفئة</th>
+                <th>البائع</th>
+                <th>السعر</th>
+                <th>المخزون</th>
+                <th>الحالة</th>
+                <th>التقييم</th>
+                <th>متغيرات</th>
+              </tr>
+            </thead>
+            <tbody id="productsTableBody"></tbody>
+          </table>
+        </div>
+        <div id="emptyState" class="empty-state darija-text" style="display:none;">
+          <i class="fas fa-box-open text-4xl mb-3 block opacity-40"></i>
+          لا توجد منتجات
+          <div class="mt-4"><a href="admin-product-form.html" class="gold-btn">➕ أضف أول منتج</a></div>
+        </div>
       </div>
-      <div id="emptyState" class="empty-state darija-text" style="display:none;">
-        <i class="fas fa-box-open text-3xl mb-3 block opacity-40"></i>
-        لا توجد منتجات حتى الآن
-        <div class="mt-4"><a href="admin-product-form.html" class="gold-btn">➕ أضف أول منتج</a></div>
+
+      <!-- Pagination -->
+      <div id="pagination" class="flex justify-center gap-2 mt-6 flex-wrap"></div>
+    </div>
+
+    <!-- ===== Tab: Stock ===== -->
+    <div class="tab-content" id="tab-stock">
+      <div class="toolbar">
+        <input type="text" id="stockSearchInput" class="search-input darija-text" placeholder="🔍 بحث عن منتج...">
+        <select id="stockCategoryFilter" class="filter-select darija-text">
+          <option value="all">📂 كل الفئات</option>
+        </select>
+        <button class="gold-btn gold darija-text" onclick="openAddStockModal()">
+          <i class="fas fa-plus"></i> إضافة مخزون
+        </button>
+        <button class="gold-btn darija-text" onclick="loadStockData()">
+          <i class="fas fa-sync-alt"></i> تحديث
+        </button>
+      </div>
+
+      <div class="table-wrap">
+        <div id="stockLoadingState" class="loading-state">
+          <div class="loader-spinner"></div>
+          <p class="darija-text">جاري تحميل المخزون...</p>
+        </div>
+        <div id="stockTableContainer" style="display:none;">
+          <table class="stock-table">
+            <thead>
+              <tr>
+                <th>المنتج</th>
+                <th>SKU</th>
+                <th>سعر البيع</th>
+                <th>سعر الشراء</th>
+                <th>الكمية</th>
+                <th>الحالة</th>
+                <th>الحد الأدنى</th>
+                <th>إجراءات</th>
+              </tr>
+            </thead>
+            <tbody id="stockTableBody"></tbody>
+          </table>
+        </div>
+        <div id="stockEmptyState" class="empty-state darija-text" style="display:none;">
+          <i class="fas fa-box-open text-4xl mb-3 block opacity-40"></i>
+          لا توجد منتجات في المخزون
+        </div>
       </div>
     </div>
 
-    <div class="history-section" id="historySection" style="display:none;">
-      <div class="history-title">
-        <i class="fas fa-history"></i>
-        <span>سجل حركات المخزون</span>
-        <button class="icon-btn" onclick="loadStockHistory()" style="margin-right: auto;"><i class="fas fa-sync-alt"></i></button>
-      </div>
-      <div style="overflow-x: auto;">
-        <table class="history-table">
-          <thead>
-            <tr>
-              <th>المنتج</th>
-              <th>التغيير</th>
-              <th>السبب</th>
-              <th>التاريخ</th>
-              <th>ملاحظة</th>
-            </tr>
-          </thead>
-          <tbody id="historyTableBody">
-            <tr><td colspan="5" class="text-center text-dim">لا توجد حركات مسجلة بعد</td></tr>
-          </tbody>
-        </table>
+    <!-- ===== Tab: History ===== -->
+    <div class="tab-content" id="tab-history">
+      <div class="history-section" style="margin-top:0;">
+        <div class="history-title">
+          <i class="fas fa-history"></i>
+          <span>سجل حركات المخزون</span>
+          <button class="icon-btn" onclick="loadStockHistory()" style="margin-right: auto;"><i class="fas fa-sync-alt"></i></button>
+        </div>
+        <div style="overflow-x: auto;">
+          <table class="history-table">
+            <thead>
+              <tr>
+                <th>المنتج</th>
+                <th>التغيير</th>
+                <th>السبب</th>
+                <th>التكلفة</th>
+                <th>التاريخ</th>
+                <th>ملاحظة</th>
+              </tr>
+            </thead>
+            <tbody id="historyTableBody">
+              <tr><td colspan="6" class="text-center text-dim">لا توجد حركات مسجلة بعد</td></tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
 
   </div>
 
+  <!-- Add Stock Modal -->
+  <div class="modal-overlay" id="addStockModal">
+    <div class="modal-box">
+      <h3 class="darija-text">📦 إضافة مخزون جديد</h3>
+      <p class="darija-text">أدخل تفاصيل المنتج الذي تريد إضافته للمخزون (سيتم خصم التكلفة من الرصيد)</p>
+
+      <div class="modal-input-group">
+        <label class="darija-text">المنتج</label>
+        <select id="addStockProductSelect" class="modal-input darija-text">
+          <option value="">-- اختر منتج --</option>
+        </select>
+      </div>
+
+      <div class="modal-input-group">
+        <label class="darija-text">الكمية المضافة</label>
+        <input type="number" id="addStockQuantity" class="modal-input" placeholder="0" min="1" step="1" value="1">
+      </div>
+
+      <div class="modal-input-group">
+        <label class="darija-text">سعر الشراء للوحدة (درهم)</label>
+        <input type="number" id="addStockPrice" class="modal-input" placeholder="0.00" step="0.01" min="0.01">
+      </div>
+
+      <div class="modal-input-group">
+        <label class="darija-text">ملاحظة (اختياري)</label>
+        <input type="text" id="addStockNote" class="modal-input" placeholder="سبب الإضافة...">
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-cancel darija-text" onclick="closeAddStockModal()">
+          <i class="fas fa-times"></i> إلغاء
+        </button>
+        <button class="gold-btn success darija-text" onclick="confirmAddStock()">
+          <i class="fas fa-check"></i> تأكيد الإضافة
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Update Stock Modal -->
   <div class="modal-overlay" id="stockModal">
     <div class="modal-box">
       <h3 class="darija-text">📦 تحديث المخزون</h3>
@@ -730,6 +947,10 @@
         <label data-reason="return">
           <i class="fas fa-undo-alt"></i>
           <span>إرجاع</span>
+        </label>
+        <label data-reason="sale">
+          <i class="fas fa-shopping-cart"></i>
+          <span>بيع</span>
         </label>
       </div>
 
@@ -754,38 +975,152 @@
     </div>
   </div>
 
+  <!-- Delete Confirmation Modal -->
+  <div class="modal-overlay" id="deleteModal">
+    <div class="modal-box">
+      <h3 class="darija-text"><i class="fas fa-trash-alt" style="color:var(--danger);"></i> تأكيد الحذف</h3>
+      <p class="darija-text" id="deleteProductName">هل أنت متأكد من حذف هذا المنتج؟</p>
+      <p class="darija-text text-xs" style="color:var(--danger);">⚠️ هذا الإجراء لا يمكن التراجع عنه</p>
+      <div class="modal-actions">
+        <button class="gold-btn darija-text" onclick="closeDeleteModal()">إلغاء</button>
+        <button class="gold-btn danger darija-text" id="confirmDeleteBtn">
+          <i class="fas fa-trash"></i> حذف
+        </button>
+      </div>
+    </div>
+  </div>
+
   <div class="toast-msg" id="toastMsg"></div>
 
-<script src="admin.js"></script>
+  <script src="admin.js"></script>
   <script src="header.js"></script>
   <script src="footer.js"></script>
 
   <script>
     AOS.init({ duration: 700, once: true, offset: 60 });
 
+    // ========== Global Variables ==========
     let sb = null;
     let allProducts = [];
     let categories = [];
     let sellers = [];
+    let walletData = null;
     let currentProductId = null;
     let selectedReason = 'restock';
-    
+    let deleteProductId = null;
+    let currentPage = 1;
+    const itemsPerPage = 15;
+
     // Scanner variables
     let html5QrCode = null;
     let scannedProductId = null;
     let isScannerRunning = false;
+    let isProcessing = false;
 
+    // ========== Supabase Init ==========
     function initSupabase() {
       try {
         if (typeof MARNISSA_CONFIG !== 'undefined' && MARNISSA_CONFIG.SUPABASE_URL && MARNISSA_CONFIG.SUPABASE_ANON_KEY) {
           sb = supabase.createClient(MARNISSA_CONFIG.SUPABASE_URL, MARNISSA_CONFIG.SUPABASE_ANON_KEY);
           console.log('✅ Supabase client initialized');
         } else {
-          console.error('❌ Supabase config manquante');
+          console.error('❌ Supabase config missing');
           showToast('❌ خطأ: تأكد من إعدادات Supabase في config.js', 'error');
         }
       } catch(e) {
         console.error('❌ Supabase init error:', e);
+      }
+    }
+
+    // ========== WALLET FUNCTIONS ==========
+    async function loadWalletBalance() {
+      try {
+        const { data: wallet, error } = await sb
+          .from('wallet')
+          .select('*')
+          .limit(1)
+          .maybeSingle();
+
+        if (error && error.code !== 'PGRST116') throw error;
+
+        if (!wallet) {
+          const { data: newWallet, error: createError } = await sb
+            .from('wallet')
+            .insert({ balance: 0, total_earned: 0, total_transferred: 0, name: 'المحفظة الرئيسية' })
+            .select()
+            .single();
+          
+          if (createError) throw createError;
+          walletData = newWallet;
+        } else {
+          walletData = wallet;
+        }
+
+        updateWalletDisplay();
+        return walletData;
+      } catch(e) {
+        console.error('❌ Error loading wallet:', e);
+        return null;
+      }
+    }
+
+    function updateWalletDisplay() {
+      if (walletData) {
+        document.getElementById('currentBalanceDisplay').textContent = walletData.balance.toFixed(2) + ' درهم';
+      }
+    }
+
+    async function deductFromWallet(amount, note) {
+      if (!walletData) return false;
+      
+      if (amount > walletData.balance) {
+        showToast(`⚠️ الرصيد غير كافي. الرصيد الحالي: ${walletData.balance.toFixed(2)} درهم`, 'error');
+        return false;
+      }
+
+      const newBalance = walletData.balance - amount;
+      
+      const { error: updateError } = await sb
+        .from('wallet')
+        .update({ 
+          balance: newBalance, 
+          total_transferred: (walletData.total_transferred || 0) + amount,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', walletData.id);
+
+      if (updateError) {
+        console.error('❌ Wallet update error:', updateError);
+        showToast('❌ فشل تحديث الرصيد: ' + updateError.message, 'error');
+        return false;
+      }
+
+      walletData.balance = newBalance;
+      walletData.total_transferred = (walletData.total_transferred || 0) + amount;
+      
+      updateWalletDisplay();
+      return true;
+    }
+
+    async function recordExpense(amount, category, description) {
+      try {
+        const { error } = await sb
+          .from('expenses')
+          .insert({
+            amount: amount,
+            category: category || 'stock',
+            description: description || 'شراء مخزون',
+            expense_date: new Date().toISOString().split('T')[0]
+          });
+
+        if (error) {
+          console.error('❌ Expense record error:', error);
+          return false;
+        }
+        return true;
+      } catch(e) {
+        console.error('❌ Record expense error:', e);
+        return false;
       }
     }
 
@@ -794,7 +1129,6 @@
       const overlay = document.getElementById('scannerOverlay');
       overlay.classList.add('active');
       
-      // إخفاء النتيجة السابقة
       document.getElementById('scannerResult').classList.remove('show');
       scannedProductId = null;
       
@@ -823,7 +1157,7 @@
       };
       
       html5QrCode.start(
-        { facingMode: "environment" }, // الكاميرا الخلفية
+        { facingMode: "environment" },
         config,
         onScanSuccess,
         onScanFailure
@@ -855,10 +1189,8 @@
     function onScanSuccess(decodedText, decodedResult) {
       console.log('✅ Scanned:', decodedText);
       
-      // منع القراءة المتكررة
       if (scannedProductId) return;
       
-      // البحث عن المنتج بالـ SKU أو الباركود
       const scannedCode = decodedText.trim();
       const product = allProducts.find(p => 
         p.sku === scannedCode || 
@@ -874,16 +1206,14 @@
           <span style="color: var(--success);">✅ تم العثور على المنتج:</span><br>
           <strong>${escapeHtml(product.name)}</strong><br>
           <span style="font-size: 0.8rem;">المخزون الحالي: <strong>${product.stock}</strong></span>
+          <span style="font-size: 0.8rem; display:block;">سعر الشراء: <strong>${product.cost_price || 0} درهم</strong></span>
         `;
         
-        // إيقاف السكنر مؤقتاً
         if (html5QrCode && isScannerRunning) {
           html5QrCode.pause(true);
         }
         
-        // تمييز المنتج في الجدول
         highlightProduct(product.id);
-        
         showToast('✅ تم التعرف على المنتج: ' + product.name, 'success');
       } else {
         scannedProductId = null;
@@ -896,8 +1226,7 @@
     }
     
     function onScanFailure(error) {
-      // أخطاء طبيعية أثناء المسح - لا نعرضها
-      // console.debug('Scan fail:', error);
+      // Normal scanning errors - ignore
     }
     
     function toggleFlash() {
@@ -905,14 +1234,11 @@
         html5QrCode.applyVideoConstraints({
           advanced: [{ torch: true }]
         }).then(() => {
-          document.getElementById('flashToggle').innerHTML = '<i class="fas fa-bolt"></i>';
           document.getElementById('flashToggle').style.background = 'rgba(255,165,2,0.3)';
         }).catch(() => {
-          // إطفاء الفلاش
           html5QrCode.applyVideoConstraints({
             advanced: [{ torch: false }]
           }).then(() => {
-            document.getElementById('flashToggle').innerHTML = '<i class="fas fa-bolt"></i>';
             document.getElementById('flashToggle').style.background = 'rgba(255,255,255,0.1)';
           });
         });
@@ -925,7 +1251,20 @@
       const product = allProducts.find(p => p.id === scannedProductId);
       if (!product) return;
       
-      const newStock = product.stock + 1;
+      // Check if wallet has enough balance
+      const costPrice = product.cost_price || product.price * 0.6;
+      if (costPrice > (walletData?.balance || 0)) {
+        showToast(`⚠️ الرصيد غير كافي لإضافة وحدة. الرصيد: ${(walletData?.balance || 0).toFixed(2)} درهم`, 'error');
+        return;
+      }
+
+      const newStock = (product.stock || 0) + 1;
+      
+      // Deduct from wallet
+      const deducted = await deductFromWallet(costPrice, `إضافة مخزون: ${product.name} (+1 وحدة)`);
+      if (!deducted) return;
+      
+      await recordExpense(costPrice, 'stock', `إضافة مخزون: ${product.name} (+1 وحدة)`);
       
       const { error: updateError } = await sb
         .from('products')
@@ -937,27 +1276,24 @@
         return;
       }
       
-      // تسجيل الحركة
       await sb.from('stock_movements').insert({
         product_id: scannedProductId,
         change: 1,
         reason: 'restock',
-        note: 'إضافة عن طريق مسح الباركود'
+        note: 'إضافة عن طريق مسح الباركود (تم الخصم من الرصيد)'
       }).catch(e => console.warn('Movement record failed:', e));
       
       product.stock = newStock;
-      renderTable(filterProducts());
-      updateKPIs(allProducts);
-      loadStockHistory();
+      loadAllData();
       
       document.getElementById('scannedProductInfo').innerHTML = `
         <span style="color: var(--success);">✅ ${escapeHtml(product.name)}</span><br>
         <span style="font-size: 0.8rem;">المخزون الجديد: <strong>${newStock}</strong> (تمت إضافة +1)</span>
+        <span style="font-size: 0.8rem; color: var(--danger);">تم خصم ${costPrice.toFixed(2)} درهم من الرصيد</span>
       `;
       
-      showToast('✅ تمت إضافة 1 للمخزون', 'success');
+      showToast(`✅ تمت إضافة 1 للمخزون (خصم ${costPrice.toFixed(2)} درهم)`, 'success');
       
-      // استئناف المسح بعد ثانية
       setTimeout(() => {
         scannedProductId = null;
         if (html5QrCode && isScannerRunning) {
@@ -973,12 +1309,12 @@
       const product = allProducts.find(p => p.id === scannedProductId);
       if (!product) return;
       
-      if (product.stock <= 0) {
+      if ((product.stock || 0) <= 0) {
         showToast('⚠️ المخزون بالفعل 0', 'error');
         return;
       }
       
-      const newStock = product.stock - 1;
+      const newStock = (product.stock || 0) - 1;
       
       const { error: updateError } = await sb
         .from('products')
@@ -990,7 +1326,6 @@
         return;
       }
       
-      // تسجيل الحركة
       await sb.from('stock_movements').insert({
         product_id: scannedProductId,
         change: -1,
@@ -999,9 +1334,7 @@
       }).catch(e => console.warn('Movement record failed:', e));
       
       product.stock = newStock;
-      renderTable(filterProducts());
-      updateKPIs(allProducts);
-      loadStockHistory();
+      loadAllData();
       
       document.getElementById('scannedProductInfo').innerHTML = `
         <span style="color: var(--warning);">📤 ${escapeHtml(product.name)}</span><br>
@@ -1010,7 +1343,6 @@
       
       showToast('✅ تم سحب 1 من المخزون', 'info');
       
-      // استئناف المسح بعد ثانية
       setTimeout(() => {
         scannedProductId = null;
         if (html5QrCode && isScannerRunning) {
@@ -1019,12 +1351,22 @@
         document.getElementById('scannerResult').classList.remove('show');
       }, 2000);
     }
+
+    function openAddStockForScanned() {
+      if (!scannedProductId) {
+        showToast('⚠️ الرجاء مسح منتج أولاً', 'error');
+        return;
+      }
+      
+      const product = allProducts.find(p => p.id === scannedProductId);
+      if (!product) return;
+      
+      stopScanner();
+      openAddStockForProduct(scannedProductId);
+    }
     
     function highlightProduct(productId) {
-      // إزالة التمييز من جميع الصفوف
       document.querySelectorAll('.stock-table tr').forEach(row => row.classList.remove('highlight'));
-      
-      // تمييز الصف المطلوب
       const row = document.querySelector(`tr[data-product-id="${productId}"]`);
       if (row) {
         row.classList.add('highlight');
@@ -1032,20 +1374,24 @@
       }
     }
 
-    // ========== CATEGORIES & SELLERS ==========
+    // ========== LOAD CATEGORIES & SELLERS ==========
     async function loadCategories() {
       try {
         const { data, error } = await sb.from('categories').select('id, name');
         if (error) throw error;
         categories = data || [];
         
-        const select = document.getElementById('categoryFilter');
-        select.innerHTML = '<option value="all">📂 كل الفئات</option>';
-        categories.forEach(cat => {
-          const opt = document.createElement('option');
-          opt.value = cat.id;
-          opt.textContent = cat.name;
-          select.appendChild(opt);
+        const selects = ['categoryFilter', 'stockCategoryFilter'];
+        selects.forEach(id => {
+          const select = document.getElementById(id);
+          if (!select) return;
+          select.innerHTML = '<option value="all">📂 كل الفئات</option>';
+          categories.forEach(cat => {
+            const opt = document.createElement('option');
+            opt.value = cat.id;
+            opt.textContent = cat.name;
+            select.appendChild(opt);
+          });
         });
       } catch(e) {
         console.error('Error loading categories:', e);
@@ -1054,28 +1400,35 @@
 
     async function loadSellers() {
       try {
-        const { data, error } = await sb.from('sellers').select('id, name');
+        const { data, error } = await sb.from('sellers').select('id, name, store_name');
         if (error) {
           console.warn('⚠️ Sellers table may not exist:', error.message);
           sellers = [];
           return;
         }
         sellers = data || [];
-        console.log('👤 Sellers loaded:', sellers.length);
       } catch(e) {
         console.error('Error loading sellers:', e);
         sellers = [];
       }
     }
 
-    async function loadStock() {
+    // ========== LOAD ALL DATA ==========
+    async function loadAllData() {
+      await loadWalletBalance();
+      await loadProducts();
+      await loadStockData();
+      await loadStockHistory();
+    }
+
+    async function loadProducts() {
       document.getElementById('loadingState').style.display = 'block';
       document.getElementById('tableContainer').style.display = 'none';
       document.getElementById('emptyState').style.display = 'none';
 
       const { data, error } = await sb
         .from('products')
-        .select('id, sku, name, price, stock, low_stock_threshold, is_available, images, category_id, seller_id, updated_at, created_at')
+        .select('*')
         .order('created_at', { ascending: false });
 
       document.getElementById('loadingState').style.display = 'none';
@@ -1087,26 +1440,84 @@
         return;
       }
 
-      console.log('📦 Products loaded:', data?.length || 0);
       allProducts = data || [];
 
       if (allProducts.length === 0) {
         document.getElementById('emptyState').style.display = 'block';
-        document.getElementById('historySection').style.display = 'none';
         return;
       }
 
       document.getElementById('tableContainer').style.display = 'block';
-      document.getElementById('historySection').style.display = 'block';
-      renderTable(filterProducts());
       updateKPIs(allProducts);
-      loadStockHistory();
+      renderProductsTable(filterProducts());
+      renderPagination();
+      populateProductSelect();
+    }
+
+    async function loadStockData() {
+      document.getElementById('stockLoadingState').style.display = 'block';
+      document.getElementById('stockTableContainer').style.display = 'none';
+      document.getElementById('stockEmptyState').style.display = 'none';
+
+      const { data, error } = await sb
+        .from('products')
+        .select('id, sku, name, price, cost_price, stock, low_stock_threshold, is_available, category_id')
+        .order('name');
+
+      document.getElementById('stockLoadingState').style.display = 'none';
+
+      if (error) {
+        console.error('❌ Stock load error:', error);
+        document.getElementById('stockEmptyState').style.display = 'block';
+        return;
+      }
+
+      const stockProducts = data || [];
+
+      if (stockProducts.length === 0) {
+        document.getElementById('stockEmptyState').style.display = 'block';
+        return;
+      }
+
+      document.getElementById('stockTableContainer').style.display = 'block';
+      renderStockTable(stockProducts);
+    }
+
+    function populateProductSelect() {
+      const select = document.getElementById('addStockProductSelect');
+      if (!select) return;
+      
+      select.innerHTML = '<option value="">-- اختر منتج --</option>';
+      allProducts.forEach(p => {
+        const opt = document.createElement('option');
+        opt.value = p.id;
+        opt.textContent = `${p.name} (سعر البيع: ${p.price || 0} درهم)`;
+        select.appendChild(opt);
+      });
+    }
+
+    // ========== HELPERS ==========
+    function getCategoryName(categoryId) {
+      if (!categoryId) return '—';
+      return categories.find(c => c.id === categoryId)?.name || '—';
     }
 
     function getSellerName(sellerId) {
       if (!sellerId) return '—';
       const seller = sellers.find(s => s.id === sellerId);
-      return seller ? seller.name : sellerId.substring(0, 8) + '...';
+      return seller ? (seller.store_name || seller.name || '—') : '—';
+    }
+
+    function getStockStatus(p) {
+      const threshold = p.low_stock_threshold || 5;
+      if ((p.stock || 0) <= 0) return { cls: 'out', icon: 'fa-ban', label: 'نفذ' };
+      if ((p.stock || 0) <= threshold) return { cls: 'low', icon: 'fa-triangle-exclamation', label: 'منخفض' };
+      return { cls: 'ok', icon: 'fa-check', label: 'متوفر' };
+    }
+
+    function renderStars(rating) {
+      const full = Math.round(rating || 0);
+      return '★'.repeat(full) + '☆'.repeat(5 - full);
     }
 
     function updateKPIs(products) {
@@ -1115,86 +1526,310 @@
       const low = products.filter(p => p.stock > 0 && p.stock <= (p.low_stock_threshold || 5)).length;
       const out = products.filter(p => p.stock <= 0).length;
       const totalValue = products.reduce((sum, p) => sum + ((p.price || 0) * (p.stock || 0)), 0);
+      const featured = products.filter(p => p.is_featured).length;
 
       document.getElementById('kpiTotalProducts').textContent = total;
       document.getElementById('kpiTotalStock').textContent = totalStock;
       document.getElementById('kpiLowStock').textContent = low;
       document.getElementById('kpiOutOfStock').textContent = out;
       document.getElementById('kpiTotalValue').textContent = totalValue.toFixed(0);
+      document.getElementById('kpiFeatured').textContent = featured;
     }
 
-    function renderTable(products) {
-      const tbody = document.getElementById('stockTableBody');
+    // ========== RENDER PRODUCTS TABLE (NO ACTIONS) ==========
+    function filterProducts() {
+      const search = document.getElementById('searchInput').value.trim().toLowerCase();
+      const categoryId = document.getElementById('categoryFilter').value;
+      const stockFilter = document.getElementById('stockFilter').value;
 
-      if (products.length === 0) {
+      return allProducts.filter(p => {
+        const sellerName = getSellerName(p.seller_id);
+        const categoryName = getCategoryName(p.category_id);
+        
+        const matchesSearch = !search || 
+          (p.name && p.name.toLowerCase().includes(search)) ||
+          (p.sku && p.sku.toLowerCase().includes(search)) ||
+          sellerName.toLowerCase().includes(search) ||
+          categoryName.toLowerCase().includes(search);
+        
+        const matchesCategory = categoryId === 'all' || p.category_id === categoryId;
+        
+        let matchesStock = true;
+        const threshold = p.low_stock_threshold || 5;
+        if (stockFilter === 'available') matchesStock = p.is_available && p.stock > threshold;
+        else if (stockFilter === 'low') matchesStock = p.stock > 0 && p.stock <= threshold;
+        else if (stockFilter === 'out') matchesStock = p.stock <= 0;
+        else if (stockFilter === 'featured') matchesStock = p.is_featured === true;
+
+        return matchesSearch && matchesCategory && matchesStock;
+      });
+    }
+
+    function renderProductsTable(products) {
+      const tbody = document.getElementById('productsTableBody');
+      const start = (currentPage - 1) * itemsPerPage;
+      const end = start + itemsPerPage;
+      const paginated = products.slice(start, end);
+
+      if (paginated.length === 0) {
         tbody.innerHTML = `<tr><td colspan="9" class="text-center py-8 darija-text" style="color:var(--text-dim);">لا توجد نتائج مطابقة</td></tr>`;
         return;
       }
 
-      tbody.innerHTML = products.map(p => {
+      tbody.innerHTML = paginated.map(p => {
         const status = getStockStatus(p);
-        const img = (p.images && p.images.length > 0) ? p.images[0] : 'https://placehold.co/46x46/1a1a2e/0057b3?text=M';
-        const updatedAt = p.updated_at ? new Date(p.updated_at).toLocaleDateString('ar-MA') : '—';
-        const categoryName = categories.find(c => c.id === p.category_id)?.name || '—';
-        const sellerName = getSellerName(p.seller_id);
+        const img = p.images?.[0] || 'https://placehold.co/48x48/1a1a2e/0057b3?text=P';
+        const variants = p.variants || [];
+        const variantCount = variants.reduce((sum, v) => sum + (v.options?.length || 0), 0);
+
+        return `
+          <tr>
+            <td>
+              <div class="product-cell">
+                <img src="${img}" alt="" onerror="this.src='https://placehold.co/48x48/1a1a2e/0057b3?text=P'">
+                <div>
+                  <div class="pname darija-text">${escapeHtml(p.name)}</div>
+                  ${p.is_featured ? '<span style="font-size:0.6rem;color:var(--warning);">⭐ مميز</span>' : ''}
+                </div>
+              </div>
+            </td>
+            <td class="darija-text"><code style="font-size:0.7rem;">${escapeHtml(p.sku || '—')}</code></td>
+            <td class="darija-text"><span class="pcat">${escapeHtml(getCategoryName(p.category_id))}</span></td>
+            <td class="darija-text"><span class="seller-tag">${escapeHtml(getSellerName(p.seller_id))}</span></td>
+            <td class="darija-text" style="font-weight:700;">${p.price || 0} <small>dh</small></td>
+            <td class="darija-text" style="font-weight:700;">${p.stock || 0}</td>
+            <td><span class="stock-badge ${status.cls} darija-text"><i class="fas ${status.icon}"></i> ${status.label}</span></td>
+            <td>
+              ${p.rating_count > 0 ? `
+                <div class="rating-stars">${renderStars(p.rating_avg)}</div>
+                <span style="font-size:0.7rem;color:var(--text-dim);">${(p.rating_avg || 0).toFixed(1)} (${p.rating_count})</span>
+              ` : '<span style="font-size:0.7rem;color:var(--text-dim);">لا تقييمات</span>'}
+            </td>
+            <td class="darija-text" style="font-size:0.75rem;">
+              ${variantCount > 0 ? `<span style="color:var(--blue-light);">${variants.length} مجموعات (${variantCount} خيار)</span>` : '—'}
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // ========== PAGINATION ==========
+    function renderPagination() {
+      const container = document.getElementById('pagination');
+      const filtered = filterProducts();
+      const totalPages = Math.ceil(filtered.length / itemsPerPage);
+
+      if (totalPages <= 1) {
+        container.innerHTML = '';
+        return;
+      }
+
+      let html = '';
+      const maxVisible = 5;
+      let startPage = Math.max(1, currentPage - Math.floor(maxVisible / 2));
+      let endPage = Math.min(totalPages, startPage + maxVisible - 1);
+      if (endPage - startPage < maxVisible - 1) startPage = Math.max(1, endPage - maxVisible + 1);
+
+      if (startPage > 1) {
+        html += `<button class="pagination-btn" onclick="goToPage(1)">1</button>`;
+        if (startPage > 2) html += `<span style="padding:0.5rem;color:var(--text-dim);">...</span>`;
+      }
+
+      for (let i = startPage; i <= endPage; i++) {
+        html += `<button class="pagination-btn ${currentPage === i ? 'active' : ''}" onclick="goToPage(${i})">${i}</button>`;
+      }
+
+      if (endPage < totalPages) {
+        if (endPage < totalPages - 1) html += `<span style="padding:0.5rem;color:var(--text-dim);">...</span>`;
+        html += `<button class="pagination-btn" onclick="goToPage(${totalPages})">${totalPages}</button>`;
+      }
+
+      container.innerHTML = html;
+    }
+
+    function goToPage(page) {
+      const totalPages = Math.ceil(filterProducts().length / itemsPerPage);
+      if (page < 1 || page > totalPages) return;
+      currentPage = page;
+      renderProductsTable(filterProducts());
+      renderPagination();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // ========== RENDER STOCK TABLE (WITH ALL ACTIONS) ==========
+    function renderStockTable(products) {
+      const tbody = document.getElementById('stockTableBody');
+
+      if (products.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" class="text-center py-8 darija-text" style="color:var(--text-dim);">لا توجد منتجات</td></tr>`;
+        return;
+      }
+
+      const search = document.getElementById('stockSearchInput')?.value?.trim().toLowerCase() || '';
+      const categoryId = document.getElementById('stockCategoryFilter')?.value || 'all';
+
+      const filtered = products.filter(p => {
+        const matchesSearch = !search || p.name.toLowerCase().includes(search);
+        const matchesCategory = categoryId === 'all' || p.category_id === categoryId;
+        return matchesSearch && matchesCategory;
+      });
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" class="text-center py-8 darija-text" style="color:var(--text-dim);">لا توجد نتائج مطابقة</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(p => {
+        const status = getStockStatus(p);
+        const categoryName = getCategoryName(p.category_id);
 
         return `
           <tr data-product-id="${p.id}">
             <td>
               <div class="product-cell">
-                <img src="${img}" alt="${escapeHtml(p.name)}" onerror="this.src='https://placehold.co/46x46/1a1a2e/0057b3?text=M'">
                 <div>
                   <div class="pname darija-text">${escapeHtml(p.name)}</div>
                   <div class="pcat darija-text">${escapeHtml(categoryName)}</div>
                 </div>
               </div>
             </td>
-            <td class="darija-text">
-              <code>${escapeHtml(p.sku || '—')}</code>
-              ${p.sku ? `<button class="icon-btn" style="width:24px;height:24px;font-size:0.6rem;" onclick="quickScanBySKU('${escapeHtml(p.sku)}')" title="مسح"><i class="fas fa-qrcode"></i></button>` : ''}
-            </td>
-            <td class="darija-text"><span class="seller-tag">${escapeHtml(sellerName)}</span></td>
-            <td class="darija-text">${p.price} درهم</td>
+            <td class="darija-text"><code style="font-size:0.7rem;">${escapeHtml(p.sku || '—')}</code></td>
+            <td class="darija-text" style="font-weight:700;">${(p.price || 0).toFixed(2)} درهم</td>
+            <td class="darija-text" style="font-weight:700;color:var(--info);">${(p.cost_price || 0).toFixed(2)} درهم</td>
             <td>
-              <input type="number" class="stock-qty-input" value="${p.stock}" data-id="${p.id}" onchange="quickUpdateStock(this)">
+              <input type="number" class="stock-qty-input" value="${p.stock || 0}" data-id="${p.id}" onchange="quickUpdateStock(this)">
             </td>
             <td><span class="stock-badge ${status.cls} darija-text"><i class="fas ${status.icon}"></i> ${status.label}</span></td>
             <td class="darija-text">${p.low_stock_threshold || 5}</td>
-            <td class="darija-text" style="font-size:0.7rem;">${updatedAt}</td>
             <td>
               <div class="actions-cell">
-                <button class="icon-btn" title="إضافة/سحب كمية" onclick="openStockModal('${p.id}', '${escapeHtml(p.name)}')">
+                <a href="product-detail.html?id=${p.id}" target="_blank" class="icon-btn" title="معاينة"><i class="fas fa-eye"></i></a>
+                <a href="admin-product-form.html?id=${p.id}" class="icon-btn" title="تعديل"><i class="fas fa-pen"></i></a>
+                <button class="icon-btn" title="تحديث الكمية" onclick="openStockModal('${p.id}', '${escapeHtml(p.name)}')">
                   <i class="fas fa-pen"></i>
                 </button>
-                <button class="icon-btn" title="عرض المنتج" onclick="window.location.href='product-detail.html?id=${p.id}'">
-                  <i class="fas fa-eye"></i>
+                <button class="icon-btn success" title="إضافة مخزون" onclick="openAddStockForProduct('${p.id}')">
+                  <i class="fas fa-plus"></i>
                 </button>
-                <button class="icon-btn success" title="سجل الحركات" onclick="showProductHistory('${p.id}')">
+                <button class="icon-btn info" title="سجل الحركات" onclick="showProductHistory('${p.id}')">
                   <i class="fas fa-history"></i>
                 </button>
+                <button class="icon-btn danger" title="حذف" onclick="openDeleteModal('${p.id}', '${escapeHtml(p.name)}')"><i class="fas fa-trash"></i></button>
               </div>
             </td>
-           </tr>
+          </tr>
         `;
       }).join('');
     }
 
-    function getStockStatus(p) {
-      const threshold = p.low_stock_threshold || 5;
-      if (p.stock <= 0) return { cls: 'out', icon: 'fa-ban', label: 'نفذ' };
-      if (p.stock <= threshold) return { cls: 'low', icon: 'fa-triangle-exclamation', label: 'منخفض' };
-      return { cls: 'ok', icon: 'fa-check', label: 'متوفر' };
+    // ========== ADD STOCK ==========
+    function openAddStockModal() {
+      document.getElementById('addStockModal').classList.add('open');
+      document.getElementById('addStockQuantity').value = 1;
+      document.getElementById('addStockPrice').value = '';
+      document.getElementById('addStockNote').value = '';
+      populateProductSelect();
     }
 
-    // دالة للبحث السريع بالـ SKU
-    window.quickScanBySKU = function(sku) {
-      const product = allProducts.find(p => p.sku === sku);
-      if (product) {
-        highlightProduct(product.id);
-        showToast('✅ المنتج: ' + product.name + ' | المخزون: ' + product.stock, 'info');
-      }
-    };
+    function openAddStockForProduct(productId) {
+      const product = allProducts.find(p => p.id === productId);
+      if (!product) return;
+      
+      document.getElementById('addStockModal').classList.add('open');
+      document.getElementById('addStockProductSelect').value = productId;
+      document.getElementById('addStockQuantity').value = 1;
+      document.getElementById('addStockPrice').value = product.cost_price || 0;
+      document.getElementById('addStockNote').value = 'إضافة مخزون';
+      populateProductSelect();
+    }
 
+    function closeAddStockModal() {
+      document.getElementById('addStockModal').classList.remove('open');
+    }
+
+    async function confirmAddStock() {
+      const productId = document.getElementById('addStockProductSelect').value;
+      const quantity = parseInt(document.getElementById('addStockQuantity').value);
+      const pricePerUnit = parseFloat(document.getElementById('addStockPrice').value);
+      const note = document.getElementById('addStockNote').value || 'شراء مخزون';
+
+      if (!productId) {
+        showToast('⚠️ الرجاء اختيار منتج', 'error');
+        return;
+      }
+
+      if (!quantity || quantity <= 0) {
+        showToast('⚠️ أدخل كمية صحيحة', 'error');
+        return;
+      }
+
+      if (!pricePerUnit || pricePerUnit <= 0) {
+        showToast('⚠️ أدخل سعر شراء صحيح', 'error');
+        return;
+      }
+
+      const totalCost = quantity * pricePerUnit;
+
+      if (totalCost > (walletData?.balance || 0)) {
+        showToast(`⚠️ الرصيد غير كافي. الرصيد الحالي: ${(walletData?.balance || 0).toFixed(2)} درهم`, 'error');
+        return;
+      }
+
+      if (isProcessing) return;
+      isProcessing = true;
+
+      try {
+        const product = allProducts.find(p => p.id === productId);
+        if (!product) {
+          showToast('⚠️ المنتج غير موجود', 'error');
+          return;
+        }
+
+        const newStock = (product.stock || 0) + quantity;
+        const newCostPrice = pricePerUnit;
+
+        const { error: updateError } = await sb
+          .from('products')
+          .update({ 
+            stock: newStock, 
+            cost_price: newCostPrice,
+            updated_at: new Date().toISOString() 
+          })
+          .eq('id', productId);
+
+        if (updateError) throw updateError;
+
+        await sb.from('stock_movements').insert({
+          product_id: productId,
+          change: quantity,
+          reason: 'restock',
+          note: `شراء مخزون: ${note} (${quantity} وحدة بسعر ${pricePerUnit} درهم)`
+        });
+
+        const deducted = await deductFromWallet(totalCost, `شراء مخزون: ${product.name} (${quantity} وحدة)`);
+        if (!deducted) {
+          await sb.from('products').update({ stock: product.stock, cost_price: product.cost_price }).eq('id', productId);
+          throw new Error('فشل خصم المبلغ من الرصيد');
+        }
+
+        await recordExpense(totalCost, 'stock', `شراء مخزون: ${product.name} (${quantity} وحدة بسعر ${pricePerUnit} درهم)`);
+
+        product.stock = newStock;
+        product.cost_price = newCostPrice;
+
+        loadAllData();
+        closeAddStockModal();
+        showToast(`✅ تم إضافة ${quantity} وحدة بتكلفة ${totalCost.toFixed(2)} درهم (تم الخصم من الرصيد)`, 'success');
+
+      } catch(e) {
+        console.error('❌ Add stock error:', e);
+        showToast('❌ فشل إضافة المخزون: ' + e.message, 'error');
+      } finally {
+        isProcessing = false;
+      }
+    }
+
+    // ========== QUICK UPDATE STOCK ==========
     window.quickUpdateStock = async function(input) {
       const productId = input.dataset.id;
       const newValue = parseInt(input.value);
@@ -1207,8 +1842,25 @@
         return;
       }
 
-      const diff = newValue - product.stock;
+      const diff = newValue - (product.stock || 0);
       if (diff === 0) return;
+
+      if (diff > 0) {
+        const totalCost = diff * (product.cost_price || product.price * 0.6);
+        if (totalCost > (walletData?.balance || 0)) {
+          showToast(`⚠️ الرصيد غير كافي لإضافة ${diff} وحدة. الرصيد: ${(walletData?.balance || 0).toFixed(2)} درهم`, 'error');
+          input.value = product.stock;
+          return;
+        }
+
+        const deducted = await deductFromWallet(totalCost, `إضافة مخزون: ${product.name} (+${diff} وحدة)`);
+        if (!deducted) {
+          input.value = product.stock;
+          return;
+        }
+
+        await recordExpense(totalCost, 'stock', `إضافة مخزون: ${product.name} (+${diff} وحدة)`);
+      }
 
       const { error: updateError } = await sb
         .from('products')
@@ -1222,24 +1874,19 @@
         return;
       }
 
-      const { error: insertError } = await sb.from('stock_movements').insert({
+      await sb.from('stock_movements').insert({
         product_id: productId,
         change: diff,
-        reason: 'adjustment',
-        note: 'تحديث سريع من لوحة المخزون'
-      });
-
-      if (insertError) {
-        console.warn('⚠️ Could not insert movement record:', insertError.message);
-      }
+        reason: diff > 0 ? 'restock' : 'adjustment',
+        note: diff > 0 ? `إضافة ${diff} وحدة (تم الخصم من الرصيد)` : `سحب ${Math.abs(diff)} وحدة`
+      }).catch(e => console.warn('⚠️ Movement record failed:', e));
 
       product.stock = newValue;
-      renderTable(filterProducts());
-      updateKPIs(allProducts);
-      loadStockHistory();
-      showToast('✅ تم تحديث المخزون بنجاح', 'success');
+      loadAllData();
+      showToast(`✅ تم تحديث المخزون بنجاح`, 'success');
     };
 
+    // ========== STOCK MODAL ==========
     window.openStockModal = function(productId, productName) {
       currentProductId = productId;
       document.getElementById('modalProductName').textContent = productName;
@@ -1266,13 +1913,28 @@
       const product = allProducts.find(p => p.id === currentProductId);
       if (!product) return;
 
-      const newStock = product.stock + changeVal;
+      const newStock = (product.stock || 0) + changeVal;
       if (newStock < 0) {
         showToast('⚠️ لا يمكن أن يكون المخزون أقل من 0', 'error');
         return;
       }
 
       const note = document.getElementById('modalNote').value;
+
+      if (changeVal > 0) {
+        const costPrice = product.cost_price || product.price * 0.6;
+        const totalCost = changeVal * costPrice;
+        
+        if (totalCost > (walletData?.balance || 0)) {
+          showToast(`⚠️ الرصيد غير كافي لإضافة ${changeVal} وحدة. الرصيد: ${(walletData?.balance || 0).toFixed(2)} درهم`, 'error');
+          return;
+        }
+
+        const deducted = await deductFromWallet(totalCost, `إضافة مخزون: ${product.name} (+${changeVal} وحدة)`);
+        if (!deducted) return;
+
+        await recordExpense(totalCost, 'stock', `إضافة مخزون: ${product.name} (+${changeVal} وحدة)`);
+      }
 
       const { error: updateError } = await sb
         .from('products')
@@ -1285,25 +1947,20 @@
         return;
       }
 
-      const { error: insertError } = await sb.from('stock_movements').insert({
+      await sb.from('stock_movements').insert({
         product_id: currentProductId,
         change: changeVal,
         reason: selectedReason,
         note: note || null
-      });
-
-      if (insertError) {
-        console.warn('⚠️ Movement record failed:', insertError.message);
-      }
+      }).catch(e => console.warn('⚠️ Movement record failed:', e));
 
       product.stock = newStock;
-      renderTable(filterProducts());
-      updateKPIs(allProducts);
-      loadStockHistory();
+      loadAllData();
       closeStockModal();
-      showToast('✅ تم تحديث المخزون بنجاح', 'success');
+      showToast(`✅ تم تحديث المخزون بنجاح`, 'success');
     };
 
+    // ========== STOCK HISTORY ==========
     async function loadStockHistory(productId = null) {
       try {
         let query = sb
@@ -1326,36 +1983,20 @@
         const tbody = document.getElementById('historyTableBody');
         
         if (!data || data.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="5" class="text-center text-dim">لا توجد حركات مسجلة</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="6" class="text-center text-dim">لا توجد حركات مسجلة</td></tr>';
           return;
         }
 
         const productIds = [...new Set(data.map(m => m.product_id))];
         const productNames = {};
+        const productCosts = {};
         
         allProducts.forEach(p => {
           if (productIds.includes(p.id)) {
             productNames[p.id] = p.name;
+            productCosts[p.id] = p.cost_price || p.price * 0.6;
           }
         });
-
-        const missingIds = productIds.filter(id => !productNames[id]);
-        if (missingIds.length > 0) {
-          try {
-            const { data: missingProducts } = await sb
-              .from('products')
-              .select('id, name')
-              .in('id', missingIds);
-            
-            if (missingProducts) {
-              missingProducts.forEach(p => {
-                productNames[p.id] = p.name;
-              });
-            }
-          } catch(e) {
-            console.warn('Could not fetch missing product names:', e);
-          }
-        }
 
         const reasonLabels = {
           restock: '🟢 توريد',
@@ -1368,12 +2009,14 @@
           const changeClass = m.change > 0 ? 'success' : 'danger';
           const changeSign = m.change > 0 ? `+${m.change}` : m.change;
           const productName = productNames[m.product_id] || m.product_id?.substring(0, 8) || '—';
+          const cost = m.change > 0 ? (m.change * (productCosts[m.product_id] || 0)) : 0;
           
           return `
             <tr>
               <td>${escapeHtml(productName)}</td>
               <td style="color: var(--${changeClass}); font-weight: bold;">${changeSign}</td>
               <td>${reasonLabels[m.reason] || m.reason || '—'}</td>
+              <td style="color: var(--danger);">${cost > 0 ? cost.toFixed(2) + ' درهم' : '—'}</td>
               <td style="font-size:0.7rem;">${m.created_at ? new Date(m.created_at).toLocaleString('ar-MA') : '—'}</td>
               <td style="font-size:0.7rem;">${escapeHtml(m.note || '—')}</td>
             </tr>
@@ -1383,42 +2026,68 @@
       } catch(e) {
         console.error('❌ Error loading stock history:', e);
         document.getElementById('historyTableBody').innerHTML = 
-          '<tr><td colspan="5" class="text-center text-danger">❌ خطأ في تحميل السجل</td></tr>';
+          '<tr><td colspan="6" class="text-center text-danger">❌ خطأ في تحميل السجل</td></tr>';
       }
     }
 
     window.showProductHistory = function(productId) {
       loadStockHistory(productId);
-      document.getElementById('historySection').scrollIntoView({ behavior: 'smooth' });
+      switchTab('history');
       showToast('📋 جاري عرض سجل هذا المنتج', 'info');
     };
 
-    function filterProducts() {
-      const search = document.getElementById('searchInput').value.trim().toLowerCase();
-      const filter = document.getElementById('filterSelect').value;
-      const categoryId = document.getElementById('categoryFilter').value;
-
-      return allProducts.filter(p => {
-        const sellerName = getSellerName(p.seller_id);
-        
-        const matchesSearch = !search || 
-          p.name.toLowerCase().includes(search) || 
-          (p.sku && p.sku.toLowerCase().includes(search)) ||
-          sellerName.toLowerCase().includes(search);
-        
-        const matchesCategory = categoryId === 'all' || p.category_id === categoryId;
-        
-        let matchesFilter = true;
-        const threshold = p.low_stock_threshold || 5;
-
-        if (filter === 'low') matchesFilter = p.stock > 0 && p.stock <= threshold;
-        else if (filter === 'out') matchesFilter = p.stock <= 0;
-        else if (filter === 'available') matchesFilter = p.is_available && p.stock > 0;
-
-        return matchesSearch && matchesFilter && matchesCategory;
-      });
+    // ========== DELETE PRODUCT ==========
+    function openDeleteModal(productId, productName) {
+      deleteProductId = productId;
+      document.getElementById('deleteProductName').textContent = `هل أنت متأكد من حذف: "${productName}"؟`;
+      document.getElementById('deleteModal').classList.add('open');
     }
 
+    function closeDeleteModal() {
+      document.getElementById('deleteModal').classList.remove('open');
+      deleteProductId = null;
+    }
+
+    document.getElementById('confirmDeleteBtn').addEventListener('click', async () => {
+      if (!deleteProductId) return;
+
+      const btn = document.getElementById('confirmDeleteBtn');
+      const orig = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الحذف...';
+
+      const { error } = await sb.from('products').delete().eq('id', deleteProductId);
+
+      btn.disabled = false;
+      btn.innerHTML = orig;
+      closeDeleteModal();
+
+      if (error) {
+        showToast('❌ فشل الحذف: ' + error.message, 'error');
+        return;
+      }
+
+      allProducts = allProducts.filter(p => p.id !== deleteProductId);
+      loadAllData();
+      showToast('✅ تم حذف المنتج بنجاح', 'success');
+    });
+
+    // ========== TABS ==========
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.tab === tabName);
+      });
+
+      document.querySelectorAll('.tab-content').forEach(content => {
+        content.classList.toggle('active', content.id === `tab-${tabName}`);
+      });
+
+      if (tabName === 'history') {
+        loadStockHistory();
+      }
+    }
+
+    // ========== HELPERS ==========
     function showToast(text, type) {
       const toast = document.getElementById('toastMsg');
       toast.textContent = text;
@@ -1432,6 +2101,7 @@
       return String(s).replace(/[&<>"']/g, m => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]));
     }
 
+    // ========== EVENT LISTENERS ==========
     document.addEventListener('DOMContentLoaded', async () => {
       initSupabase();
       
@@ -1440,13 +2110,34 @@
         return;
       }
 
-      await Promise.all([loadCategories(), loadSellers()]);
-      await loadStock();
+      await loadCategories();
+      await loadSellers();
+      await loadAllData();
 
-      document.getElementById('searchInput').addEventListener('input', () => renderTable(filterProducts()));
-      document.getElementById('filterSelect').addEventListener('change', () => renderTable(filterProducts()));
-      document.getElementById('categoryFilter').addEventListener('change', () => renderTable(filterProducts()));
+      // Products filters
+      document.getElementById('searchInput').addEventListener('input', () => {
+        currentPage = 1;
+        renderProductsTable(filterProducts());
+        renderPagination();
+      });
 
+      document.getElementById('categoryFilter').addEventListener('change', () => {
+        currentPage = 1;
+        renderProductsTable(filterProducts());
+        renderPagination();
+      });
+
+      document.getElementById('stockFilter').addEventListener('change', () => {
+        currentPage = 1;
+        renderProductsTable(filterProducts());
+        renderPagination();
+      });
+
+      // Stock filters
+      document.getElementById('stockSearchInput').addEventListener('input', loadStockData);
+      document.getElementById('stockCategoryFilter').addEventListener('change', loadStockData);
+
+      // Reason row for stock modal
       document.querySelectorAll('#reasonRow label').forEach(label => {
         label.addEventListener('click', () => {
           document.querySelectorAll('#reasonRow label').forEach(l => l.classList.remove('active'));
@@ -1455,14 +2146,28 @@
         });
       });
 
+      // Modal close on overlay click
       document.getElementById('stockModal').addEventListener('click', (e) => {
         if (e.target.id === 'stockModal') closeStockModal();
       });
-      
-      // إغلاق السكنر بزر ESC
+
+      document.getElementById('addStockModal').addEventListener('click', (e) => {
+        if (e.target.id === 'addStockModal') closeAddStockModal();
+      });
+
+      document.getElementById('deleteModal').addEventListener('click', (e) => {
+        if (e.target.id === 'deleteModal') closeDeleteModal();
+      });
+
+      // Keyboard shortcuts
       document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && document.getElementById('scannerOverlay').classList.contains('active')) {
-          stopScanner();
+        if (e.key === 'Escape') {
+          if (document.getElementById('scannerOverlay').classList.contains('active')) {
+            stopScanner();
+          }
+          closeStockModal();
+          closeAddStockModal();
+          closeDeleteModal();
         }
       });
     });

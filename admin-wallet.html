@@ -87,7 +87,6 @@
       padding: 0 1.5rem clamp(60px, 8vh, 100px);
     }
 
-    /* ===== KPI Cards ===== */
     .kpi-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -119,10 +118,10 @@
     .kpi-icon.danger { background: rgba(255,71,87,0.15); color: var(--danger); }
     .kpi-icon.info { background: rgba(0,188,212,0.15); color: var(--info); }
     .kpi-icon.purple { background: rgba(108,92,231,0.15); color: var(--purple); }
+    .kpi-icon.gold { background: rgba(249,168,37,0.15); color: var(--gold); }
     .kpi-value { font-size: 1.5rem; font-weight: 800; line-height: 1.2; }
-    .kpi-label { font-size: 0.75rem; color: var(--text-dim); margin-top: 2px; }
+    .kpi-label { font-size: 0.7rem; color: var(--text-dim); margin-top: 2px; }
 
-    /* ===== Wallet Card ===== */
     .wallet-card {
       background: var(--card);
       backdrop-filter: blur(8px);
@@ -153,7 +152,7 @@
       margin: 0.5rem 0;
     }
     .balance-item .label {
-      font-size: 0.8rem;
+      font-size: 0.75rem;
       color: var(--text-dim);
     }
     .balance-item .icon {
@@ -164,8 +163,10 @@
     .balance-item.success .amount { color: var(--success); }
     .balance-item.warning .amount { color: var(--warning); }
     .balance-item.danger .amount { color: var(--danger); }
+    .balance-item.gold .amount { color: var(--gold); }
+    .balance-item.purple .amount { color: var(--purple); }
+    .balance-item.info .amount { color: var(--info); }
 
-    /* ===== Buttons ===== */
     .gold-btn {
       background: transparent;
       border: 1.5px solid var(--blue-primary);
@@ -200,8 +201,9 @@
     .gold-btn.danger:hover { background: rgba(255,71,87,0.1); }
     .gold-btn.purple { border-color: var(--purple); color: var(--purple); }
     .gold-btn.purple:hover { background: rgba(108,92,231,0.1); }
+    .gold-btn.gold { border-color: var(--gold); color: var(--gold); }
+    .gold-btn.gold:hover { background: rgba(249,168,37,0.1); }
 
-    /* ===== Table ===== */
     .table-wrap {
       background: var(--card);
       backdrop-filter: blur(8px);
@@ -234,7 +236,6 @@
     }
     .wallet-table tr:hover td { background: var(--card-hover); }
 
-    /* ===== Status Badges ===== */
     .status-badge {
       display: inline-flex;
       align-items: center;
@@ -248,8 +249,8 @@
     .status-badge.pending { background: rgba(255,165,2,0.12); color: var(--warning); }
     .status-badge.completed { background: rgba(37,211,102,0.12); color: var(--success); }
     .status-badge.failed { background: rgba(255,71,87,0.12); color: var(--danger); }
+    .status-badge.expense { background: rgba(255,71,87,0.12); color: var(--danger); }
 
-    /* ===== Icons ===== */
     .icon-btn {
       width: 34px; height: 34px;
       border-radius: 8px;
@@ -269,7 +270,6 @@
 
     .actions-cell { display: flex; gap: 0.4rem; justify-content: flex-end; }
 
-    /* ===== Toolbar ===== */
     .toolbar {
       display: flex;
       flex-wrap: wrap;
@@ -302,7 +302,6 @@
     }
     .filter-select:focus { outline: none; border-color: var(--blue-primary); }
 
-    /* ===== Modal ===== */
     .modal-overlay {
       position: fixed; inset: 0;
       background: rgba(0,0,0,0.7);
@@ -321,6 +320,8 @@
       padding: 1.75rem;
       max-width: 500px;
       width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
       box-shadow: 0 20px 60px rgba(0,0,0,0.4);
     }
     .modal-box h3 { font-size: 1.2rem; margin-bottom: 0.3rem; color: var(--text); font-family: 'Tajawal', 'Cairo', sans-serif; }
@@ -339,6 +340,7 @@
     }
     .modal-input:focus { outline: none; border-color: var(--blue-primary); }
     .modal-input::placeholder { color: var(--text-dim); }
+    .modal-input option { background: var(--bg2); }
 
     .modal-actions { display: flex; gap: 0.75rem; margin-top: 1.5rem; }
     .modal-actions .gold-btn { flex: 1; justify-content: center; }
@@ -361,7 +363,6 @@
     }
     .btn-cancel:hover { background: rgba(255,71,87,0.15); }
 
-    /* ===== States ===== */
     .empty-state, .loading-state {
       text-align: center;
       padding: 4rem 1rem;
@@ -378,7 +379,6 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* ===== Toast ===== */
     .toast-msg {
       position: fixed;
       bottom: 30px; left: 50%;
@@ -418,6 +418,72 @@
       margin-right: 0.3rem;
     }
 
+    .tabs-container {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.5rem;
+      flex-wrap: wrap;
+    }
+    .tab-btn {
+      padding: 0.6rem 1.2rem;
+      border-radius: 12px;
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--text-dim);
+      cursor: pointer;
+      transition: all 0.3s;
+      font-family: 'Tajawal', 'Cairo', sans-serif;
+      font-size: 0.85rem;
+    }
+    .tab-btn:hover { background: var(--card-hover); color: var(--text); }
+    .tab-btn.active {
+      border-color: var(--blue-primary);
+      color: var(--blue-primary);
+      background: rgba(0,87,179,0.08);
+    }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    .formula-box {
+      background: rgba(0,87,179,0.05);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 0.75rem 1rem;
+      margin-top: 1rem;
+      text-align: center;
+      font-size: 0.85rem;
+      color: var(--text-dim);
+    }
+    .formula-box strong {
+      color: var(--text);
+    }
+    .formula-box .plus { color: var(--success); }
+    .formula-box .minus { color: var(--danger); }
+
+    .stock-metrics {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 0.75rem;
+      margin-top: 0.5rem;
+    }
+    .stock-metric-item {
+      text-align: center;
+      padding: 0.5rem;
+      background: rgba(0,87,179,0.03);
+      border-radius: 8px;
+      border: 1px solid var(--border2);
+    }
+    .stock-metric-item .label {
+      font-size: 0.65rem;
+      color: var(--text-dim);
+    }
+    .stock-metric-item .value {
+      font-size: 1rem;
+      font-weight: 700;
+    }
+
     @media (max-width: 768px) {
       .table-wrap { overflow-x: auto; }
       .wallet-table { min-width: 650px; }
@@ -451,17 +517,45 @@
         </div>
       </div>
       <div class="kpi-card">
-        <div class="kpi-icon success"><i class="fas fa-arrow-up"></i></div>
+        <div class="kpi-icon gold"><i class="fas fa-boxes"></i></div>
         <div>
-          <div class="kpi-value" id="kpiEarned">0.00</div>
-          <div class="kpi-label darija-text">إجمالي المكاسب</div>
+          <div class="kpi-value" id="kpiStockValue">0.00</div>
+          <div class="kpi-label darija-text">قيمة المخزون (سعر البيع)</div>
         </div>
       </div>
       <div class="kpi-card">
-        <div class="kpi-icon warning"><i class="fas fa-arrow-down"></i></div>
+        <div class="kpi-icon info"><i class="fas fa-shopping-cart"></i></div>
         <div>
-          <div class="kpi-value" id="kpiTransferred">0.00</div>
-          <div class="kpi-label darija-text">إجمالي المحول</div>
+          <div class="kpi-value" id="kpiStockCost">0.00</div>
+          <div class="kpi-label darija-text">تكلفة المخزون (سعر الشراء)</div>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon success"><i class="fas fa-chart-line"></i></div>
+        <div>
+          <div class="kpi-value" id="kpiDailyRevenue">0.00</div>
+          <div class="kpi-label darija-text">إيرادات اليوم</div>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon danger"><i class="fas fa-receipt"></i></div>
+        <div>
+          <div class="kpi-value" id="kpiDailyExpenses">0.00</div>
+          <div class="kpi-label darija-text">مصروفات اليوم</div>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon purple"><i class="fas fa-coins"></i></div>
+        <div>
+          <div class="kpi-value" id="kpiDailyProfit">0.00</div>
+          <div class="kpi-label darija-text">صافي ربح اليوم</div>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon warning"><i class="fas fa-rocket"></i></div>
+        <div>
+          <div class="kpi-value" id="kpiPotentialProfit">0.00</div>
+          <div class="kpi-label darija-text">الربح المحتمل</div>
         </div>
       </div>
       <div class="kpi-card">
@@ -469,13 +563,6 @@
         <div>
           <div class="kpi-value" id="kpiPending">0</div>
           <div class="kpi-label darija-text">العمليات المعلقة</div>
-        </div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-icon info"><i class="fas fa-exchange-alt"></i></div>
-        <div>
-          <div class="kpi-value" id="kpiTotalTransfers">0</div>
-          <div class="kpi-label darija-text">إجمالي التحويلات</div>
         </div>
       </div>
     </div>
@@ -491,6 +578,11 @@
               <i class="fas fa-clock"></i> <span id="pendingCountBadge">0</span> معلق
             </span>
           </p>
+          <div class="formula-box darija-text">
+            📊 <strong>الرصيد الحالي</strong> = 
+            <span class="plus">(الإيرادات + الإيداعات)</span> - 
+            <span class="minus">(المصروفات + السحوبات)</span>
+          </div>
         </div>
         <div class="quick-actions">
           <button class="gold-btn success darija-text" onclick="openAddFundsModal()">
@@ -501,6 +593,9 @@
           </button>
           <button class="gold-btn purple darija-text" onclick="openTransferModal()">
             <i class="fas fa-exchange-alt"></i> تحويل
+          </button>
+          <button class="gold-btn gold darija-text" onclick="openExpenseModal()">
+            <i class="fas fa-receipt"></i> مصروف
           </button>
         </div>
       </div>
@@ -513,66 +608,224 @@
         </div>
         <div class="balance-item success">
           <div class="icon"><i class="fas fa-arrow-up"></i></div>
-          <div class="label darija-text">إجمالي المكاسب</div>
-          <div class="amount" id="totalEarned">0.00 درهم</div>
+          <div class="label darija-text">إجمالي الإيرادات</div>
+          <div class="amount" id="totalRevenue">0.00 درهم</div>
         </div>
-        <div class="balance-item warning">
-          <div class="icon"><i class="fas fa-arrow-down"></i></div>
-          <div class="label darija-text">إجمالي المحول</div>
-          <div class="amount" id="totalTransferred">0.00 درهم</div>
+        <div class="balance-item success">
+          <div class="icon"><i class="fas fa-hand-holding-usd"></i></div>
+          <div class="label darija-text">إجمالي الإيداعات</div>
+          <div class="amount" id="totalDeposits">0.00 درهم</div>
         </div>
         <div class="balance-item danger">
-          <div class="icon"><i class="fas fa-clock"></i></div>
-          <div class="label darija-text">العمليات المعلقة</div>
-          <div class="amount" id="pendingTransfers">0</div>
+          <div class="icon"><i class="fas fa-arrow-down"></i></div>
+          <div class="label darija-text">إجمالي المصروفات</div>
+          <div class="amount" id="totalExpenses">0.00 درهم</div>
+        </div>
+        <div class="balance-item danger">
+          <div class="icon"><i class="fas fa-hand-holding-usd"></i></div>
+          <div class="label darija-text">إجمالي السحوبات</div>
+          <div class="amount" id="totalWithdrawals">0.00 درهم</div>
         </div>
       </div>
     </div>
 
-    <!-- ===== شريط الأدوات ===== -->
-    <div class="toolbar">
-      <input type="text" id="searchInput" class="search-input darija-text" placeholder="🔍 بحث عن تحويل (مبلغ، ملاحظة)...">
-      <select id="statusFilter" class="filter-select darija-text">
-        <option value="all">📊 كل الحالات</option>
-        <option value="pending">⏳ معلق</option>
-        <option value="completed">✅ مكتمل</option>
-        <option value="failed">❌ فشل</option>
-      </select>
-      <button class="gold-btn darija-text" onclick="loadWalletData()">
-        <i class="fas fa-sync-alt"></i> تحديث
+    <!-- ===== بطاقة المخزون ===== -->
+    <div class="wallet-card" data-aos="fade-up">
+      <h2 class="text-lg font-bold darija-text" style="color:var(--text);">📦 تفاصيل المخزون الحالي</h2>
+      <div class="wallet-balance">
+        <div class="balance-item gold">
+          <div class="icon"><i class="fas fa-boxes"></i></div>
+          <div class="label darija-text">قيمة المخزون (سعر البيع)</div>
+          <div class="amount" id="currentStockValue">0.00 درهم</div>
+        </div>
+        <div class="balance-item info">
+          <div class="icon"><i class="fas fa-shopping-cart"></i></div>
+          <div class="label darija-text">تكلفة المخزون (سعر الشراء)</div>
+          <div class="amount" id="currentStockCost">0.00 درهم</div>
+        </div>
+        <div class="balance-item warning">
+          <div class="icon"><i class="fas fa-rocket"></i></div>
+          <div class="label darija-text">الربح المحتمل</div>
+          <div class="amount" id="potentialProfit">0.00 درهم</div>
+        </div>
+        <div class="balance-item purple">
+          <div class="icon"><i class="fas fa-coins"></i></div>
+          <div class="label darija-text">صافي ربح اليوم</div>
+          <div class="amount" id="todayProfit">0.00 درهم</div>
+        </div>
+      </div>
+      
+      <!-- Stock breakdown -->
+      <div class="stock-metrics" id="stockBreakdown">
+        <div class="stock-metric-item">
+          <div class="label darija-text">📦 إجمالي المنتجات</div>
+          <div class="value" id="totalProducts">0</div>
+        </div>
+        <div class="stock-metric-item">
+          <div class="label darija-text">📊 إجمالي الوحدات</div>
+          <div class="value" id="totalUnits">0</div>
+        </div>
+        <div class="stock-metric-item">
+          <div class="label darija-text">💰 متوسط سعر البيع</div>
+          <div class="value" id="avgSellingPrice">0.00 درهم</div>
+        </div>
+        <div class="stock-metric-item">
+          <div class="label darija-text">💰 متوسط سعر الشراء</div>
+          <div class="value" id="avgCostPrice">0.00 درهم</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== Tabs ===== -->
+    <div class="tabs-container">
+      <button class="tab-btn active" data-tab="transfers" onclick="switchTab('transfers')">
+        <i class="fas fa-exchange-alt"></i> التحويلات
+      </button>
+      <button class="tab-btn" data-tab="expenses" onclick="switchTab('expenses')">
+        <i class="fas fa-receipt"></i> المصروفات
+      </button>
+      <button class="tab-btn" data-tab="reports" onclick="switchTab('reports')">
+        <i class="fas fa-chart-bar"></i> التقارير اليومية
       </button>
     </div>
 
-    <!-- ===== جدول التحويلات ===== -->
-    <div class="table-wrap">
-      <div id="loadingState" class="loading-state darija-text">
-        <div class="loader-spinner"></div>
-        <p>جاري تحميل البيانات...</p>
+    <!-- ===== Tab: Transfers ===== -->
+    <div class="tab-content active" id="tab-transfers">
+      <div class="toolbar">
+        <input type="text" id="searchInput" class="search-input darija-text" placeholder="🔍 بحث عن تحويل (مبلغ، ملاحظة)...">
+        <select id="statusFilter" class="filter-select darija-text">
+          <option value="all">📊 كل الحالات</option>
+          <option value="pending">⏳ معلق</option>
+          <option value="completed">✅ مكتمل</option>
+          <option value="failed">❌ فشل</option>
+        </select>
+        <button class="gold-btn darija-text" onclick="loadWalletData()">
+          <i class="fas fa-sync-alt"></i> تحديث
+        </button>
       </div>
-      <div id="tableContainer" style="display:none;">
-        <table class="wallet-table">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>المبلغ</th>
-              <th>الحالة</th>
-              <th>الملاحظة</th>
-              <th>تاريخ الإنشاء</th>
-              <th>الإجراءات</th>
-            </tr>
-          </thead>
-          <tbody id="transfersTableBody"></tbody>
-        </table>
+
+      <div class="table-wrap">
+        <div id="loadingState" class="loading-state darija-text">
+          <div class="loader-spinner"></div>
+          <p>جاري تحميل البيانات...</p>
+        </div>
+        <div id="tableContainer" style="display:none;">
+          <table class="wallet-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>المبلغ</th>
+                <th>النوع</th>
+                <th>الحالة</th>
+                <th>الملاحظة</th>
+                <th>تاريخ الإنشاء</th>
+                <th>الإجراءات</th>
+              </tr>
+            </thead>
+            <tbody id="transfersTableBody"></tbody>
+          </table>
+        </div>
+        <div id="emptyState" class="empty-state darija-text" style="display:none;">
+          <i class="fas fa-exchange-alt text-3xl mb-3 block opacity-40"></i>
+          لا توجد تحويلات مسجلة
+        </div>
       </div>
-      <div id="emptyState" class="empty-state darija-text" style="display:none;">
-        <i class="fas fa-exchange-alt text-3xl mb-3 block opacity-40"></i>
-        لا توجد تحويلات مسجلة
+    </div>
+
+    <!-- ===== Tab: Expenses ===== -->
+    <div class="tab-content" id="tab-expenses">
+      <div class="toolbar">
+        <input type="text" id="expenseSearchInput" class="search-input darija-text" placeholder="🔍 بحث عن مصروف...">
+        <select id="expenseCategoryFilter" class="filter-select darija-text">
+          <option value="all">📊 كل الفئات</option>
+          <option value="salary">رواتب</option>
+          <option value="electricity">كهرباء</option>
+          <option value="water">ماء</option>
+          <option value="internet">إنترنت</option>
+          <option value="rent">إيجار</option>
+          <option value="maintenance">صيانة</option>
+          <option value="marketing">تسويق</option>
+          <option value="other">أخرى</option>
+        </select>
+        <button class="gold-btn gold darija-text" onclick="openExpenseModal()">
+          <i class="fas fa-plus"></i> إضافة مصروف
+        </button>
+      </div>
+
+      <div class="table-wrap">
+        <div id="expenseTableContainer">
+          <table class="wallet-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>المبلغ</th>
+                <th>الفئة</th>
+                <th>الوصف</th>
+                <th>التاريخ</th>
+                <th>الإجراءات</th>
+              </tr>
+            </thead>
+            <tbody id="expensesTableBody"></tbody>
+          </table>
+        </div>
+        <div id="expenseEmptyState" class="empty-state darija-text" style="display:none;">
+          <i class="fas fa-receipt text-3xl mb-3 block opacity-40"></i>
+          لا توجد مصروفات مسجلة
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== Tab: Reports ===== -->
+    <div class="tab-content" id="tab-reports">
+      <div class="wallet-card">
+        <h3 class="text-lg font-bold darija-text mb-4" style="color:var(--text);">📊 التقارير اليومية</h3>
+        <div class="toolbar">
+          <input type="date" id="reportDate" class="search-input darija-text" style="max-width:200px;">
+          <button class="gold-btn darija-text" onclick="loadDailyReport()">
+            <i class="fas fa-search"></i> عرض
+          </button>
+          <button class="gold-btn success darija-text" onclick="loadDailyReport('today')">
+            <i class="fas fa-calendar-day"></i> اليوم
+          </button>
+          <button class="gold-btn info darija-text" onclick="loadDailyReport('yesterday')">
+            <i class="fas fa-calendar-minus"></i> أمس
+          </button>
+        </div>
+        <div id="reportContent" class="mt-4">
+          <div class="wallet-balance">
+            <div class="balance-item primary">
+              <div class="label darija-text">إجمالي الإيرادات</div>
+              <div class="amount" id="reportRevenue">0.00 درهم</div>
+            </div>
+            <div class="balance-item success">
+              <div class="label darija-text">إجمالي الإيداعات</div>
+              <div class="amount" id="reportDeposits">0.00 درهم</div>
+            </div>
+            <div class="balance-item danger">
+              <div class="label darija-text">إجمالي المصروفات</div>
+              <div class="amount" id="reportExpenses">0.00 درهم</div>
+            </div>
+            <div class="balance-item danger">
+              <div class="label darija-text">إجمالي السحوبات</div>
+              <div class="amount" id="reportWithdrawals">0.00 درهم</div>
+            </div>
+            <div class="balance-item success">
+              <div class="label darija-text">صافي الرصيد</div>
+              <div class="amount" id="reportBalance">0.00 درهم</div>
+            </div>
+            <div class="balance-item info">
+              <div class="label darija-text">عدد الطلبات</div>
+              <div class="amount" id="reportOrders">0</div>
+            </div>
+          </div>
+          <div id="reportDetails" class="mt-4" style="color:var(--text-dim); font-size:0.9rem;"></div>
+        </div>
       </div>
     </div>
 
   </div>
 
-  <!-- ===== مودال الإيداع/السحب/التحويل ===== -->
+  <!-- ===== مودال ===== -->
   <div class="modal-overlay" id="walletModal">
     <div class="modal-box">
       <h3 id="modalTitle" class="darija-text">💰 إيداع</h3>
@@ -581,6 +834,20 @@
       <div class="modal-input-group">
         <label class="darija-text">المبلغ (درهم)</label>
         <input type="number" id="modalAmount" class="modal-input" placeholder="0.00" step="0.01" min="0.01">
+      </div>
+
+      <div class="modal-input-group" id="expenseCategoryGroup" style="display:none;">
+        <label class="darija-text">فئة المصروف</label>
+        <select id="expenseCategory" class="modal-input darija-text">
+          <option value="salary">رواتب</option>
+          <option value="electricity">كهرباء</option>
+          <option value="water">ماء</option>
+          <option value="internet">إنترنت</option>
+          <option value="rent">إيجار</option>
+          <option value="maintenance">صيانة</option>
+          <option value="marketing">تسويق</option>
+          <option value="other">أخرى</option>
+        </select>
       </div>
 
       <div class="modal-input-group">
@@ -615,7 +882,12 @@
     let sb = null;
     let walletData = null;
     let transfers = [];
+    let expenses = [];
+    let products = [];
+    let orders = [];
+    let orderItems = [];
     let isProcessing = false;
+    let currentTab = 'transfers';
 
     function initSupabase() {
       try {
@@ -623,7 +895,7 @@
           sb = supabase.createClient(MARNISSA_CONFIG.SUPABASE_URL, MARNISSA_CONFIG.SUPABASE_ANON_KEY);
           console.log('✅ Supabase client initialized');
         } else {
-          console.error('❌ Supabase config manquante');
+          console.error('❌ Supabase config missing');
           showToast('❌ خطأ: تأكد من إعدادات Supabase في config.js', 'error');
         }
       } catch(e) {
@@ -631,16 +903,48 @@
       }
     }
 
+    // ========== Safe DOM Element Update ==========
+    function safeSetText(id, value) {
+      const el = document.getElementById(id);
+      if (el) {
+        el.textContent = value;
+      } else {
+        console.warn(`Element with id "${id}" not found`);
+      }
+    }
+
+    function safeSetHTML(id, value) {
+      const el = document.getElementById(id);
+      if (el) {
+        el.innerHTML = value;
+      } else {
+        console.warn(`Element with id "${id}" not found`);
+      }
+    }
+
+    function safeShow(id) {
+      const el = document.getElementById(id);
+      if (el) el.style.display = 'block';
+    }
+
+    function safeHide(id) {
+      const el = document.getElementById(id);
+      if (el) el.style.display = 'none';
+    }
+
     // ========== تحميل البيانات ==========
     async function loadWalletData() {
-      if (!sb) return;
+      if (!sb) {
+        showToast('❌ Supabase not initialized', 'error');
+        return;
+      }
 
-      document.getElementById('loadingState').style.display = 'block';
-      document.getElementById('tableContainer').style.display = 'none';
-      document.getElementById('emptyState').style.display = 'none';
+      safeShow('loadingState');
+      safeHide('tableContainer');
+      safeHide('emptyState');
 
       try {
-        // 1. تحميل بيانات المحفظة
+        // 1. Load wallet data
         const { data: wallet, error: walletError } = await sb
           .from('wallet')
           .select('*')
@@ -652,7 +956,6 @@
         }
 
         if (!wallet) {
-          // إنشاء محفظة افتراضية إذا لم تكن موجودة
           const { data: newWallet, error: createError } = await sb
             .from('wallet')
             .insert({
@@ -670,7 +973,7 @@
           walletData = wallet;
         }
 
-        // 2. تحميل التحويلات
+        // 2. Load transfers
         const { data: transfersData, error: transfersError } = await sb
           .from('wallet_transfers')
           .select('*')
@@ -679,67 +982,320 @@
         if (transfersError) throw transfersError;
         transfers = transfersData || [];
 
-        // 3. تحديث الواجهة
+        // 3. Load expenses
+        const { data: expensesData, error: expensesError } = await sb
+          .from('expenses')
+          .select('*')
+          .order('expense_date', { ascending: false })
+          .order('created_at', { ascending: false });
+
+        if (expensesError) throw expensesError;
+        expenses = expensesData || [];
+
+        // 4. Load products for stock value
+        try {
+          const { data: productsData, error: productsError } = await sb
+            .from('products')
+            .select('id, name, price, cost_price, stock');
+          if (!productsError) {
+            products = productsData || [];
+          }
+        } catch(e) {
+          console.warn('⚠️ Products table may not exist:', e.message);
+          products = [];
+        }
+
+        // 5. Load orders
+        try {
+          const { data: ordersData, error: ordersError } = await sb
+            .from('orders')
+            .select('*')
+            .order('created_at', { ascending: false });
+          if (!ordersError) {
+            orders = ordersData || [];
+          }
+        } catch(e) {
+          console.warn('⚠️ Orders table may not exist:', e.message);
+          orders = [];
+        }
+
+        // 6. Load order items
+        try {
+          const { data: orderItemsData, error: orderItemsError } = await sb
+            .from('order_items')
+            .select('*');
+          if (!orderItemsError) {
+            orderItems = orderItemsData || [];
+          }
+        } catch(e) {
+          console.warn('⚠️ Order items table may not exist:', e.message);
+          orderItems = [];
+        }
+
+        // 7. Update UI
         updateWalletUI();
         renderTransfersTable(filterTransfers());
+        renderExpensesTable(filterExpenses());
         updateKPIs();
-        document.getElementById('loadingState').style.display = 'none';
-        document.getElementById('tableContainer').style.display = 'block';
+        safeHide('loadingState');
+        safeShow('tableContainer');
+
+        // Set default date for reports
+        const reportDate = document.getElementById('reportDate');
+        if (reportDate && !reportDate.value) {
+          reportDate.value = new Date().toISOString().split('T')[0];
+        }
 
       } catch(e) {
         console.error('❌ Error loading wallet data:', e);
         showToast('❌ خطأ في تحميل البيانات: ' + e.message, 'error');
-        document.getElementById('loadingState').style.display = 'none';
-        document.getElementById('emptyState').style.display = 'block';
+        safeHide('loadingState');
+        safeShow('emptyState');
       }
     }
 
+    // ========== Stock Calculations ==========
+    function calculateStockMetrics() {
+      let totalStockValue = 0;
+      let totalStockCost = 0;
+      let potentialProfit = 0;
+      let totalUnits = 0;
+      let totalProducts = 0;
+      let totalSellingPrice = 0;
+      let totalCostPrice = 0;
+
+      if (products && products.length > 0) {
+        products.forEach(p => {
+          const quantity = p.stock || 0;
+          const sellingPrice = p.price || 0;
+          const costPrice = p.cost_price || 0;
+
+          if (quantity > 0) {
+            totalStockValue += quantity * sellingPrice;
+            totalStockCost += quantity * costPrice;
+            potentialProfit += quantity * (sellingPrice - costPrice);
+            totalUnits += quantity;
+            totalProducts++;
+            totalSellingPrice += sellingPrice;
+            totalCostPrice += costPrice;
+          }
+        });
+      }
+
+      const avgSellingPrice = totalProducts > 0 ? totalSellingPrice / totalProducts : 0;
+      const avgCostPrice = totalProducts > 0 ? totalCostPrice / totalProducts : 0;
+
+      return { 
+        totalStockValue, 
+        totalStockCost, 
+        potentialProfit,
+        totalUnits,
+        totalProducts,
+        avgSellingPrice,
+        avgCostPrice
+      };
+    }
+
+    // ========== Daily Metrics ==========
+    function calculateDailyMetrics(date = null) {
+      const targetDate = date ? new Date(date) : new Date();
+      const dateStr = targetDate.toISOString().split('T')[0];
+
+      let totalRevenue = 0;
+      let totalCost = 0;
+      let orderCount = 0;
+      let totalExpenses = 0;
+
+      if (orders && orders.length > 0) {
+        const dailyOrders = orders.filter(o => {
+          const orderDate = new Date(o.created_at).toISOString().split('T')[0];
+          return orderDate === dateStr;
+        });
+
+        orderCount = dailyOrders.length;
+
+        dailyOrders.forEach(order => {
+          if (order.total_price) {
+            totalRevenue += order.total_price || 0;
+          } else {
+            const items = orderItems.filter(item => item.order_id === order.id);
+            items.forEach(item => {
+              totalRevenue += (item.price || 0) * (item.quantity || 0);
+            });
+          }
+          
+          const items = orderItems.filter(item => item.order_id === order.id);
+          items.forEach(item => {
+            const costPerItem = item.product_price || (item.price * 0.6);
+            totalCost += costPerItem * (item.quantity || 0);
+          });
+        });
+      }
+
+      if (expenses && expenses.length > 0) {
+        const dailyExpenses = expenses.filter(e => {
+          const expenseDate = new Date(e.expense_date).toISOString().split('T')[0];
+          return expenseDate === dateStr;
+        });
+        totalExpenses = dailyExpenses.reduce((sum, e) => sum + (e.amount || 0), 0);
+      }
+
+      const netProfit = totalRevenue - totalCost;
+
+      // Get deposits and withdrawals for the day from transfers
+      let dailyDeposits = 0;
+      let dailyWithdrawals = 0;
+      
+      if (transfers && transfers.length > 0) {
+        const dailyTransfers = transfers.filter(t => {
+          const transferDate = new Date(t.created_at).toISOString().split('T')[0];
+          return transferDate === dateStr && t.status === 'completed';
+        });
+        
+        dailyTransfers.forEach(t => {
+          if (t.amount > 0) {
+            dailyDeposits += t.amount;
+          } else {
+            dailyWithdrawals += Math.abs(t.amount);
+          }
+        });
+      }
+
+      return {
+        date: dateStr,
+        revenue: totalRevenue,
+        expenses: totalExpenses,
+        netProfit: netProfit,
+        orderCount: orderCount,
+        costOfGoods: totalCost,
+        deposits: dailyDeposits,
+        withdrawals: dailyWithdrawals,
+        balance: (totalRevenue + dailyDeposits) - (totalExpenses + dailyWithdrawals)
+      };
+    }
+
+    // ========== Total Calculations ==========
+    function calculateTotals() {
+      let totalRevenue = 0;
+      let totalExpenses = 0;
+      let totalDeposits = 0;
+      let totalWithdrawals = 0;
+
+      // Total revenue from orders
+      if (orders && orders.length > 0) {
+        orders.forEach(order => {
+          if (order.total_price) {
+            totalRevenue += order.total_price || 0;
+          } else {
+            const items = orderItems.filter(item => item.order_id === order.id);
+            items.forEach(item => {
+              totalRevenue += (item.price || 0) * (item.quantity || 0);
+            });
+          }
+        });
+      }
+
+      // Total expenses
+      if (expenses && expenses.length > 0) {
+        totalExpenses = expenses.reduce((sum, e) => sum + (e.amount || 0), 0);
+      }
+
+      // Total deposits and withdrawals from completed transfers
+      if (transfers && transfers.length > 0) {
+        const completedTransfers = transfers.filter(t => t.status === 'completed');
+        completedTransfers.forEach(t => {
+          if (t.amount > 0) {
+            totalDeposits += t.amount;
+          } else {
+            totalWithdrawals += Math.abs(t.amount);
+          }
+        });
+      }
+
+      return { 
+        totalRevenue, 
+        totalExpenses, 
+        totalDeposits, 
+        totalWithdrawals,
+        balance: (totalRevenue + totalDeposits) - (totalExpenses + totalWithdrawals)
+      };
+    }
+
+    // ========== Update UI ==========
     function updateWalletUI() {
       if (!walletData) return;
 
-      const balance = walletData.balance || 0;
-      const earned = walletData.total_earned || 0;
-      const transferred = walletData.total_transferred || 0;
+      const stockMetrics = calculateStockMetrics();
+      const todayMetrics = calculateDailyMetrics();
+      const totals = calculateTotals();
+
+      // Current balance = (Revenue + Deposits) - (Expenses + Withdrawals)
+      const currentBalance = totals.balance;
+
+      // Update wallet section
+      safeSetText('currentBalance', currentBalance.toFixed(2) + ' درهم');
+      safeSetText('totalRevenue', totals.totalRevenue.toFixed(2) + ' درهم');
+      safeSetText('totalDeposits', totals.totalDeposits.toFixed(2) + ' درهم');
+      safeSetText('totalExpenses', totals.totalExpenses.toFixed(2) + ' درهم');
+      safeSetText('totalWithdrawals', totals.totalWithdrawals.toFixed(2) + ' درهم');
+
+      // Update stock section
+      safeSetText('currentStockValue', stockMetrics.totalStockValue.toFixed(2) + ' درهم');
+      safeSetText('currentStockCost', stockMetrics.totalStockCost.toFixed(2) + ' درهم');
+      safeSetText('potentialProfit', stockMetrics.potentialProfit.toFixed(2) + ' درهم');
+      safeSetText('todayProfit', todayMetrics.netProfit.toFixed(2) + ' درهم');
+
+      // Update stock breakdown
+      safeSetText('totalProducts', stockMetrics.totalProducts.toString());
+      safeSetText('totalUnits', stockMetrics.totalUnits.toString());
+      safeSetText('avgSellingPrice', stockMetrics.avgSellingPrice.toFixed(2) + ' درهم');
+      safeSetText('avgCostPrice', stockMetrics.avgCostPrice.toFixed(2) + ' درهم');
+
+      // Update wallet data
+      walletData.balance = currentBalance;
+
       const pendingCount = transfers.filter(t => t.status === 'pending').length;
+      const pendingEl = document.getElementById('pendingTransfers');
+      if (pendingEl) pendingEl.textContent = pendingCount;
 
-      document.getElementById('currentBalance').textContent = balance.toFixed(2) + ' درهم';
-      document.getElementById('totalEarned').textContent = earned.toFixed(2) + ' درهم';
-      document.getElementById('totalTransferred').textContent = transferred.toFixed(2) + ' درهم';
-      document.getElementById('pendingTransfers').textContent = pendingCount;
-      
       const updated = walletData.updated_at ? new Date(walletData.updated_at).toLocaleString('ar-MA') : '—';
-      document.getElementById('lastUpdated').textContent = updated;
+      safeSetText('lastUpdated', updated);
 
-      // Badge للعمليات المعلقة
       const badge = document.getElementById('pendingBadge');
       const badgeCount = document.getElementById('pendingCountBadge');
-      if (pendingCount > 0) {
-        badge.style.display = 'inline';
-        badgeCount.textContent = pendingCount;
-      } else {
-        badge.style.display = 'none';
+      if (badge && badgeCount) {
+        if (pendingCount > 0) {
+          badge.style.display = 'inline';
+          badgeCount.textContent = pendingCount;
+        } else {
+          badge.style.display = 'none';
+        }
       }
     }
 
     function updateKPIs() {
-      const balance = walletData?.balance || 0;
-      const earned = walletData?.total_earned || 0;
-      const transferred = walletData?.total_transferred || 0;
+      const totals = calculateTotals();
+      const stockMetrics = calculateStockMetrics();
+      const todayMetrics = calculateDailyMetrics();
       const pendingCount = transfers.filter(t => t.status === 'pending').length;
-      const totalTransfers = transfers.length;
 
-      document.getElementById('kpiBalance').textContent = balance.toFixed(2) + ' درهم';
-      document.getElementById('kpiEarned').textContent = earned.toFixed(2) + ' درهم';
-      document.getElementById('kpiTransferred').textContent = transferred.toFixed(2) + ' درهم';
-      document.getElementById('kpiPending').textContent = pendingCount;
-      document.getElementById('kpiTotalTransfers').textContent = totalTransfers;
+      safeSetText('kpiBalance', totals.balance.toFixed(2) + ' درهم');
+      safeSetText('kpiStockValue', stockMetrics.totalStockValue.toFixed(2) + ' درهم');
+      safeSetText('kpiStockCost', stockMetrics.totalStockCost.toFixed(2) + ' درهم');
+      safeSetText('kpiDailyRevenue', todayMetrics.revenue.toFixed(2) + ' درهم');
+      safeSetText('kpiDailyExpenses', todayMetrics.expenses.toFixed(2) + ' درهم');
+      safeSetText('kpiDailyProfit', todayMetrics.netProfit.toFixed(2) + ' درهم');
+      safeSetText('kpiPotentialProfit', stockMetrics.potentialProfit.toFixed(2) + ' درهم');
+      safeSetText('kpiPending', pendingCount.toString());
     }
 
+    // ========== Render Transfers Table ==========
     function renderTransfersTable(filteredTransfers) {
       const tbody = document.getElementById('transfersTableBody');
+      if (!tbody) return;
 
       if (!filteredTransfers || filteredTransfers.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" class="text-center py-8 darija-text" style="color:var(--text-dim);">لا توجد تحويلات مطابقة</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7" class="text-center py-8 darija-text" style="color:var(--text-dim);">لا توجد تحويلات مطابقة</td></tr>`;
         return;
       }
 
@@ -749,11 +1305,13 @@
         const amountColor = t.status === 'completed' ? 'var(--success)' : t.status === 'failed' ? 'var(--danger)' : 'var(--warning)';
         const sign = t.amount > 0 ? '+' : '';
         const formattedAmount = `${sign}${t.amount.toFixed(2)}`;
+        const typeLabel = t.amount > 0 ? 'إيداع' : 'سحب';
 
         return `
           <tr>
             <td>${index + 1}</td>
             <td style="color: ${amountColor}; font-weight: 700;">${formattedAmount} درهم</td>
+            <td>${typeLabel}</td>
             <td>
               <span class="status-badge ${statusClass} darija-text">
                 <i class="fas ${statusIcon}"></i>
@@ -784,8 +1342,10 @@
     }
 
     function filterTransfers() {
-      const search = document.getElementById('searchInput').value.trim().toLowerCase();
-      const status = document.getElementById('statusFilter').value;
+      const searchInput = document.getElementById('searchInput');
+      const statusFilter = document.getElementById('statusFilter');
+      const search = searchInput ? searchInput.value.trim().toLowerCase() : '';
+      const status = statusFilter ? statusFilter.value : 'all';
 
       return transfers.filter(t => {
         const matchesSearch = !search || 
@@ -798,34 +1358,197 @@
       });
     }
 
-    // ========== عمليات المحفظة ==========
-    async function updateWalletBalance(amount, type, note = '') {
-      if (!walletData) return false;
+    // ========== Render Expenses Table ==========
+    function renderExpensesTable(filteredExpenses) {
+      const tbody = document.getElementById('expensesTableBody');
+      if (!tbody) return;
 
-      const newBalance = type === 'deposit' 
-        ? walletData.balance + amount 
-        : walletData.balance - amount;
+      if (!filteredExpenses || filteredExpenses.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="text-center py-8 darija-text" style="color:var(--text-dim);">لا توجد مصروفات مطابقة</td></tr>`;
+        return;
+      }
 
-      if (newBalance < 0) {
-        showToast('⚠️ الرصيد غير كافي', 'error');
+      const categoryLabels = {
+        salary: 'رواتب',
+        electricity: 'كهرباء',
+        water: 'ماء',
+        internet: 'إنترنت',
+        rent: 'إيجار',
+        maintenance: 'صيانة',
+        marketing: 'تسويق',
+        other: 'أخرى'
+      };
+
+      tbody.innerHTML = filteredExpenses.map((e, index) => {
+        const categoryLabel = categoryLabels[e.category] || e.category;
+
+        return `
+          <tr>
+            <td>${index + 1}</td>
+            <td style="color: var(--danger); font-weight: 700;">- ${e.amount.toFixed(2)} درهم</td>
+            <td><span class="status-badge expense darija-text">${categoryLabel}</span></td>
+            <td class="darija-text" style="font-size:0.8rem;">${escapeHtml(e.description || '—')}</td>
+            <td style="font-size:0.7rem;">${new Date(e.expense_date).toLocaleDateString('ar-MA')}</td>
+            <td>
+              <div class="actions-cell">
+                <button class="icon-btn danger" onclick="deleteExpense('${e.id}')" title="حذف">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function filterExpenses() {
+      const searchInput = document.getElementById('expenseSearchInput');
+      const categoryFilter = document.getElementById('expenseCategoryFilter');
+      const search = searchInput ? searchInput.value.trim().toLowerCase() : '';
+      const category = categoryFilter ? categoryFilter.value : 'all';
+
+      return expenses.filter(e => {
+        const matchesSearch = !search || 
+          (e.description && e.description.toLowerCase().includes(search)) ||
+          e.amount.toString().includes(search) ||
+          e.category.includes(search);
+        
+        const matchesCategory = category === 'all' || e.category === category;
+        
+        return matchesSearch && matchesCategory;
+      });
+    }
+
+    // ========== Expense Management ==========
+    async function addExpense(amount, category, description) {
+      if (!sb) {
+        showToast('❌ Supabase not initialized', 'error');
         return false;
       }
 
-      // تحديث المحفظة
-      const updates = {
-        balance: newBalance,
-        updated_at: new Date().toISOString()
-      };
+      try {
+        // Check if balance is sufficient
+        const totals = calculateTotals();
+        if (amount > totals.balance) {
+          showToast(`⚠️ الرصيد غير كافي. الرصيد الحالي: ${totals.balance.toFixed(2)} درهم`, 'error');
+          return false;
+        }
+
+        const expenseData = {
+          amount: amount,
+          category: category,
+          description: description || '',
+          expense_date: new Date().toISOString().split('T')[0]
+        };
+
+        const { data, error } = await sb
+          .from('expenses')
+          .insert(expenseData)
+          .select()
+          .single();
+
+        if (error) {
+          console.error('❌ Expense insert error:', error);
+          
+          if (error.message && error.message.includes('row-level security policy')) {
+            showToast('❌ خطأ في صلاحيات الوصول. يرجى الاتصال بالمسؤول لإضافة سياسات RLS', 'error');
+            return false;
+          }
+          
+          throw error;
+        }
+
+        // Deduct from wallet
+        const success = await updateWalletBalance(amount, 'expense', `مصروف: ${category} - ${description || ''}`);
+        if (!success) {
+          await sb.from('expenses').delete().eq('id', data.id);
+          return false;
+        }
+
+        expenses.unshift(data);
+        renderExpensesTable(filterExpenses());
+        updateWalletUI();
+        updateKPIs();
+
+        showToast(`✅ تم تسجيل مصروف بقيمة ${amount.toFixed(2)} درهم`, 'success');
+        return true;
+
+      } catch(e) {
+        console.error('❌ Add expense error:', e);
+        
+        let errorMsg = 'فشل تسجيل المصروف';
+        if (e.message && e.message.includes('permission denied')) {
+          errorMsg = '❌ ليس لديك صلاحية لإضافة المصروفات. يرجى تسجيل الدخول كمسؤول.';
+        } else if (e.message && e.message.includes('row-level security')) {
+          errorMsg = '❌ خطأ في صلاحيات RLS. يرجى إعداد سياسات الأمان في قاعدة البيانات.';
+        } else if (e.message) {
+          errorMsg = '❌ ' + e.message;
+        }
+        
+        showToast(errorMsg, 'error');
+        return false;
+      }
+    }
+
+    async function deleteExpense(expenseId) {
+      if (!confirm('⚠️ هل أنت متأكد من حذف هذا المصروف؟')) return;
+
+      try {
+        const expense = expenses.find(e => e.id === expenseId);
+        if (!expense) {
+          showToast('⚠️ المصروف غير موجود', 'error');
+          return;
+        }
+
+        const { error } = await sb
+          .from('expenses')
+          .delete()
+          .eq('id', expenseId);
+
+        if (error) throw error;
+
+        // Refund the amount
+        await updateWalletBalance(expense.amount, 'refund_expense', `استرجاع مصروف: ${expense.category}`);
+
+        expenses = expenses.filter(e => e.id !== expenseId);
+        renderExpensesTable(filterExpenses());
+        updateWalletUI();
+        updateKPIs();
+
+        showToast('✅ تم حذف المصروف', 'success');
+      } catch(e) {
+        console.error('❌ Delete expense error:', e);
+        showToast('❌ خطأ في الحذف: ' + e.message, 'error');
+      }
+    }
+
+    // ========== Wallet Operations ==========
+    async function updateWalletBalance(amount, type, note = '') {
+      if (!walletData) return false;
+
+      let newBalance = walletData.balance;
+      let updateFields = { updated_at: new Date().toISOString() };
 
       if (type === 'deposit') {
-        updates.total_earned = (walletData.total_earned || 0) + amount;
-      } else {
-        updates.total_transferred = (walletData.total_transferred || 0) + amount;
+        newBalance = walletData.balance + amount;
+        updateFields.total_earned = (walletData.total_earned || 0) + amount;
+      } else if (type === 'withdraw' || type === 'expense') {
+        if (amount > walletData.balance) {
+          showToast('⚠️ الرصيد غير كافي', 'error');
+          return false;
+        }
+        newBalance = walletData.balance - amount;
+        updateFields.total_transferred = (walletData.total_transferred || 0) + amount;
+      } else if (type === 'refund_expense') {
+        newBalance = walletData.balance + amount;
+        updateFields.total_transferred = (walletData.total_transferred || 0) - amount;
       }
+
+      updateFields.balance = newBalance;
 
       const { error: updateError } = await sb
         .from('wallet')
-        .update(updates)
+        .update(updateFields)
         .eq('id', walletData.id);
 
       if (updateError) {
@@ -834,37 +1557,39 @@
         return false;
       }
 
-      // تحديث البيانات المحلية
       walletData.balance = newBalance;
       if (type === 'deposit') {
         walletData.total_earned = (walletData.total_earned || 0) + amount;
-      } else {
+      } else if (type === 'withdraw' || type === 'expense') {
         walletData.total_transferred = (walletData.total_transferred || 0) + amount;
+      } else if (type === 'refund_expense') {
+        walletData.total_transferred = (walletData.total_transferred || 0) - amount;
       }
 
-      // تسجيل التحويل
-      const { error: insertError } = await sb
-        .from('wallet_transfers')
-        .insert({
-          amount: type === 'deposit' ? amount : -amount,
-          status: 'completed',
-          note: note || (type === 'deposit' ? 'إيداع' : 'سحب')
-        });
+      if (type !== 'expense' && type !== 'refund_expense') {
+        const transferAmount = type === 'deposit' ? amount : -amount;
+        const { error: insertError } = await sb
+          .from('wallet_transfers')
+          .insert({
+            amount: transferAmount,
+            status: 'completed',
+            note: note || (type === 'deposit' ? 'إيداع' : 'سحب')
+          });
 
-      if (insertError) {
-        console.warn('⚠️ Transfer record failed:', insertError.message);
+        if (insertError) {
+          console.warn('⚠️ Transfer record failed:', insertError.message);
+        }
       }
 
       return true;
     }
 
-    // ========== إدارة التحويلات ==========
+    // ========== Transfer Management ==========
     async function updateTransferStatus(transferId, status) {
       if (isProcessing) return;
       isProcessing = true;
 
       try {
-        // جلب بيانات التحويل
         const { data: transfer, error: fetchError } = await sb
           .from('wallet_transfers')
           .select('*')
@@ -877,7 +1602,6 @@
           return;
         }
 
-        // تحديث حالة التحويل
         const { error: updateError } = await sb
           .from('wallet_transfers')
           .update({ status })
@@ -885,14 +1609,12 @@
 
         if (updateError) throw updateError;
 
-        // إذا كانت مكتملة، تحديث المحفظة
         if (status === 'completed') {
           const isDeposit = transfer.amount > 0;
           const amount = Math.abs(transfer.amount);
           const success = await updateWalletBalance(amount, isDeposit ? 'deposit' : 'withdraw', transfer.note);
           
           if (!success) {
-            // إعادة الحالة إذا فشل التحديث
             await sb.from('wallet_transfers').update({ status: 'pending' }).eq('id', transferId);
             return;
           }
@@ -927,34 +1649,80 @@
       }
     }
 
-    // ========== المودالات ==========
+    // ========== Modals ==========
     function openAddFundsModal() {
-      document.getElementById('modalTitle').textContent = '💰 إيداع في المحفظة';
-      document.getElementById('modalSubtitle').textContent = 'أدخل المبلغ الذي تريد إضافته للمحفظة';
-      document.getElementById('modalType').value = 'deposit';
-      document.getElementById('modalAmount').value = '';
-      document.getElementById('modalNote').value = '';
-      document.getElementById('modalConfirmBtn').innerHTML = '<i class="fas fa-plus"></i> إيداع';
+      const title = document.getElementById('modalTitle');
+      const subtitle = document.getElementById('modalSubtitle');
+      const type = document.getElementById('modalType');
+      const amount = document.getElementById('modalAmount');
+      const note = document.getElementById('modalNote');
+      const categoryGroup = document.getElementById('expenseCategoryGroup');
+      const confirmBtn = document.getElementById('modalConfirmBtn');
+
+      if (title) title.textContent = '💰 إيداع في المحفظة';
+      if (subtitle) subtitle.textContent = 'أدخل المبلغ الذي تريد إضافته للمحفظة';
+      if (type) type.value = 'deposit';
+      if (amount) amount.value = '';
+      if (note) note.value = '';
+      if (categoryGroup) categoryGroup.style.display = 'none';
+      if (confirmBtn) confirmBtn.innerHTML = '<i class="fas fa-plus"></i> إيداع';
       document.getElementById('walletModal').classList.add('open');
     }
 
     function openWithdrawModal() {
-      document.getElementById('modalTitle').textContent = '💸 سحب من المحفظة';
-      document.getElementById('modalSubtitle').textContent = 'أدخل المبلغ الذي تريد سحبه من المحفظة';
-      document.getElementById('modalType').value = 'withdraw';
-      document.getElementById('modalAmount').value = '';
-      document.getElementById('modalNote').value = '';
-      document.getElementById('modalConfirmBtn').innerHTML = '<i class="fas fa-minus"></i> سحب';
+      const title = document.getElementById('modalTitle');
+      const subtitle = document.getElementById('modalSubtitle');
+      const type = document.getElementById('modalType');
+      const amount = document.getElementById('modalAmount');
+      const note = document.getElementById('modalNote');
+      const categoryGroup = document.getElementById('expenseCategoryGroup');
+      const confirmBtn = document.getElementById('modalConfirmBtn');
+
+      if (title) title.textContent = '💸 سحب من المحفظة';
+      if (subtitle) subtitle.textContent = 'أدخل المبلغ الذي تريد سحبه من المحفظة';
+      if (type) type.value = 'withdraw';
+      if (amount) amount.value = '';
+      if (note) note.value = '';
+      if (categoryGroup) categoryGroup.style.display = 'none';
+      if (confirmBtn) confirmBtn.innerHTML = '<i class="fas fa-minus"></i> سحب';
       document.getElementById('walletModal').classList.add('open');
     }
 
     function openTransferModal() {
-      document.getElementById('modalTitle').textContent = '🔄 تحويل مالي';
-      document.getElementById('modalSubtitle').textContent = 'أدخل المبلغ المراد تحويله (سيتم تسجيله كتحويل معلق)';
-      document.getElementById('modalType').value = 'transfer';
-      document.getElementById('modalAmount').value = '';
-      document.getElementById('modalNote').value = '';
-      document.getElementById('modalConfirmBtn').innerHTML = '<i class="fas fa-exchange-alt"></i> تحويل';
+      const title = document.getElementById('modalTitle');
+      const subtitle = document.getElementById('modalSubtitle');
+      const type = document.getElementById('modalType');
+      const amount = document.getElementById('modalAmount');
+      const note = document.getElementById('modalNote');
+      const categoryGroup = document.getElementById('expenseCategoryGroup');
+      const confirmBtn = document.getElementById('modalConfirmBtn');
+
+      if (title) title.textContent = '🔄 تحويل مالي';
+      if (subtitle) subtitle.textContent = 'أدخل المبلغ المراد تحويله (سيتم تسجيله كتحويل معلق)';
+      if (type) type.value = 'transfer';
+      if (amount) amount.value = '';
+      if (note) note.value = '';
+      if (categoryGroup) categoryGroup.style.display = 'none';
+      if (confirmBtn) confirmBtn.innerHTML = '<i class="fas fa-exchange-alt"></i> تحويل';
+      document.getElementById('walletModal').classList.add('open');
+    }
+
+    function openExpenseModal() {
+      const title = document.getElementById('modalTitle');
+      const subtitle = document.getElementById('modalSubtitle');
+      const type = document.getElementById('modalType');
+      const amount = document.getElementById('modalAmount');
+      const note = document.getElementById('modalNote');
+      const categoryGroup = document.getElementById('expenseCategoryGroup');
+      const confirmBtn = document.getElementById('modalConfirmBtn');
+
+      if (title) title.textContent = '🧾 تسجيل مصروف';
+      if (subtitle) subtitle.textContent = 'أدخل تفاصيل المصروف (سيتم خصم المبلغ من الرصيد)';
+      if (type) type.value = 'expense';
+      if (amount) amount.value = '';
+      if (note) note.value = '';
+      if (categoryGroup) categoryGroup.style.display = 'block';
+      if (confirmBtn) confirmBtn.innerHTML = '<i class="fas fa-save"></i> تسجيل المصروف';
       document.getElementById('walletModal').classList.add('open');
     }
 
@@ -963,9 +1731,18 @@
     }
 
     async function confirmWalletAction() {
-      const amount = parseFloat(document.getElementById('modalAmount').value);
-      const note = document.getElementById('modalNote').value.trim();
-      const type = document.getElementById('modalType').value;
+      const amountInput = document.getElementById('modalAmount');
+      const noteInput = document.getElementById('modalNote');
+      const typeInput = document.getElementById('modalType');
+
+      if (!amountInput || !typeInput) {
+        showToast('⚠️ خطأ في النموذج', 'error');
+        return;
+      }
+
+      const amount = parseFloat(amountInput.value);
+      const note = noteInput ? noteInput.value.trim() : '';
+      const type = typeInput.value;
 
       if (!amount || amount <= 0) {
         showToast('⚠️ أدخل مبلغ صحيح', 'error');
@@ -977,7 +1754,6 @@
 
       try {
         if (type === 'deposit') {
-          // إيداع مباشر
           const success = await updateWalletBalance(amount, 'deposit', note || 'إيداع يدوي');
           if (success) {
             showToast(`✅ تم إيداع ${amount.toFixed(2)} درهم بنجاح`, 'success');
@@ -985,9 +1761,9 @@
             await loadWalletData();
           }
         } else if (type === 'withdraw') {
-          // سحب مباشر
-          if (amount > walletData.balance) {
-            showToast(`⚠️ الرصيد غير كافي. الرصيد الحالي: ${walletData.balance.toFixed(2)} درهم`, 'error');
+          const totals = calculateTotals();
+          if (amount > totals.balance) {
+            showToast(`⚠️ الرصيد غير كافي. الرصيد الحالي: ${totals.balance.toFixed(2)} درهم`, 'error');
             return;
           }
           const success = await updateWalletBalance(amount, 'withdraw', note || 'سحب يدوي');
@@ -997,7 +1773,6 @@
             await loadWalletData();
           }
         } else if (type === 'transfer') {
-          // تحويل معلق
           const { error: insertError } = await sb
             .from('wallet_transfers')
             .insert({
@@ -1010,6 +1785,14 @@
           showToast(`⏳ تم تسجيل تحويل بقيمة ${amount.toFixed(2)} درهم (معلق)`, 'info');
           closeWalletModal();
           await loadWalletData();
+        } else if (type === 'expense') {
+          const categorySelect = document.getElementById('expenseCategory');
+          const category = categorySelect ? categorySelect.value : 'other';
+          await addExpense(amount, category, note);
+          if (walletData) {
+            closeWalletModal();
+            await loadWalletData();
+          }
         }
       } catch(e) {
         console.error('❌ Action error:', e);
@@ -1019,9 +1802,115 @@
       }
     }
 
-    // ========== أدوات مساعدة ==========
+    // ========== Daily Reports ==========
+    function loadDailyReport(period) {
+      let reportDate = document.getElementById('reportDate');
+      if (!reportDate) return;
+
+      let date = reportDate.value;
+      
+      if (period === 'today') {
+        date = new Date().toISOString().split('T')[0];
+        reportDate.value = date;
+      } else if (period === 'yesterday') {
+        const yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+        date = yesterday.toISOString().split('T')[0];
+        reportDate.value = date;
+      }
+
+      if (!date) {
+        showToast('⚠️ الرجاء اختيار تاريخ', 'error');
+        return;
+      }
+
+      const metrics = calculateDailyMetrics(date);
+      
+      safeSetText('reportRevenue', metrics.revenue.toFixed(2) + ' درهم');
+      safeSetText('reportDeposits', metrics.deposits.toFixed(2) + ' درهم');
+      safeSetText('reportExpenses', metrics.expenses.toFixed(2) + ' درهم');
+      safeSetText('reportWithdrawals', metrics.withdrawals.toFixed(2) + ' درهم');
+      safeSetText('reportBalance', metrics.balance.toFixed(2) + ' درهم');
+      safeSetText('reportOrders', metrics.orderCount.toString());
+
+      const details = document.getElementById('reportDetails');
+      if (details) {
+        details.innerHTML = `
+          <div class="grid grid-cols-2 gap-4 mt-4" style="direction: rtl;">
+            <div style="background: var(--card); padding: 1rem; border-radius: 12px; border: 1px solid var(--border);">
+              <span style="color: var(--text-dim);">📅 التاريخ:</span>
+              <strong style="color: var(--text); display: block; font-size: 1.1rem;">${metrics.date}</strong>
+            </div>
+            <div style="background: var(--card); padding: 1rem; border-radius: 12px; border: 1px solid var(--border);">
+              <span style="color: var(--text-dim);">💰 تكلفة البضائع:</span>
+              <strong style="color: var(--text); display: block; font-size: 1.1rem;">${metrics.costOfGoods.toFixed(2)} درهم</strong>
+            </div>
+            <div style="background: var(--card); padding: 1rem; border-radius: 12px; border: 1px solid var(--border);">
+              <span style="color: var(--text-dim);">📊 عدد الطلبات:</span>
+              <strong style="color: var(--text); display: block; font-size: 1.1rem;">${metrics.orderCount}</strong>
+            </div>
+            <div style="background: var(--card); padding: 1rem; border-radius: 12px; border: 1px solid var(--border);">
+              <span style="color: var(--text-dim);">📈 صافي الربح:</span>
+              <strong style="color: ${metrics.netProfit >= 0 ? 'var(--success)' : 'var(--danger)'}; display: block; font-size: 1.1rem;">
+                ${metrics.netProfit.toFixed(2)} درهم
+              </strong>
+            </div>
+            <div style="background: var(--card); padding: 1rem; border-radius: 12px; border: 1px solid var(--border); grid-column: span 2;">
+              <span style="color: var(--text-dim);">📊 تفاصيل الرصيد:</span>
+              <div style="color: var(--text); font-size: 1rem; margin-top: 0.5rem;">
+                <div style="display: flex; justify-content: space-between; padding: 0.25rem 0;">
+                  <span style="color: var(--success);">+ الإيرادات:</span>
+                  <strong>${metrics.revenue.toFixed(2)} درهم</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding: 0.25rem 0;">
+                  <span style="color: var(--success);">+ الإيداعات:</span>
+                  <strong>${metrics.deposits.toFixed(2)} درهم</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding: 0.25rem 0;">
+                  <span style="color: var(--danger);">- المصروفات:</span>
+                  <strong>${metrics.expenses.toFixed(2)} درهم</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding: 0.25rem 0;">
+                  <span style="color: var(--danger);">- السحوبات:</span>
+                  <strong>${metrics.withdrawals.toFixed(2)} درهم</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding: 0.5rem 0; border-top: 1px solid var(--border); margin-top: 0.5rem;">
+                  <span style="color: var(--blue-primary); font-weight: 700;">= الرصيد النهائي:</span>
+                  <strong style="color: ${metrics.balance >= 0 ? 'var(--success)' : 'var(--danger)'}; font-size: 1.2rem;">
+                    ${metrics.balance.toFixed(2)} درهم
+                  </strong>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    // ========== Tabs ==========
+    function switchTab(tabName) {
+      currentTab = tabName;
+
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.tab === tabName);
+      });
+
+      document.querySelectorAll('.tab-content').forEach(content => {
+        content.classList.toggle('active', content.id === `tab-${tabName}`);
+      });
+
+      if (tabName === 'expenses') {
+        renderExpensesTable(filterExpenses());
+      } else if (tabName === 'reports') {
+        loadDailyReport();
+      }
+    }
+
+    // ========== Helpers ==========
     function showToast(text, type) {
       const toast = document.getElementById('toastMsg');
+      if (!toast) return;
+      
       toast.textContent = text;
       toast.className = `toast-msg ${type} show`;
       clearTimeout(window._toastTimer);
@@ -1042,18 +1931,49 @@
       }
       await loadWalletData();
 
-      document.getElementById('searchInput').addEventListener('input', () => renderTransfersTable(filterTransfers()));
-      document.getElementById('statusFilter').addEventListener('change', () => renderTransfersTable(filterTransfers()));
+      // Transfers filters
+      const searchInput = document.getElementById('searchInput');
+      const statusFilter = document.getElementById('statusFilter');
+      
+      if (searchInput) {
+        searchInput.addEventListener('input', () => renderTransfersTable(filterTransfers()));
+      }
+      if (statusFilter) {
+        statusFilter.addEventListener('change', () => renderTransfersTable(filterTransfers()));
+      }
 
-      // إغلاق المودال بالضغط خارجها
-      document.getElementById('walletModal').addEventListener('click', (e) => {
-        if (e.target.id === 'walletModal') closeWalletModal();
-      });
+      // Expenses filters
+      const expenseSearch = document.getElementById('expenseSearchInput');
+      const expenseCategoryFilter = document.getElementById('expenseCategoryFilter');
+      
+      if (expenseSearch) {
+        expenseSearch.addEventListener('input', () => renderExpensesTable(filterExpenses()));
+      }
+      if (expenseCategoryFilter) {
+        expenseCategoryFilter.addEventListener('change', () => renderExpensesTable(filterExpenses()));
+      }
 
-      // إغلاق المودال بزر ESC
+      // Report date
+      const reportDate = document.getElementById('reportDate');
+      if (reportDate) {
+        reportDate.addEventListener('change', () => loadDailyReport());
+      }
+
+      // Close modal on overlay click
+      const modal = document.getElementById('walletModal');
+      if (modal) {
+        modal.addEventListener('click', (e) => {
+          if (e.target.id === 'walletModal') closeWalletModal();
+        });
+      }
+
+      // Close modal on ESC
       document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') closeWalletModal();
       });
+
+      // Load default report
+      setTimeout(() => loadDailyReport('today'), 500);
     });
   </script>
 </body>
