@@ -1,5 +1,5 @@
 // admin.js - Marnissa Admin Drawer Navigation
-// الصفحات: admin-dashboard.html | admin-products.html | admin-product-form.html | admin-stock.html | admin-categories.html
+// الصفحات: admin-dashboard.html |  admin-product-form.html | admin-stock.html | admin-categories.html
 
 (function () {
   if (document.getElementById('admin-navbar')) return;
@@ -20,7 +20,6 @@
     
     const pageInfo = {
       'admin-dashboard.html': { label: 'لوحة التحكم', icon: '📊', section: 'dashboard' },
-      'admin-products.html': { label: 'إدارة المنتجات', icon: '🏷️', section: 'products' },
       'admin-product-form.html': { label: 'إضافة منتج', icon: '➕', section: 'products' },
       'admin-stock.html': { label: 'المخزون', icon: '📋', section: 'products' },
       'admin-categories.html': { label: 'الفئات', icon: '📂', section: 'categories' }
@@ -31,7 +30,7 @@
     const isCategorySection = info.section === 'categories';
 
     // ==========================================
-    // CSS مخصص للقائمة - باستخدام نفس ألوان admin-products.html
+   
     // ==========================================
     if (!document.getElementById('admin-nav-styles')) {
       const style = document.createElement('style');
@@ -329,8 +328,7 @@
     drawer.className = 'adm-drawer';
 
     // تحديد العنصر النشط في القوائم الفرعية
-    const isProductsActive = currentPage === 'admin-products.html' || 
-                            currentPage === 'admin-product-form.html' || 
+    const isProductsActive = currentPage === 'admin-product-form.html' || 
                             currentPage === 'admin-stock.html';
     
     const isCategoriesActive = currentPage === 'admin-categories.html';
@@ -360,9 +358,7 @@
           <i class="fas fa-chevron-down adm-chevron"></i>
         </div>
         <div class="adm-submenu ${isProductsActive ? 'open' : ''}" id="productsSubmenu">
-          <a href="admin-products.html" class="adm-sub-item ${currentPage === 'admin-products.html' ? 'active' : ''}">
-            <span>📋 إدارة المنتجات</span>
-          </a>
+         
           <a href="admin-product-form.html" class="adm-sub-item ${currentPage === 'admin-product-form.html' ? 'active' : ''}">
             <span>➕ إضافة منتج جديد</span>
           </a>
