@@ -212,6 +212,33 @@
     .category-cell .cname { font-weight: 600; color: var(--text); font-size: 0.9rem; }
     .category-cell .cslug { font-size: 0.7rem; color: var(--text-dim); }
 
+    /* Image preview in modal */
+    .image-preview-container {
+      margin-top: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .image-preview-container img {
+      width: 60px;
+      height: 60px;
+      border-radius: 12px;
+      object-fit: cover;
+      border: 1px solid var(--border2);
+      background: #1a1a2e;
+    }
+    .image-preview-container .placeholder-icon {
+      width: 60px;
+      height: 60px;
+      border-radius: 12px;
+      border: 1px dashed var(--border2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-dim);
+      font-size: 1.5rem;
+    }
+
     .status-badge {
       display: inline-flex;
       align-items: center;
@@ -259,10 +286,12 @@
       border: 1px solid var(--border2);
       border-radius: 20px;
       padding: 2rem;
-      max-width: 450px;
+      max-width: 500px;
       width: 100%;
       text-align: center;
       box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+      max-height: 90vh;
+      overflow-y: auto;
     }
     .modal-box h3 { font-size: 1.2rem; margin-bottom: 0.5rem; color: var(--text); }
     .modal-box p { font-size: 0.85rem; color: var(--text-dim); margin-bottom: 1.5rem; }
@@ -292,6 +321,49 @@
     .modal-form .form-input::placeholder { color: var(--text-dim); }
     .modal-form .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
     @media (max-width: 480px) { .modal-form .form-row { grid-template-columns: 1fr; } }
+
+    /* File input styling */
+    .file-input-wrapper {
+      position: relative;
+      overflow: hidden;
+      display: inline-block;
+      width: 100%;
+    }
+    .file-input-wrapper input[type=file] {
+      position: absolute;
+      left: 0;
+      top: 0;
+      opacity: 0;
+      width: 100%;
+      height: 100%;
+      cursor: pointer;
+    }
+    .file-input-label {
+      background: rgba(0,87,179,0.05);
+      border: 1px dashed var(--border2);
+      border-radius: 10px;
+      padding: 0.7rem 1rem;
+      color: var(--text-dim);
+      width: 100%;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+    .file-input-label:hover {
+      border-color: var(--blue-primary);
+      color: var(--blue-primary);
+      background: rgba(0,87,179,0.08);
+    }
+    .file-input-label.has-file {
+      border-color: var(--success);
+      color: var(--success);
+      background: rgba(37,211,102,0.05);
+    }
 
     .empty-state, .loading-state {
       text-align: center;
@@ -432,7 +504,21 @@
           </div>
           <div class="form-group">
             <label class="darija-text">صورة الفئة</label>
-            <input type="text" id="categoryImage" class="form-input darija-text" placeholder="رابط الصورة">
+            <div class="file-input-wrapper">
+              <input type="file" id="categoryImageFile" accept="image/*">
+              <div class="file-input-label darija-text" id="fileInputLabel">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <span id="fileInputText">اختر صورة من جهازك</span>
+              </div>
+            </div>
+            <div class="image-preview-container" id="imagePreviewContainer" style="display:none;">
+              <img id="imagePreview" src="" alt="معاينة الصورة">
+              <button type="button" class="icon-btn danger" onclick="removeImage()" title="إزالة الصورة" style="width:30px;height:30px;font-size:0.7rem;">
+                <i class="fas fa-times"></i>
+              </button>
+              <span style="font-size:0.7rem;color:var(--text-dim);" id="imagePreviewText">تم اختيار الصورة</span>
+            </div>
+            <input type="hidden" id="categoryImage" value="">
           </div>
         </div>
         <div class="form-group">
@@ -496,6 +582,93 @@
     // ========== Variables ==========
     let allCategories = [];
     let editingCategoryId = null;
+    let selectedFile = null;
+    let currentImageUrl = '';
+
+    // ========== File Input Handling ==========
+    document.getElementById('categoryImageFile').addEventListener('change', function(e) {
+      const file = this.files[0];
+      if (file) {
+        selectedFile = file;
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          document.getElementById('imagePreview').src = event.target.result;
+          document.getElementById('imagePreviewContainer').style.display = 'flex';
+          document.getElementById('fileInputText').textContent = file.name;
+          document.getElementById('fileInputLabel').classList.add('has-file');
+          document.getElementById('categoryImage').value = '';
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    function removeImage() {
+      selectedFile = null;
+      document.getElementById('categoryImageFile').value = '';
+      document.getElementById('imagePreviewContainer').style.display = 'none';
+      document.getElementById('fileInputText').textContent = 'اختر صورة من جهازك';
+      document.getElementById('fileInputLabel').classList.remove('has-file');
+      document.getElementById('categoryImage').value = '';
+      currentImageUrl = '';
+    }
+
+    function setImagePreview(url) {
+      if (url) {
+        document.getElementById('imagePreview').src = url;
+        document.getElementById('imagePreviewContainer').style.display = 'flex';
+        document.getElementById('fileInputText').textContent = 'صورة موجودة';
+        document.getElementById('fileInputLabel').classList.add('has-file');
+        document.getElementById('categoryImage').value = url;
+        currentImageUrl = url;
+      }
+    }
+
+    // ========== Upload Image to Supabase Storage ==========
+    async function uploadCategoryImage(file, categoryId) {
+      try {
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${categoryId}-${Date.now()}.${fileExt}`;
+        const filePath = `categories/${fileName}`;
+
+        const { data, error } = await sb.storage
+          .from('category-images')
+          .upload(filePath, file, {
+            cacheControl: '3600',
+            upsert: true
+          });
+
+        if (error) throw error;
+
+        // Get public URL
+        const { data: urlData } = sb.storage
+          .from('category-images')
+          .getPublicUrl(filePath);
+
+        return urlData.publicUrl;
+      } catch (error) {
+        console.error('❌ Upload error:', error);
+        throw error;
+      }
+    }
+
+    // ========== Delete Image from Storage ==========
+    async function deleteCategoryImage(imageUrl) {
+      if (!imageUrl) return;
+      try {
+        // Extract file path from URL
+        const urlParts = imageUrl.split('/');
+        const fileName = urlParts[urlParts.length - 1];
+        const filePath = `categories/${fileName}`;
+
+        const { error } = await sb.storage
+          .from('category-images')
+          .remove([filePath]);
+
+        if (error) console.warn('⚠️ Could not delete image:', error);
+      } catch (error) {
+        console.warn('⚠️ Could not delete image:', error);
+      }
+    }
 
     // ========== Load Data ==========
     async function loadCategories() {
@@ -660,12 +833,19 @@
     // ========== Add/Edit Modal ==========
     function openAddModal() {
       editingCategoryId = null;
+      selectedFile = null;
+      currentImageUrl = '';
       document.getElementById('modalTitle').innerHTML = '<i class="fas fa-folder" style="color:var(--blue-primary);"></i> إضافة فئة جديدة';
       document.getElementById('saveBtnText').textContent = 'حفظ';
       document.getElementById('categoryForm').reset();
       document.getElementById('categoryOrder').value = allCategories.length;
       document.getElementById('categoryStatus').value = 'true';
       document.getElementById('categorySlug').value = '';
+      document.getElementById('categoryImage').value = '';
+      document.getElementById('categoryImageFile').value = '';
+      document.getElementById('imagePreviewContainer').style.display = 'none';
+      document.getElementById('fileInputText').textContent = 'اختر صورة من جهازك';
+      document.getElementById('fileInputLabel').classList.remove('has-file');
       populateParentSelect();
       document.getElementById('categoryModal').classList.add('open');
     }
@@ -675,6 +855,7 @@
       if (!category) return;
 
       editingCategoryId = categoryId;
+      selectedFile = null;
       document.getElementById('modalTitle').innerHTML = '<i class="fas fa-edit" style="color:var(--blue-primary);"></i> تعديل الفئة';
       document.getElementById('saveBtnText').textContent = 'تحديث';
       
@@ -682,8 +863,16 @@
       document.getElementById('categorySlug').value = category.slug || '';
       document.getElementById('categoryDescription').value = category.description || '';
       document.getElementById('categoryOrder').value = category.display_order || 0;
-      document.getElementById('categoryImage').value = category.image || '';
       document.getElementById('categoryStatus').value = category.is_active !== false ? 'true' : 'false';
+      
+      // Set image
+      if (category.image) {
+        setImagePreview(category.image);
+        document.getElementById('categoryImage').value = category.image;
+        currentImageUrl = category.image;
+      } else {
+        removeImage();
+      }
       
       populateParentSelect();
       if (category.parent_id) {
@@ -696,6 +885,7 @@
     function closeCategoryModal() {
       document.getElementById('categoryModal').classList.remove('open');
       editingCategoryId = null;
+      selectedFile = null;
     }
 
     // ========== Save Category ==========
@@ -707,8 +897,8 @@
       const description = document.getElementById('categoryDescription').value.trim();
       const parentId = document.getElementById('categoryParent').value || null;
       const displayOrder = parseInt(document.getElementById('categoryOrder').value) || 0;
-      const image = document.getElementById('categoryImage').value.trim();
       const isActive = document.getElementById('categoryStatus').value === 'true';
+      const existingImage = document.getElementById('categoryImage').value;
 
       if (!name) {
         showToast('⚠️ المرجو إدخال اسم الفئة', 'error');
@@ -724,41 +914,61 @@
       btn.disabled = true;
       btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الحفظ...';
 
-      // بناء البيانات بدون updated_at (لأن العمود غير موجود)
-      const data = {
-        name: name,
-        slug: slug,
-        description: description || null,
-        parent_id: parentId,
-        display_order: displayOrder,
-        image: image || null,
-        is_active: isActive
-      };
+      try {
+        let imageUrl = existingImage;
 
-      // إضافة created_at فقط إذا كانت إضافة جديدة
-      if (!editingCategoryId) {
-        data.created_at = new Date().toISOString();
+        // If there's a new file selected, upload it
+        if (selectedFile) {
+          // Generate temporary ID for upload
+          const tempId = editingCategoryId || `temp-${Date.now()}`;
+          imageUrl = await uploadCategoryImage(selectedFile, tempId);
+          
+          // If editing and there was an old image, delete it
+          if (editingCategoryId && currentImageUrl && currentImageUrl !== imageUrl) {
+            await deleteCategoryImage(currentImageUrl);
+          }
+        }
+
+        const data = {
+          name: name,
+          slug: slug,
+          description: description || null,
+          parent_id: parentId,
+          display_order: displayOrder,
+          image: imageUrl || null,
+          is_active: isActive
+        };
+
+        if (!editingCategoryId) {
+          data.created_at = new Date().toISOString();
+        }
+
+        let result;
+        if (editingCategoryId) {
+          result = await sb.from('categories').update(data).eq('id', editingCategoryId);
+        } else {
+          result = await sb.from('categories').insert(data);
+        }
+
+        btn.disabled = false;
+        btn.innerHTML = orig;
+
+        if (result.error) {
+          console.error('❌ Error:', result.error);
+          showToast('❌ خطأ: ' + result.error.message, 'error');
+          return;
+        }
+
+        closeCategoryModal();
+        showToast('✅ تم حفظ الفئة بنجاح', 'success');
+        loadCategories();
+
+      } catch (error) {
+        console.error('❌ Error:', error);
+        btn.disabled = false;
+        btn.innerHTML = orig;
+        showToast('❌ خطأ: ' + error.message, 'error');
       }
-
-      let result;
-      if (editingCategoryId) {
-        result = await sb.from('categories').update(data).eq('id', editingCategoryId);
-      } else {
-        result = await sb.from('categories').insert(data);
-      }
-
-      btn.disabled = false;
-      btn.innerHTML = orig;
-
-      if (result.error) {
-        console.error('❌ Error:', result.error);
-        showToast('❌ خطأ: ' + result.error.message, 'error');
-        return;
-      }
-
-      closeCategoryModal();
-      showToast('✅ تم حفظ الفئة بنجاح', 'success');
-      loadCategories();
     });
 
     // ========== Delete ==========
@@ -781,38 +991,51 @@
       btn.disabled = true;
       btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الحذف...';
 
-      const { count, error: countError } = await sb
-        .from('products')
-        .select('*', { count: 'exact', head: true })
-        .eq('category_id', categoryId);
+      try {
+        const { count, error: countError } = await sb
+          .from('products')
+          .select('*', { count: 'exact', head: true })
+          .eq('category_id', categoryId);
 
-      if (countError) {
-        showToast('❌ فشل التحقق: ' + countError.message, 'error');
+        if (countError) {
+          showToast('❌ فشل التحقق: ' + countError.message, 'error');
+          btn.disabled = false;
+          btn.innerHTML = orig;
+          return;
+        }
+
+        if (count > 0) {
+          showToast(`⚠️ لا يمكن حذف الفئة، هناك ${count} منتج(ة) تابعة لها`, 'error');
+          btn.disabled = false;
+          btn.innerHTML = orig;
+          return;
+        }
+
+        // Get category to delete its image
+        const category = allCategories.find(c => c.id === categoryId);
+        if (category && category.image) {
+          await deleteCategoryImage(category.image);
+        }
+
+        const { error } = await sb.from('categories').delete().eq('id', categoryId);
+
         btn.disabled = false;
         btn.innerHTML = orig;
-        return;
-      }
+        closeDeleteModal();
 
-      if (count > 0) {
-        showToast(`⚠️ لا يمكن حذف الفئة، هناك ${count} منتج(ة) تابعة لها`, 'error');
+        if (error) {
+          showToast('❌ فشل الحذف: ' + error.message, 'error');
+          return;
+        }
+
+        showToast('✅ تم حذف الفئة بنجاح', 'success');
+        loadCategories();
+
+      } catch (error) {
         btn.disabled = false;
         btn.innerHTML = orig;
-        return;
+        showToast('❌ خطأ: ' + error.message, 'error');
       }
-
-      const { error } = await sb.from('categories').delete().eq('id', categoryId);
-
-      btn.disabled = false;
-      btn.innerHTML = orig;
-      closeDeleteModal();
-
-      if (error) {
-        showToast('❌ فشل الحذف: ' + error.message, 'error');
-        return;
-      }
-
-      showToast('✅ تم حذف الفئة بنجاح', 'success');
-      loadCategories();
     });
 
     // ========== Helpers ==========
